@@ -5,6 +5,7 @@ use lang\IllegalStateException;
 use unittest\TestCase;
 use util\URI;
 use web\rest\RestResponse;
+use web\rest\format\Json;
 use web\rest\io\Reader;
 
 class RestResponseTest extends TestCase {
