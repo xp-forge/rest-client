@@ -3,6 +3,11 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 0.4.1 / 2018-08-30
+
+* Fixed parameters supplied in resource appearing twice in request URL
+  (@thekid)
+
 ## 0.4.0 / 2018-08-30
 
 * Default mime type for resources' `post()`, `put()` and `patch()` methods
