@@ -11,7 +11,7 @@ class Unsupported extends Format {
     throw new FormatUnsupported('Cannot serialize '.($this->mime ? 'to '.$this->mime : 'without mime type'));
   }
 
-  public function deserialize($stream, $type) {
+  public function deserialize($stream) {
     throw new FormatUnsupported('Cannot deserialize '.($this->mime ? 'from '.$this->mime : 'without mime type'));
   }
 }

@@ -2,5 +2,5 @@
 
 interface Transfer {
 
-  public function writer($request, $payload, $format);
+  public function writer($request, $payload, $format, $marshalling);
 }

@@ -4,6 +4,7 @@ use io\streams\MemoryInputStream;
 use lang\IllegalStateException;
 use unittest\TestCase;
 use util\URI;
+use util\data\Marshalling;
 use web\rest\RestResponse;
 use web\rest\format\Json;
 use web\rest\io\Reader;
@@ -22,7 +23,8 @@ class RestResponseTest extends TestCase {
 
   #[@test]
   public function can_create_with_reader() {
-    new RestResponse(200, 'OK', [], new Reader(new MemoryInputStream('...'), null));
+    $reader= new Reader(new MemoryInputStream('...'), new Json(), new Marshalling());
+    new RestResponse(200, 'OK', [], $reader);
   }
 
   #[@test, @values(['http://localhost/', new URI('http://localhost/')])]
@@ -41,20 +43,22 @@ class RestResponseTest extends TestCase {
   }
 
   #[@test]
+  public function stream() {
+    $stream= new MemoryInputStream('...');
+    $reader= new Reader($stream, new Json(), new Marshalling());
+    $this->assertEquals($stream, (new RestResponse(200, 'OK', [], $reader))->stream());
+  }
+
+  #[@test]
   public function headers() {
     $headers= ['Content-Type' => 'text/html'];
     $this->assertEquals($headers, (new RestResponse(200, 'OK', $headers))->headers());
   }
 
-  #[@test]
-  public function stream() {
-    $stream= new MemoryInputStream('...');
-    $this->assertEquals($stream, (new RestResponse(200, 'OK', [], new Reader($stream, null)))->stream());
-  }
-
   #[@test, @values(['content-type', 'Content-type', 'Content-Type'])]
   public function header($name) {
-    $this->assertEquals('text/html', (new RestResponse(200, 'OK', ['Content-Type' => 'text/html']))->header($name));
+    $headers= ['Content-Type' => 'text/html'];
+    $this->assertEquals('text/html', (new RestResponse(200, 'OK', $headers))->header($name));
   }
 
   #[@test]
@@ -85,5 +89,19 @@ class RestResponseTest extends TestCase {
       new URI('http://localhost/redirect'),
       (new RestResponse(200, 'OK', ['Location' => '/redirect'], null, 'http://localhost'))->location()
     );
+  }
+
+  #[@test]
+  public function value() {
+    $stream= new MemoryInputStream('{"key":"value"}');
+    $reader= new Reader($stream, new Json(), new Marshalling());
+    $this->assertEquals(['key' => 'value'], (new RestResponse(200, 'OK', [], $reader))->value());
+  }
+
+  #[@test]
+  public function type_coercion() {
+    $stream= new MemoryInputStream('{"key":200}');
+    $reader= new Reader($stream, new Json(), new Marshalling());
+    $this->assertEquals(['key' => '200'], (new RestResponse(200, 'OK', [], $reader))->value('[:string]'));
   }
 }

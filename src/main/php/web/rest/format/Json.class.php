@@ -21,7 +21,7 @@ class Json extends Format {
     return $stream;
   }
 
-  public function deserialize($stream, $type) {
+  public function deserialize($stream) {
     return (new StreamInput($stream))->read();
   }
 }

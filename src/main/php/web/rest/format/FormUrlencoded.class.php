@@ -7,7 +7,7 @@ class FormUrlencoded extends Format {
     return $stream;
   }
 
-  public function deserialize($stream, $type) {
+  public function deserialize($stream) {
     // TBI
   }
 }

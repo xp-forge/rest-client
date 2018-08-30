@@ -4,6 +4,7 @@ use peer\URL;
 use peer\http\HttpConnection;
 use peer\http\HttpRequest;
 use util\URI;
+use util\data\Marshalling;
 use web\rest\io\Buffered;
 use web\rest\io\Reader;
 use web\rest\io\Streamed;
@@ -35,6 +36,7 @@ class Endpoint {
     $this->base= $uri->using()->path(rtrim($uri->path(), '/').'/')->create();
     $this->formats= $formats ?: Formats::defaults();
     $this->transfer= new Streamed();
+    $this->marshalling= new Marshalling();
     $this->connections= function($uri) { return new HttpConnection($uri); };
   }
 
@@ -84,14 +86,16 @@ class Endpoint {
 
     try {
       if ($payload= $request->payload()) {
-        $writer= $this->transfer->writer($s, $payload, $this->formats->named($request->header('Content-Type')));
+        $input= $this->formats->named($request->header('Content-Type'));
+        $writer= $this->transfer->writer($s, $payload, $input, $this->marshalling);
         $stream= $writer($conn->open($s));
       } else {
         $stream= $conn->open($s);
       }
 
       $r= $conn->finish($stream);
-      $reader= new Reader($r->in(), $this->formats->named(current($r->header('Content-Type'))));
+      $output= $this->formats->named(current($r->header('Content-Type')));
+      $reader= new Reader($r->in(), $output, $this->marshalling);
       return new RestResponse($r->statusCode(), $r->message(), $r->headers(), $reader, $uri);
     } catch (Throwable $e) {
       throw new RestException('Cannot send request', $e);

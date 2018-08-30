@@ -39,7 +39,7 @@ class FormatsTest extends TestCase {
     $mime= 'application/vnd.php.serialized';
     $format= newinstance(Format::class, [], [
       'serialize'   => function($value, $stream) { /* TBI */ },
-      'deserialize' => function($stream, $type) { /* TBI */ }
+      'deserialize' => function($stream) { /* TBI */ }
     ]);
 
     $this->assertEquals($format, (new Formats())->with($mime, $format)->named($mime));
@@ -53,7 +53,7 @@ class FormatsTest extends TestCase {
     $pattern= 'application/vnd.*+xml';
     $format= newinstance(Format::class, [], [
       'serialize'   => function($value, $stream) { /* TBI */ },
-      'deserialize' => function($stream, $type) { /* TBI */ }
+      'deserialize' => function($stream) { /* TBI */ }
     ]);
 
     $this->assertEquals($format, (new Formats())->matching($pattern, $format)->named($mime));

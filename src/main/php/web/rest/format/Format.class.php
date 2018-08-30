@@ -4,6 +4,6 @@ abstract class Format {
 
   public abstract function serialize($value, $stream);
 
-  public abstract function deserialize($stream, $type);
+  public abstract function deserialize($stream);
 
 }
