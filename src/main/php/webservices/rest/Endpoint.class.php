@@ -87,7 +87,7 @@ class Endpoint {
     try {
       if ($payload= $request->payload()) {
         $input= $this->formats->named($request->header('Content-Type'));
-        $writer= $this->transfer->writer($s, $payload, $input, $this->marshalling);
+        $writer= $this->transfer->writer($s, $payload->value(), $input, $this->marshalling);
         $stream= $writer($conn->open($s));
       } else {
         $stream= $conn->open($s);

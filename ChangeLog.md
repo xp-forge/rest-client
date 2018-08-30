@@ -3,6 +3,7 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+* Allowed transferring `NULL` as payload - @thekid
 * Fixed *Too few arguments to {closure}()* when using buffered transfers
   (@thekid)
 
