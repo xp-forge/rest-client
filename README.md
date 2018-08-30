@@ -18,7 +18,7 @@ The `Endpoint` class serves as the entry point to this API. Create a new instanc
 ### Creating: post
 
 ```php
-use web\rest\Endpoint;
+use webservices\rest\Endpoint;
 use lang\IllegalStateException;
 
 $api= new Endpoint('https://api.example.com/');
@@ -36,7 +36,7 @@ $url= $response->location();
 ### Reading: get / head
 
 ```php
-use web\rest\Endpoint;
+use webservices\rest\Endpoint;
 
 $api= new Endpoint('https://api.example.com/');
 
@@ -53,7 +53,7 @@ $list= $api->resource('user')->get(['page' => 1, 'per_page' => 50])->value();
 ### Updating: put / patch
 
 ```php
-use web\rest\Endpoint;
+use webservices\rest\Endpoint;
 
 $api= new Endpoint('https://api.example.com/');
 $resource= $api->resource('users/self')
@@ -71,7 +71,7 @@ $updated= $resource->patch(['name' => 'Changed'])->value();
 ### Deleting: delete
 
 ```php
-use web\rest\Endpoint;
+use webservices\rest\Endpoint;
 
 $api= new Endpoint('https://api.example.com/');
 
