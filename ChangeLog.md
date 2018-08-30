@@ -3,6 +3,9 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+* Fixed *Too few arguments to {closure}()* when using buffered transfers
+  (@thekid)
+
 ## 0.2.0 / 2018-08-30
 
 * **Heads up:** All classes are now inside the package `webservices.rest`!
