@@ -3,6 +3,8 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 0.3.0 / 2018-08-30
+
 * Allowed transferring `NULL` as payload - @thekid
 * Fixed *Too few arguments to {closure}()* when using buffered transfers
   (@thekid)
