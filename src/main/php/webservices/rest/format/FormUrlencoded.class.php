@@ -1,5 +1,7 @@
 <?php namespace webservices\rest\format;
 
+use io\streams\Streams;
+
 /**
  * Represents `application/x-www-form-urlencoded`
  *

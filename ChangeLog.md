@@ -3,6 +3,14 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 0.4.0 / 2018-08-30
+
+* Default mime type for resources' `post()`, `put()` and `patch()` methods
+  to `application/x-www-form-urlencoded`.
+  (@thekid)
+* Fixed `application/x-www-form-urlencoded` format not serializing data
+  (@thekid)
+
 ## 0.3.0 / 2018-08-30
 
 * Allowed transferring `NULL` as payload - @thekid

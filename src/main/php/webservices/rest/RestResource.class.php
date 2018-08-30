@@ -116,7 +116,7 @@ class RestResource {
     );
   }
 
-  public function post($payload, $type= null) {
+  public function post($payload, $type= 'application/x-www-form-urlencoded') {
     $request= clone $this->request;
     return $this->endpoint->execute($request->using('POST')
       ->with($this->headers + ['Content-Type' => $type])
@@ -124,7 +124,7 @@ class RestResource {
     );
   }
 
-  public function put($payload, $type= null) {
+  public function put($payload, $type= 'application/x-www-form-urlencoded') {
     $request= clone $this->request;
     return $this->endpoint->execute($request->using('PUT')
       ->with($this->headers + ['Content-Type' => $type])
@@ -132,7 +132,7 @@ class RestResource {
     );
   }
 
-  public function patch($payload, $type= null) {
+  public function patch($payload, $type= 'application/x-www-form-urlencoded') {
     $request= clone $this->request;
     return $this->endpoint->execute($request->using('PATCH')
       ->with($this->headers + ['Content-Type' => $type])
