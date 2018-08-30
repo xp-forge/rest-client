@@ -15,7 +15,7 @@ use webservices\rest\io\Streamed;
  * @test  xp://web.rest.unittest.EndpointTest
  */
 class Endpoint {
-  private $base, $formats, $transfer, $connections;
+  private $base, $formats, $transfer, $marshalling;
 
   /**
    * Creates a new REST endpoint with a given base URI. The base URI may contain
@@ -53,6 +53,17 @@ class Endpoint {
     return $this;
   }
 
+  /**
+   * Specify a connection function
+   *
+   * @param  function(util.URI): peer.http.HttpConnection $connections
+   * @return self
+   */
+  public function connecting($connections) {
+    $this->connections= $connections;
+    return $this;
+  }
+
   /** @return util.URI */
   public function base() { return $this->base; }
 
@@ -80,7 +91,7 @@ class Endpoint {
 
     $s= $conn->create(new HttpRequest());
     $s->setMethod($request->method());
-    $s->setTarget($uri->path().(($query= $uri->query()) ? '?'.$query : ''));
+    $s->setTarget($uri->path());
     $s->addHeaders($request->headers());
     $s->setParameters($request->parameters());
 
