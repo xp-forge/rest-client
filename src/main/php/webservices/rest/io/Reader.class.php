@@ -1,8 +1,8 @@
-<?php namespace web\rest\io;
+<?php namespace webservices\rest\io;
 
 use io\streams\InputStream;
 use util\data\Marshalling;
-use web\rest\format\Format;
+use webservices\rest\format\Format;
 
 class Reader {
   private $stream, $format, $marshalling;

@@ -1,13 +1,13 @@
-<?php namespace web\rest;
+<?php namespace webservices\rest;
 
 use peer\URL;
 use peer\http\HttpConnection;
 use peer\http\HttpRequest;
 use util\URI;
 use util\data\Marshalling;
-use web\rest\io\Buffered;
-use web\rest\io\Reader;
-use web\rest\io\Streamed;
+use webservices\rest\io\Buffered;
+use webservices\rest\io\Reader;
+use webservices\rest\io\Streamed;
 
 /**
  * Entry point class

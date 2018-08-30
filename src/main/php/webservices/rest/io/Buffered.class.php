@@ -1,4 +1,4 @@
-<?php namespace web\rest\io;
+<?php namespace webservices\rest\io;
 
 use io\streams\MemoryOutputStream;
 

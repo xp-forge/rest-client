@@ -1,11 +1,11 @@
-<?php namespace web\rest\unittest;
+<?php namespace webservices\rest\unittest;
 
 use lang\ElementNotFoundException;
 use unittest\TestCase;
-use web\rest\Endpoint;
-use web\rest\RestRequest;
-use web\rest\RestResource;
-use web\rest\RestResponse;
+use webservices\rest\Endpoint;
+use webservices\rest\RestRequest;
+use webservices\rest\RestResource;
+use webservices\rest\RestResponse;
 
 class RestResourceTest extends TestCase {
   private $endpoint;

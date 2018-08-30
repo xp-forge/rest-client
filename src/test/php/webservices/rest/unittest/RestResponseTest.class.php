@@ -1,13 +1,13 @@
-<?php namespace web\rest\unittest;
+<?php namespace webservices\rest\unittest;
 
 use io\streams\MemoryInputStream;
 use lang\IllegalStateException;
 use unittest\TestCase;
 use util\URI;
 use util\data\Marshalling;
-use web\rest\RestResponse;
-use web\rest\format\Json;
-use web\rest\io\Reader;
+use webservices\rest\RestResponse;
+use webservices\rest\format\Json;
+use webservices\rest\io\Reader;
 
 class RestResponseTest extends TestCase {
 

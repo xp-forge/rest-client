@@ -1,4 +1,4 @@
-<?php namespace web\rest;
+<?php namespace webservices\rest;
 
 class RestRequest {
   use Headers;

@@ -1,4 +1,4 @@
-<?php namespace web\rest\io;
+<?php namespace webservices\rest\io;
 
 interface Transfer {
 

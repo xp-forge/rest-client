@@ -1,4 +1,4 @@
-<?php namespace web\rest\unittest;
+<?php namespace webservices\rest\unittest;
 
 use lang\Error;
 use lang\FormatException;
@@ -7,8 +7,8 @@ use peer\URL;
 use unittest\TestCase;
 use unittest\actions\RuntimeVersion;
 use util\URI;
-use web\rest\Endpoint;
-use web\rest\RestResource;
+use webservices\rest\Endpoint;
+use webservices\rest\RestResource;
 
 class EndpointTest extends TestCase {
   const BASE_URL = 'https://api.example.com/';

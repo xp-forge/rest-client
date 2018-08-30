@@ -1,8 +1,8 @@
-<?php namespace web\rest;
+<?php namespace webservices\rest;
 
 use lang\Value;
 use util\URI;
-use web\rest\io\Reader;
+use webservices\rest\io\Reader;
 
 /**
  * REST response

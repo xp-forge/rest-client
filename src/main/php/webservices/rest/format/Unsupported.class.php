@@ -1,4 +1,4 @@
-<?php namespace web\rest\format;
+<?php namespace webservices\rest\format;
 
 class Unsupported extends Format {
   private $mime;

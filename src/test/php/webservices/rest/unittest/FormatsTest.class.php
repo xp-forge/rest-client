@@ -1,11 +1,11 @@
-<?php namespace web\rest\unittest;
+<?php namespace webservices\rest\unittest;
 
 use unittest\TestCase;
-use web\rest\Formats;
-use web\rest\format\FormUrlencoded;
-use web\rest\format\Format;
-use web\rest\format\Json;
-use web\rest\format\Unsupported;
+use webservices\rest\Formats;
+use webservices\rest\format\FormUrlencoded;
+use webservices\rest\format\Format;
+use webservices\rest\format\Json;
+use webservices\rest\format\Unsupported;
 
 class FormatsTest extends TestCase {
 
