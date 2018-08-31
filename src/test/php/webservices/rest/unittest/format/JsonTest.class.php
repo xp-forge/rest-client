@@ -14,8 +14,15 @@ class JsonTest extends TestCase {
 
   #[@test]
   public function serialize() {
-    $format= new Json();
-    $this->assertEquals('{"key":"value"}', $format->serialize(['key' => 'value'], new MemoryOutputStream())->getBytes());
+    $this->assertEquals('{"key":"value"}', (new Json())->serialize(['key' => 'value'], new MemoryOutputStream())->getBytes());
+  }
+
+  #[@test, @values([
+  #  [[], '{}'],
+  #  [['key' => 'value'], '{"key":"value"}'],
+  #])]
+  public function serialize_object($map, $expected) {
+    $this->assertEquals($expected, (new Json())->serialize((object)$map, new MemoryOutputStream())->getBytes());
   }
 
   #[@test]
