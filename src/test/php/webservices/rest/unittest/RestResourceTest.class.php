@@ -113,12 +113,12 @@ class RestResourceTest extends TestCase {
   #  [new Cookies(['lang' => 'de', 'uid' => 6100, 'not-sent' => null])],
   #  [new Cookies([new Cookie('lang', 'de'), new Cookie('uid',  6100), new Cookie('not-sent', null)])],
   #])]
-  public function passing_cookies($cookies) {
+  public function including_cookies($cookies) {
     $resource= new RestResource($this->endpoint, '/users');
-    $resource->passing($cookies)->get();
+    $resource->including($cookies)->get();
 
     $this->assertEquals(
-      [(new RestRequest('GET', '/users'))->with(['Cookie' => 'lang=de, uid=6100'])],
+      [(new RestRequest('GET', '/users'))->including($cookies)],
       $this->endpoint->sent
     );
   }
