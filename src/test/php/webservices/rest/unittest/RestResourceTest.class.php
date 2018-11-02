@@ -104,4 +104,15 @@ class RestResourceTest extends TestCase {
       $this->endpoint->sent
     );
   }
+
+  #[@test]
+  public function passing_cookies() {
+    $resource= new RestResource($this->endpoint, '/users');
+    $resource->passing(['lang' => 'de', 'uid' => 6100])->get();
+
+    $this->assertEquals(
+      [(new RestRequest('GET', '/users'))->with(['Cookie' => 'lang=de, uid=6100'])],
+      $this->endpoint->sent
+    );
+  }
 }

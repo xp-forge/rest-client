@@ -92,6 +92,21 @@ class RestResource {
     return $this;
   }
 
+  /**
+   * Passes given cookies. Encodes value using URL encoding.
+   *
+   * @param  [:?string] $cookies
+   * @return self
+   */
+  public function passing($cookies) {
+    $header= '';
+    foreach ($cookies as $name => $value) {
+      $header.= ', '.$name.'='.urlencode($value);
+    }
+    $this->headers['Cookie'][]= substr($header, 2);
+    return $this;
+  }
+
   public function get($parameters= []) {
     $request= clone $this->request;
     return $this->endpoint->execute($request->using('GET')
