@@ -33,10 +33,26 @@ class Links implements Value {
   /**
    * Parses a Link header into a links structure
    *
+   * @param  string|webservices.rest.Link[] $arg
+   * @throws lang.FormatException If a string is passed and it's malformed
+   */
+  public function __construct($arg) {
+    if (is_array($arg)) {
+      $this->links= $arg;
+    } else {
+      $this->links= $this->parse($arg);
+    }
+  }
+
+  /**
+   * Parse an input string
+   *
    * @param  string $header
+   * @return webservices.rest.Link[]
    * @throws lang.FormatException If the header is malformed
    */
-  public function __construct($header) {
+  private function parse($header) {
+    $links= [];
     $st= new StringTokenizer($header, '<>', true);
     do {
       $this->expect($st, '<');
@@ -56,8 +72,21 @@ class Links implements Value {
         $params[$param]= $value;
       } while ($st->hasMoreTokens());
 
-      $this->links[]= new Link($uri, $params);
+      $links[]= new Link($uri, $params);
     } while ($st->nextToken('<'));
+    return $links;
+  }
+
+  /**
+   * Create a Links instance from a header; returning an empty collection if
+   * `NULL` is passed.
+   *
+   * @param  ?string $header
+   * @return self
+   * @throws lang.FormatException If the header is malformed
+   */
+  public static function in($header) {
+    return new self(null === $header ? [] : (string)$header);
   }
 
   /**
