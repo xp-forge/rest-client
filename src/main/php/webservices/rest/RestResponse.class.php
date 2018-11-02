@@ -59,6 +59,23 @@ class RestResponse implements Value {
   }
 
   /**
+   * Returns cookies sent by server
+   *
+   * @see    https://tools.ietf.org/html/rfc6265
+   * @return [:webservices.rest.Cookie]
+   */
+  public function cookies() {
+    if (!isset($this->lookup['set-cookie'])) return [];
+
+    $r= [];
+    foreach ($this->headers[$this->lookup['set-cookie']] as $cookie) {
+      sscanf($cookie, "%[^=]=%[^\r]", $name, $value);
+      $r[$name]= new Cookie($name, $value);
+    }
+    return $r;
+  }
+
+  /**
    * Returns a value from the response, using the given type for deserialization
    *
    * @param  string $type

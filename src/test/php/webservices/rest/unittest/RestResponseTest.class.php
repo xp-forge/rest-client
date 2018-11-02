@@ -5,6 +5,7 @@ use lang\IllegalStateException;
 use unittest\TestCase;
 use util\URI;
 use util\data\Marshalling;
+use webservices\rest\Cookie;
 use webservices\rest\RestResponse;
 use webservices\rest\format\Json;
 use webservices\rest\io\Reader;
@@ -103,5 +104,20 @@ class RestResponseTest extends TestCase {
     $stream= new MemoryInputStream('{"key":200}');
     $reader= new Reader($stream, new Json(), new Marshalling());
     $this->assertEquals(['key' => '200'], (new RestResponse(200, 'OK', [], $reader))->value('[:string]'));
+  }
+
+  #[@test]
+  public function one_cookie() {
+    $headers= ['Set-Cookie' => 'session=0x6100'];
+    $this->assertEquals(['session' => new Cookie('session', '0x6100')], (new RestResponse(200, 'OK', $headers))->cookies());
+  }
+
+  #[@test]
+  public function multiple_cookies() {
+    $headers= ['Set-Cookie' => ['session=0x6100', 'language=de']];
+    $this->assertEquals(
+      ['session' => new Cookie('session', '0x6100'), 'language' => new Cookie('language', 'de')],
+      (new RestResponse(200, 'OK', $headers))->cookies()
+    );
   }
 }
