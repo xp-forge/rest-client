@@ -77,6 +77,15 @@ class RestResponse implements Value {
           $attributes[$name]= 2 === $r ? urldecode($value) : true;
         }
       }
+
+      // Normalize domain: If a domain is specified, subdomains are always included.
+      // Otherwise, defaults to current host; not including subdomains.
+      if (isset($attributes['Domain'])) {
+        $attributes['Domain']= '.'.ltrim($attributes['Domain'], '.');
+      } else if ($this->uri) {
+        $attributes['Domain']= $this->uri->host();
+      }
+
       $list[]= new Cookie($matches[1], isset($matches[2]) ? urldecode($matches[2]) : null, $attributes);
     }
     return new Cookies($list);

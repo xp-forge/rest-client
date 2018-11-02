@@ -89,10 +89,15 @@ class Endpoint {
     $uri= $this->base->resolve($request->path());
     $conn= $this->connections->__invoke($uri);
 
+    $headers= $request->headers();
+    // foreach ($request->cookies()->forURI($uri) as $cookie) {
+    //   $headers['Set-Cookie'][]= $cookie->name().'='.urlencode($cookie->value());
+    // }
+
     $s= $conn->create(new HttpRequest());
     $s->setMethod($request->method());
     $s->setTarget($uri->path());
-    $s->addHeaders($request->headers());
+    $s->addHeaders($headers);
     $s->setParameters($request->parameters());
 
     try {

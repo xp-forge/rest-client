@@ -3,6 +3,7 @@
 use lang\ElementNotFoundException;
 use lang\Value;
 use util\Objects;
+use util\URI;
 
 /**
  * Cookie JAR
@@ -11,7 +12,7 @@ use util\Objects;
  */
 class Cookies implements Value, \IteratorAggregate {
   public static $EMPTY;
-  private $named= [];
+  private $list= [];
 
   static function __static() {
     self::$EMPTY= new self([]);  // @codeCoverageIgnore
@@ -23,31 +24,10 @@ class Cookies implements Value, \IteratorAggregate {
   }
 
   /** @return bool */
-  public function present() { return sizeof($this->named) > 0; }
-
-  /**
-   * Checks whether a given cookie is contained in this list
-   *
-   * @param  string $name
-   * @return bool
-   */
-  public function provides($name) { return isset($this->named[$name]); }
-
-  /**
-   * Returns a given named cookie
-   *
-   * @param  string $name
-   * @return webservices.rest.Cookie
-   * @throws lang.ElementNotFoundException
-   */
-  public function named($name) {
-    if (isset($this->named[$name])) return $this->named[$name];
-
-    throw new ElementNotFoundException('No cookie named "'.$name.'"');
-  }
+  public function present() { return sizeof($this->list) > 0; }
 
   /** @return self */
-  public function clear() { $this->named= []; return $this; }
+  public function clear() { $this->list= []; return $this; }
 
   /**
    * Merges these cookies with a given list of cookies
@@ -58,38 +38,74 @@ class Cookies implements Value, \IteratorAggregate {
   public function merge($cookies) {
     foreach ($cookies as $name => $cookie) {
       if ($cookie instanceof Cookie) {
+        $domain= $cookie->domain();
+        $key= sprintf(
+          '#^%s://%s%s/%s#',
+          $cookie->secure() ? 'https': 'https?',
+          0 === strncmp($domain, '.', 1) ? '.+' : '',
+          preg_quote($domain),
+          ltrim($cookie->path(), '/')
+        );
         if (null === ($value= $cookie->value())) {
-          unset($this->named[$cookie->name()]);
+          unset($this->list[$key][$cookie->name()]);
         } else {
-          $this->named[$cookie->name()]= $cookie;
+          $this->list[$key][$cookie->name()]= $cookie;
         }
       } else {
+        $key= '#^https?://[^/]+/#';
         if (null === $cookie) {
-          unset($this->named[$name]);
+          unset($this->list[$key][$name]);
         } else {
-          $this->named[$name]= new Cookie($name, $cookie);
+          $this->list[$key][$name]= new Cookie($name, $cookie);
         }
       }
     }
+
+    // RFC 6265: The user agent SHOULD sort the cookie-list in the following order:
+    // Cookies with longer paths are listed before cookies with shorter paths.
+    uksort($this->list, function($a, $b) { return strlen($b) - strlen($a); });
     return $this;
   }
 
-  /** @return iterable */
+  /**
+   * Returns all cookies
+   * 
+   * @return iterable
+   */
   public function getIterator() {
-    foreach ($this->named as $name => $cookie) {
-      yield $name => $cookie;
+    foreach ($this->list as $lookup) {
+      foreach ($lookup as $cookie) {
+        yield $cookie;
+      }
+    }
+  }
+
+  /**
+   * Retrieves cookies for a given URI. 
+   *
+   * @param  string|util.URI $arg
+   * @return iterable
+   */
+  public function forURI($arg) {
+    $uri= $arg instanceof URI ? $arg : new URI($arg);
+    $normalized= (string)$uri->canonicalize();
+
+    $yielded= [];
+    foreach ($this->list as $key => $lookup) {
+      if (preg_match($key, $normalized)) foreach ($lookup as $name => $cookie) {
+        if (isset($yielded[$name])) continue;
+
+        $yielded[$name]= true;
+        yield $cookie;
+      }
     }
   }
 
   /** @return string */
-  public function toString() {
-    return nameof($this).'@'.Objects::stringOf($this->named);
-  }
+  public function toString() { return nameof($this).'@'.Objects::stringOf($this->list); }
 
   /** @return string */
-  public function hashCode() {
-    return Objects::hashOf($this->named);
-  }
+  public function hashCode() { return Objects::hashOf($this->list); }
 
   /**
    * Compares this cookie to another given value
@@ -98,6 +114,6 @@ class Cookies implements Value, \IteratorAggregate {
    * @return int
    */
   public function compareTo($value) {
-    return $value instanceof self ? Objects::compare($this->named, $value->named) : 1;
+    return $value instanceof self ? Objects::compare($this->list, $value->list) : 1;
   }
 }
