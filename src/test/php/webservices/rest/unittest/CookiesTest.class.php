@@ -47,6 +47,7 @@ class CookiesTest extends TestCase {
     $excluded= [
       new Cookie('session', '0x6100', ['Domain' => '.example.com', 'Path' => '/path']),
       new Cookie('uid', '1549', ['Domain' => '.example.com', 'Expires' => $expired]),
+      new Cookie('accept', 'yes', ['Domain' => '.example.com', 'Max-Age' => 0]),
       new Cookie('session', '0x6100', ['Domain' => '.example.com', 'Path' => '/other']),
       new Cookie('session', '0x6100', ['Domain' => '.example.com', 'Path' => '/', 'Secure' => true]),
       new Cookie('session', '0x6100', ['Domain' => 'example.com', 'Path' => '/']),
