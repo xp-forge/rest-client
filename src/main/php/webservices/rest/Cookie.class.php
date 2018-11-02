@@ -20,6 +20,12 @@ class Cookie implements Value {
     $this->attributes= $attributes;
   }
 
+  /** @return string */
+  public function name() { return $this->name; }
+
+  /** @return string */
+  public function value() { return $this->value; }
+
   /** @return ?util.Date */
   public function expires() { return isset($this->attributes['Expires']) ? new Date($this->attributes['Expires']) : null; }
 
