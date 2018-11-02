@@ -82,13 +82,13 @@ class Cookies implements Value, \IteratorAggregate {
   }
 
   /**
-   * Retrieves cookies for a given URI. 
+   * Retrieves non-expired cookies for a given URI.
    *
    * @param  string|util.URI $arg
    * @param  ?util.Date $rel
    * @return iterable
    */
-  public function forURI($arg, $rel= null) {
+  public function validFor($arg, $rel= null) {
     $uri= $arg instanceof URI ? $arg : new URI($arg);
     $normalized= (string)$uri->canonicalize();
     $rel || $rel= Date::now();

@@ -55,7 +55,7 @@ class CookiesTest extends TestCase {
     ];
 
     $cookies= new Cookies(array_merge($excluded, $included));
-    $this->assertEquals($included, iterator_to_array($cookies->forURI('http://sub.example.com/path')));
+    $this->assertEquals($included, iterator_to_array($cookies->validFor('http://sub.example.com/path')));
   }
 
   #[@test]

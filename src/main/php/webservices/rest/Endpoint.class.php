@@ -93,7 +93,7 @@ class Endpoint {
     // RFC 6265: When the user agent generates an HTTP request, the user agent
     // MUST NOT attach more than one Cookie header field.
     $cookies= (array)$request->header('Cookie');
-    foreach ($request->cookies()->forURI($uri) as $cookie) {
+    foreach ($request->cookies()->validFor($uri) as $cookie) {
       $cookies[]= $cookie->name().'='.urlencode($cookie->value());
     }
     $cookies && $headers['Cookie']= implode('; ', $cookies);
