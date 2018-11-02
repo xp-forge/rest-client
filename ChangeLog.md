@@ -3,6 +3,10 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 0.5.0 / 2018-11-02
+
+* Merged PR #4: Parse "Link" headers as defined per RFC 5988 - @thekid
+
 ## 0.4.1 / 2018-08-30
 
 * Fixed parameters supplied in resource appearing twice in request URL
