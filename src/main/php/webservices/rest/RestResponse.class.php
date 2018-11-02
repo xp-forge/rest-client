@@ -91,6 +91,11 @@ class RestResponse implements Value {
         $attributes['Domain']= $this->uri->host();
       }
 
+      // Insecure sites (http:) can't set cookies with the "secure" directive
+      if (isset($attributes['Secure']) && $this->uri && 'https' !== $this->uri->scheme()) {
+        continue;
+      }
+
       $list[]= new Cookie($matches[1], isset($matches[2]) ? urldecode($matches[2]) : null, $attributes);
     }
     return new Cookies($list);

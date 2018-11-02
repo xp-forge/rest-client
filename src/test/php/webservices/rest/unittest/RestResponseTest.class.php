@@ -155,4 +155,12 @@ class RestResponseTest extends TestCase {
 
     $this->assertEquals(new Cookies($list), (new RestResponse(200, 'OK', $headers, null, $uri))->cookies());
   }
+
+  #[@test]
+  public function secure_cookies_cannot_be_set_by_inssecure_sites() {
+    $headers= ['Set-Cookie' => 'session=0x6100; Secure'];
+    $uri= new URI('http://app.example.com/');
+
+    $this->assertEquals(Cookies::$EMPTY, (new RestResponse(200, 'OK', $headers, null, $uri))->cookies());
+  }
 }
