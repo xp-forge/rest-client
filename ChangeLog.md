@@ -3,6 +3,12 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 0.5.1 / 2018-11-02
+
+* Merged PR #5: Add new static `Links::in()` method which accepts null
+  and returns an empty header; thus simplifying its usage.
+  (@thekid)
+
 ## 0.5.0 / 2018-11-02
 
 * Merged PR #4: Parse "Link" headers as defined per RFC 5988 - @thekid
