@@ -9,7 +9,7 @@ class Cookies implements Value, \IteratorAggregate {
   private $named= [];
 
   static function __static() {
-    self::$EMPTY= new self([]);
+    self::$EMPTY= new self([]);  // @codeCoverageIgnore
   }
 
   /** @param webservices.rest.Cookie[]|[:?string] $cookies */
@@ -53,9 +53,17 @@ class Cookies implements Value, \IteratorAggregate {
   public function merge($cookies) {
     foreach ($cookies as $name => $cookie) {
       if ($cookie instanceof Cookie) {
-        $this->named[$cookie->name()]= $cookie;
+        if (null === ($value= $cookie->value())) {
+          unset($this->named[$cookie->name()]);
+        } else {
+          $this->named[$cookie->name()]= $cookie;
+        }
       } else {
-        $this->named[$name]= new Cookie($name, $cookie);
+        if (null === $cookie) {
+          unset($this->named[$name]);
+        } else {
+          $this->named[$name]= new Cookie($name, $cookie);
+        }
       }
     }
     return $this;
