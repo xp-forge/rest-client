@@ -124,7 +124,7 @@ class RestResponseTest extends TestCase {
   public function multiple_cookies() {
     $headers= ['Set-Cookie' => ['session=0x6100; Max-Age=3600', 'lang=de; Secure', 'test=']];
     $named= [
-      'session' => new Cookie('session', '0x6100', ['Max-Age' => 3600]),
+      'session' => new Cookie('session', '0x6100', ['Max-Age' => '3600']),
       'lang'    => new Cookie('lang', 'de', ['Secure' => true]),
       'test'    => new Cookie('test', null)
     ];
