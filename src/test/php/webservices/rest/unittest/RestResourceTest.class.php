@@ -109,7 +109,7 @@ class RestResourceTest extends TestCase {
   #[@test]
   public function passing_cookies_as_map() {
     $resource= new RestResource($this->endpoint, '/users');
-    $resource->passing(['lang' => 'de', 'uid' => 6100])->get();
+    $resource->passing(['lang' => 'de', 'uid' => 6100, 'not-sent' => null])->get();
 
     $this->assertEquals(
       [(new RestRequest('GET', '/users'))->with(['Cookie' => 'lang=de, uid=6100'])],
@@ -120,7 +120,7 @@ class RestResourceTest extends TestCase {
   #[@test]
   public function passing_cookies() {
     $resource= new RestResource($this->endpoint, '/users');
-    $resource->passing([new Cookie('lang', 'de'), new Cookie('uid',  6100)])->get();
+    $resource->passing([new Cookie('lang', 'de'), new Cookie('uid',  6100), new Cookie('not-sent', null)])->get();
 
     $this->assertEquals(
       [(new RestRequest('GET', '/users'))->with(['Cookie' => 'lang=de, uid=6100'])],

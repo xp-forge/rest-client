@@ -102,11 +102,15 @@ class RestResource {
     $header= '';
     if (0 === key($cookies)) {
       foreach ($cookies as $cookie) {
-        $header.= ', '.$cookie->name().'='.urlencode($cookie->value());
+        if (null !== ($value= $cookie->value())) {
+          $header.= ', '.$cookie->name().'='.urlencode($cookie->value());
+        }
       }
     } else {
       foreach ($cookies as $name => $value) {
-        $header.= ', '.$name.'='.urlencode($value);
+        if (null !== $value) {
+          $header.= ', '.$name.'='.urlencode($value);
+        }
       }
     }
     $this->headers['Cookie'][]= substr($header, 2);
