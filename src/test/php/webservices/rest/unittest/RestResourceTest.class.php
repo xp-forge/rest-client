@@ -2,6 +2,7 @@
 
 use lang\ElementNotFoundException;
 use unittest\TestCase;
+use webservices\rest\Cookie;
 use webservices\rest\Endpoint;
 use webservices\rest\RestRequest;
 use webservices\rest\RestResource;
@@ -106,9 +107,20 @@ class RestResourceTest extends TestCase {
   }
 
   #[@test]
-  public function passing_cookies() {
+  public function passing_cookies_as_map() {
     $resource= new RestResource($this->endpoint, '/users');
     $resource->passing(['lang' => 'de', 'uid' => 6100])->get();
+
+    $this->assertEquals(
+      [(new RestRequest('GET', '/users'))->with(['Cookie' => 'lang=de, uid=6100'])],
+      $this->endpoint->sent
+    );
+  }
+
+  #[@test]
+  public function passing_cookies() {
+    $resource= new RestResource($this->endpoint, '/users');
+    $resource->passing([new Cookie('lang', 'de'), new Cookie('uid',  6100)])->get();
 
     $this->assertEquals(
       [(new RestRequest('GET', '/users'))->with(['Cookie' => 'lang=de, uid=6100'])],
