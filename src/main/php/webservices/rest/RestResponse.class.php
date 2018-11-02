@@ -62,12 +62,12 @@ class RestResponse implements Value {
    * Returns cookies sent by server
    *
    * @see    https://tools.ietf.org/html/rfc6265
-   * @return [:webservices.rest.Cookie]
+   * @return webservices.rest.Cookies
    */
   public function cookies() {
-    if (!isset($this->lookup['set-cookie'])) return [];
+    if (!isset($this->lookup['set-cookie'])) return Cookies::$EMPTY;
 
-    $cookies= [];
+    $list= [];
     foreach ($this->headers[$this->lookup['set-cookie']] as $cookie) {
       $attributes= [];
       preg_match('/([^=]+)=("([^"]+)"|([^;]+))?(;(.+))*/', $cookie, $matches);
@@ -77,9 +77,9 @@ class RestResponse implements Value {
           $attributes[$name]= 2 === $r ? urldecode($value) : true;
         }
       }
-      $cookies[$matches[1]]= new Cookie($matches[1], isset($matches[2]) ? urldecode($matches[2]) : null, $attributes);
+      $list[]= new Cookie($matches[1], isset($matches[2]) ? urldecode($matches[2]) : null, $attributes);
     }
-    return $cookies;
+    return new Cookies($list);
   }
 
   /**

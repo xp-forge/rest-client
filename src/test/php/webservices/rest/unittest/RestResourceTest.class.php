@@ -3,6 +3,7 @@
 use lang\ElementNotFoundException;
 use unittest\TestCase;
 use webservices\rest\Cookie;
+use webservices\rest\Cookies;
 use webservices\rest\Endpoint;
 use webservices\rest\RestRequest;
 use webservices\rest\RestResource;
@@ -106,21 +107,15 @@ class RestResourceTest extends TestCase {
     );
   }
 
-  #[@test]
-  public function passing_cookies_as_map() {
+  #[@test, @values([
+  #  [['lang' => 'de', 'uid' => 6100, 'not-sent' => null]],
+  #  [[new Cookie('lang', 'de'), new Cookie('uid',  6100), new Cookie('not-sent', null)]],
+  #  [new Cookies(['lang' => 'de', 'uid' => 6100, 'not-sent' => null])],
+  #  [new Cookies([new Cookie('lang', 'de'), new Cookie('uid',  6100), new Cookie('not-sent', null)])],
+  #])]
+  public function passing_cookies($cookies) {
     $resource= new RestResource($this->endpoint, '/users');
-    $resource->passing(['lang' => 'de', 'uid' => 6100, 'not-sent' => null])->get();
-
-    $this->assertEquals(
-      [(new RestRequest('GET', '/users'))->with(['Cookie' => 'lang=de, uid=6100'])],
-      $this->endpoint->sent
-    );
-  }
-
-  #[@test]
-  public function passing_cookies() {
-    $resource= new RestResource($this->endpoint, '/users');
-    $resource->passing([new Cookie('lang', 'de'), new Cookie('uid',  6100), new Cookie('not-sent', null)])->get();
+    $resource->passing($cookies)->get();
 
     $this->assertEquals(
       [(new RestRequest('GET', '/users'))->with(['Cookie' => 'lang=de, uid=6100'])],

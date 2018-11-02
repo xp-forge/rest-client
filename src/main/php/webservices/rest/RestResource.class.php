@@ -95,23 +95,20 @@ class RestResource {
   /**
    * Passes given cookies. Encodes value using URL encoding.
    *
-   * @param  [:?string]|webservices.rest.Cookie[] $cookies
+   * @param  [:?string]|webservices.rest.Cookie[]|webservices.rest.Cookies $cookies
    * @return self
    */
   public function passing($cookies) {
     $header= '';
-    if (0 === key($cookies)) {
-      foreach ($cookies as $cookie) {
-        if (null !== ($value= $cookie->value())) {
-          $header.= ', '.$cookie->name().'='.urlencode($cookie->value());
-        }
+    foreach ($cookies as $name => $cookie) {
+      if ($cookie instanceof Cookie) {
+        $name= $cookie->name();
+        $value= $cookie->value();
+      } else {
+        $value= $cookie;
       }
-    } else {
-      foreach ($cookies as $name => $value) {
-        if (null !== $value) {
-          $header.= ', '.$name.'='.urlencode($value);
-        }
-      }
+
+      null === $value || $header.= ', '.$name.'='.urlencode($value);
     }
     $this->headers['Cookie'][]= substr($header, 2);
     return $this;

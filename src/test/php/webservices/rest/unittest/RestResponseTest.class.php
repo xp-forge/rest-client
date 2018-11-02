@@ -6,6 +6,7 @@ use unittest\TestCase;
 use util\URI;
 use util\data\Marshalling;
 use webservices\rest\Cookie;
+use webservices\rest\Cookies;
 use webservices\rest\RestResponse;
 use webservices\rest\format\Json;
 use webservices\rest\io\Reader;
@@ -107,20 +108,27 @@ class RestResponseTest extends TestCase {
   }
 
   #[@test]
+  public function no_cookies() {
+    $this->assertEquals(Cookies::$EMPTY, (new RestResponse(200, 'OK', []))->cookies());
+  }
+
+  #[@test]
   public function one_cookie() {
     $headers= ['Set-Cookie' => 'session=0x6100; HttpOnly; Path=/'];
-    $this->assertEquals(
-      ['session' => new Cookie('session', '0x6100', ['HttpOnly' => true, 'Path' => '/'])],
-      (new RestResponse(200, 'OK', $headers))->cookies()
-    );
+    $named= ['session' => new Cookie('session', '0x6100', ['HttpOnly' => true, 'Path' => '/'])];
+
+    $this->assertEquals(new Cookies($named), (new RestResponse(200, 'OK', $headers))->cookies());
   }
 
   #[@test]
   public function multiple_cookies() {
-    $headers= ['Set-Cookie' => ['session=0x6100', 'lang=de', 'test=']];
-    $this->assertEquals(
-      ['session' => new Cookie('session', '0x6100'), 'lang' => new Cookie('lang', 'de'), 'test' => new Cookie('test', null)],
-      (new RestResponse(200, 'OK', $headers))->cookies()
-    );
+    $headers= ['Set-Cookie' => ['session=0x6100; Max-Age=3600', 'lang=de; Secure', 'test=']];
+    $named= [
+      'session' => new Cookie('session', '0x6100', ['Max-Age' => 3600]),
+      'lang'    => new Cookie('lang', 'de', ['Secure' => true]),
+      'test'    => new Cookie('test', null)
+    ];
+
+    $this->assertEquals(new Cookies($named), (new RestResponse(200, 'OK', $headers))->cookies());
   }
 }

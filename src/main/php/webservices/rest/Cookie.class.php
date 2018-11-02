@@ -33,7 +33,7 @@ class Cookie implements Value {
   public function maxAge() { return isset($this->attributes['Max-Age']) ? (int)$this->attributes['Max-Age'] : null; }
 
   /** @return ?string */
-  public function domain() { return isset($this->attributes['Domain']) ? (int)$this->attributes['Domain'] : null; }
+  public function domain() { return isset($this->attributes['Domain']) ? $this->attributes['Domain'] : null; }
 
   /** @return ?string */
   public function path() { return isset($this->attributes['Path']) ? $this->attributes['Path'] : null; }
@@ -54,7 +54,7 @@ class Cookie implements Value {
 
   /** @return string */
   public function hashCode() {
-    return Objects::stringOf((array)$this);
+    return Objects::hashOf((array)$this);
   }
 
   /**
