@@ -55,9 +55,9 @@ class LinksTest extends \unittest\TestCase {
     $this->assertEquals([new Link('http://example.com/?page=2', ['rel' => 'next'])], iterator_to_array($links->all()));
   }
 
-  #[@test, @values([null, ''])]
-  public function in_can_handle_empty($header) {
-    $this->assertEquals([], iterator_to_array(Links::in($header)->all()));
+  #[@test]
+  public function in_can_handle_empty() {
+    $this->assertEquals([], iterator_to_array(Links::in(null)->all()));
   }
 
   #[@test]

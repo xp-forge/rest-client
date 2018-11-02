@@ -79,18 +79,14 @@ class Links implements Value {
 
   /**
    * Create a Links instance from a header; returning an empty collection if
-   * either `NULL` or an empty string is passed.
+   * `NULL` is passed.
    *
    * @param  ?string $header
    * @return self
    * @throws lang.FormatException If the header is malformed
    */
   public static function in($header) {
-    if (null === $header || '' === $header) {
-      return new self([]);
-    } else {
-      return new self((string)$header);
-    }
+    return new self(null === $header ? [] : (string)$header);
   }
 
   /**
