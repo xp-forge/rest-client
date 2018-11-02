@@ -11,7 +11,7 @@ use text\StringTokenizer;
  * @see  https://www.w3.org/wiki/LinkHeader
  * @see  https://tools.ietf.org/html/rfc5988 Web Linking
  */
-class Links implements \lang\Value {
+class Links implements Value {
   private $links= [];
 
   /**
