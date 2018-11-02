@@ -84,7 +84,7 @@ class RestResponse implements Value {
 
         // A cookie belonging to a domain that does not include the origin server 
         // should be rejected by the user agent
-        if ($this->uri && !preg_match('/^.+'.preg_quote($attributes['Domain']).'/', $this->uri->host())) continue;
+        if ($this->uri && !preg_match('/^.+'.preg_quote($attributes['Domain']).'$/', $this->uri->host())) continue;
         $attributes['Domain']= '.'.ltrim($attributes['Domain'], '.');
       } else if ($this->uri) {
         $attributes['Domain']= $this->uri->host();

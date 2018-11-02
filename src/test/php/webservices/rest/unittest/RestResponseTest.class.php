@@ -132,9 +132,16 @@ class RestResponseTest extends TestCase {
     $this->assertEquals(new Cookies($list), (new RestResponse(200, 'OK', $headers))->cookies());
   }
 
-  #[@test]
-  public function cookie_from_invalid_domain_rejected() {
-    $headers= ['Set-Cookie' => 'session=0x6100; Domain=evil.example.com'];
+  #[@test, @values([
+  #  'evil.example.com',
+  #  'evil.example',
+  #  'example',
+  #  'example.tld',
+  #  'evil-example.com',
+  #  'evil.example.com.tld',
+  #])]
+  public function cookie_from_invalid_domain_rejected($domain) {
+    $headers= ['Set-Cookie' => 'session=0x6100; Domain='.$domain];
     $uri= new URI('http://app.example.com/');
 
     $this->assertEquals(Cookies::$EMPTY, (new RestResponse(200, 'OK', $headers, null, $uri))->cookies());
