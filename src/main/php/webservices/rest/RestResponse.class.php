@@ -70,33 +70,32 @@ class RestResponse implements Value {
 
     $list= [];
     foreach ($this->headers[$this->lookup['set-cookie']] as $cookie) {
-      $attributes= [];
+      $attr= [];
       preg_match('/([^=]+)=("([^"]+)"|([^;]+))?(;(.+))*/', $cookie, $matches);
       if (isset($matches[6])) {
         foreach (explode(';', $matches[6]) as $attribute) {
           $r= sscanf(trim($attribute), "%[^=]=%[^\r]", $name, $value);
-          $attributes[$name]= 2 === $r ? urldecode($value) : true;
+          $attr[$name]= 2 === $r ? urldecode($value) : true;
         }
       }
 
+      // Reject cookies if:
+      // * They belong to a domain that does not include the origin server
+      // * An insecure site tries to set a cookie with a "Secure" directive
+      if ($this->uri && (
+        (isset($attr['Domain']) && !preg_match('/^.+'.preg_quote($attr['Domain']).'$/', $this->uri->host())) ||
+        (isset($attr['Secure']) && 'https' !== $this->uri->scheme())
+      )) continue;
+
       // Normalize domain: If a domain is specified, subdomains are always included.
       // Otherwise, defaults to current host; not including subdomains.
-      if (isset($attributes['Domain'])) {
-
-        // A cookie belonging to a domain that does not include the origin server 
-        // should be rejected by the user agent.
-        if ($this->uri && !preg_match('/^.+'.preg_quote($attributes['Domain']).'$/', $this->uri->host())) continue;
-        $attributes['Domain']= '.'.ltrim($attributes['Domain'], '.');
+      if (isset($attr['Domain'])) {
+        $attr['Domain']= '.'.ltrim($attr['Domain'], '.');
       } else if ($this->uri) {
-        $attributes['Domain']= $this->uri->host();
+        $attr['Domain']= $this->uri->host();
       }
 
-      // Insecure sites (http:) can't set cookies with the "secure" directive
-      if (isset($attributes['Secure']) && $this->uri && 'https' !== $this->uri->scheme()) {
-        continue;
-      }
-
-      $list[]= new Cookie($matches[1], isset($matches[2]) ? urldecode($matches[2]) : null, $attributes);
+      $list[]= new Cookie($matches[1], isset($matches[2]) ? urldecode($matches[2]) : null, $attr);
     }
     return new Cookies($list);
   }
