@@ -38,6 +38,7 @@ class CookiesTest extends TestCase {
 
   #[@test]
   public function for_domain_and_path() {
+    $expired= gmdate('D, d M Y H:i:s \G\M\T', time() - 86400);
     $included= [
       new Cookie('session', '0x6100', ['Domain' => 'sub.example.com', 'Path' => '/path']),
       new Cookie('lang', 'de', ['Domain' => '.example.com', 'Path' => '/path']),
@@ -45,6 +46,7 @@ class CookiesTest extends TestCase {
     ];
     $excluded= [
       new Cookie('session', '0x6100', ['Domain' => '.example.com', 'Path' => '/path']),
+      new Cookie('uid', '1549', ['Domain' => '.example.com', 'Expires' => $expired]),
       new Cookie('session', '0x6100', ['Domain' => '.example.com', 'Path' => '/other']),
       new Cookie('session', '0x6100', ['Domain' => '.example.com', 'Path' => '/', 'Secure' => true]),
       new Cookie('session', '0x6100', ['Domain' => 'example.com', 'Path' => '/']),

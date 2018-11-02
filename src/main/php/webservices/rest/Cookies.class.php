@@ -2,6 +2,7 @@
 
 use lang\ElementNotFoundException;
 use lang\Value;
+use util\Date;
 use util\Objects;
 use util\URI;
 
@@ -84,19 +85,24 @@ class Cookies implements Value, \IteratorAggregate {
    * Retrieves cookies for a given URI. 
    *
    * @param  string|util.URI $arg
+   * @param  ?util.Date $rel
    * @return iterable
    */
-  public function forURI($arg) {
+  public function forURI($arg, $rel= null) {
     $uri= $arg instanceof URI ? $arg : new URI($arg);
     $normalized= (string)$uri->canonicalize();
+    $rel || $rel= Date::now();
 
     $yielded= [];
     foreach ($this->list as $key => $lookup) {
       if (preg_match($key, $normalized)) foreach ($lookup as $name => $cookie) {
         if (isset($yielded[$name])) continue;
 
-        $yielded[$name]= true;
-        yield $cookie;
+        $expires= $cookie->expires();
+        if (null === $expires || $expires->isAfter($rel)) {
+          yield $cookie;
+          $yielded[$name]= true;
+        }
       }
     }
   }
