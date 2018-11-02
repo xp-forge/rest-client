@@ -1,8 +1,8 @@
 <?php namespace webservices\rest\unittest;
 
+use lang\FormatException;
 use webservices\rest\Link;
 use webservices\rest\Links;
-use lang\FormatException;
 
 class LinksTest extends \unittest\TestCase {
 
@@ -19,7 +19,14 @@ class LinksTest extends \unittest\TestCase {
     new Links($header);
   }
 
+  #[@test]
+  public function can_create_from_array() {
+    $list= [new Link('http://example.com/?page=2', ['rel' => 'next'])];
+    $this->assertEquals($list, iterator_to_array((new Links($list))->all()));
+  }
+
   #[@test, @expect(FormatException::class), @values([
+  #  [null],
   #  [''],
   #  ['<>'],
   #  ['<http://example.com/?page=2'],
@@ -40,6 +47,17 @@ class LinksTest extends \unittest\TestCase {
   public function all_with_rel() {
     $links= new Links('<http://example.com/?page=2>; rel="next", <http://example.com/>; title="Home"');
     $this->assertEquals([new Link('http://example.com/?page=2', ['rel' => 'next'])], iterator_to_array($links->all(['rel' => null])));
+  }
+
+  #[@test, @values([null, ''])]
+  public function in($header) {
+    $links= Links::in('<http://example.com/?page=2>; rel="next"');
+    $this->assertEquals([new Link('http://example.com/?page=2', ['rel' => 'next'])], iterator_to_array($links->all()));
+  }
+
+  #[@test, @values([null, ''])]
+  public function in_can_handle_empty($header) {
+    $this->assertEquals([], iterator_to_array(Links::in($header)->all()));
   }
 
   #[@test]
