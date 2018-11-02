@@ -67,12 +67,19 @@ class RestResponse implements Value {
   public function cookies() {
     if (!isset($this->lookup['set-cookie'])) return [];
 
-    $r= [];
+    $cookies= [];
     foreach ($this->headers[$this->lookup['set-cookie']] as $cookie) {
-      sscanf($cookie, "%[^=]=%[^\r]", $name, $value);
-      $r[$name]= new Cookie($name, $value);
+      $attributes= [];
+      preg_match('/([^=]+)=("([^"]+)"|([^;]+))?(;(.+))*/', $cookie, $matches);
+      if (isset($matches[6])) {
+        foreach (explode(';', $matches[6]) as $attribute) {
+          $r= sscanf(trim($attribute), "%[^=]=%[^\r]", $name, $value);
+          $attributes[$name]= 2 === $r ? urldecode($value) : true;
+        }
+      }
+      $cookies[$matches[1]]= new Cookie($matches[1], isset($matches[2]) ? urldecode($matches[2]) : null, $attributes);
     }
-    return $r;
+    return $cookies;
   }
 
   /**

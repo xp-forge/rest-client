@@ -108,15 +108,18 @@ class RestResponseTest extends TestCase {
 
   #[@test]
   public function one_cookie() {
-    $headers= ['Set-Cookie' => 'session=0x6100'];
-    $this->assertEquals(['session' => new Cookie('session', '0x6100')], (new RestResponse(200, 'OK', $headers))->cookies());
+    $headers= ['Set-Cookie' => 'session=0x6100; HttpOnly; Path=/'];
+    $this->assertEquals(
+      ['session' => new Cookie('session', '0x6100', ['HttpOnly' => true, 'Path' => '/'])],
+      (new RestResponse(200, 'OK', $headers))->cookies()
+    );
   }
 
   #[@test]
   public function multiple_cookies() {
-    $headers= ['Set-Cookie' => ['session=0x6100', 'language=de']];
+    $headers= ['Set-Cookie' => ['session=0x6100', 'lang=de', 'test=']];
     $this->assertEquals(
-      ['session' => new Cookie('session', '0x6100'), 'language' => new Cookie('language', 'de')],
+      ['session' => new Cookie('session', '0x6100'), 'lang' => new Cookie('lang', 'de'), 'test' => new Cookie('test', null)],
       (new RestResponse(200, 'OK', $headers))->cookies()
     );
   }
