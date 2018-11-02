@@ -4,6 +4,11 @@ use lang\ElementNotFoundException;
 use lang\Value;
 use util\Objects;
 
+/**
+ * Cookie JAR
+ *
+ * @test  xp://webservices.rest.unittest.CookiesTest
+ */
 class Cookies implements Value, \IteratorAggregate {
   public static $EMPTY;
   private $named= [];
