@@ -81,6 +81,10 @@ class RestResponse implements Value {
       // Normalize domain: If a domain is specified, subdomains are always included.
       // Otherwise, defaults to current host; not including subdomains.
       if (isset($attributes['Domain'])) {
+
+        // A cookie belonging to a domain that does not include the origin server 
+        // should be rejected by the user agent
+        if ($this->uri && !preg_match('/^.+'.preg_quote($attributes['Domain']).'/', $this->uri->host())) continue;
         $attributes['Domain']= '.'.ltrim($attributes['Domain'], '.');
       } else if ($this->uri) {
         $attributes['Domain']= $this->uri->host();

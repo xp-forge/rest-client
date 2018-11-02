@@ -115,20 +115,37 @@ class RestResponseTest extends TestCase {
   #[@test]
   public function one_cookie() {
     $headers= ['Set-Cookie' => 'session=0x6100; HttpOnly; Path=/'];
-    $named= ['session' => new Cookie('session', '0x6100', ['HttpOnly' => true, 'Path' => '/'])];
+    $list= [new Cookie('session', '0x6100', ['HttpOnly' => true, 'Path' => '/'])];
 
-    $this->assertEquals(new Cookies($named), (new RestResponse(200, 'OK', $headers))->cookies());
+    $this->assertEquals(new Cookies($list), (new RestResponse(200, 'OK', $headers))->cookies());
   }
 
   #[@test]
   public function multiple_cookies() {
     $headers= ['Set-Cookie' => ['session=0x6100; Max-Age=3600', 'lang=de; Secure', 'test=']];
-    $named= [
-      'session' => new Cookie('session', '0x6100', ['Max-Age' => '3600']),
-      'lang'    => new Cookie('lang', 'de', ['Secure' => true]),
-      'test'    => new Cookie('test', null)
+    $list= [
+      new Cookie('session', '0x6100', ['Max-Age' => '3600']),
+      new Cookie('lang', 'de', ['Secure' => true]),
+      new Cookie('test', null)
     ];
 
-    $this->assertEquals(new Cookies($named), (new RestResponse(200, 'OK', $headers))->cookies());
+    $this->assertEquals(new Cookies($list), (new RestResponse(200, 'OK', $headers))->cookies());
+  }
+
+  #[@test]
+  public function cookie_from_invalid_domain_rejected() {
+    $headers= ['Set-Cookie' => 'session=0x6100; Domain=evil.example.com'];
+    $uri= new URI('http://app.example.com/');
+
+    $this->assertEquals(Cookies::$EMPTY, (new RestResponse(200, 'OK', $headers, null, $uri))->cookies());
+  }
+
+  #[@test]
+  public function cookie_from_parent_domain_accepted() {
+    $headers= ['Set-Cookie' => 'session=0x6100; Domain=example.com'];
+    $list= [new Cookie('session', '0x6100', ['Domain' => '.example.com'])];
+    $uri= new URI('http://app.example.com/');
+
+    $this->assertEquals(new Cookies($list), (new RestResponse(200, 'OK', $headers, null, $uri))->cookies());
   }
 }
