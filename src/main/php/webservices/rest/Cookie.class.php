@@ -23,7 +23,7 @@ class Cookie implements Value {
   /** @return string */
   public function name() { return $this->name; }
 
-  /** @return string */
+  /** @return ?string */
   public function value() { return $this->value; }
 
   /** @return ?util.Date */
