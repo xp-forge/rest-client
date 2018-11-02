@@ -18,6 +18,11 @@ class Cookie implements Value {
     $this->name= $name;
     $this->value= $value;
     $this->attributes= $attributes;
+
+    // If both (Expires and Max-Age) are set, Max-Age will have precedence.
+    if (isset($this->attributes['Max-Age'])) {
+      $this->attributes['Expires']= gmdate('D, d M Y H:i:s \G\M\T', time() + $this->attributes['Max-Age']);
+    }
   }
 
   /** @return string */
