@@ -59,7 +59,8 @@ class RestResponse implements Value {
   }
 
   /**
-   * Returns cookies sent by server
+   * Returns cookies sent by server; rejecting cookies from invalid domains.
+   * However, it does *not* take https://publicsuffix.org/list/ into account!
    *
    * @see    https://tools.ietf.org/html/rfc6265
    * @return webservices.rest.Cookies
@@ -83,7 +84,7 @@ class RestResponse implements Value {
       if (isset($attributes['Domain'])) {
 
         // A cookie belonging to a domain that does not include the origin server 
-        // should be rejected by the user agent
+        // should be rejected by the user agent.
         if ($this->uri && !preg_match('/^.+'.preg_quote($attributes['Domain']).'$/', $this->uri->host())) continue;
         $attributes['Domain']= '.'.ltrim($attributes['Domain'], '.');
       } else if ($this->uri) {
