@@ -75,4 +75,22 @@ class CookiesTest extends TestCase {
       iterator_to_array($cookies->merge(['session' => null]))
     );
   }
+
+  #[@test]
+  public function string_representation() {
+    $cookies= new Cookies([
+      new Cookie('session', '0x6100', ['Secure' => true]),
+      new Cookie('lang', 'de'),
+    ]);
+
+    $this->assertEquals(
+      "webservices.rest.Cookies@{\n".
+      "  webservices.rest.Cookie(lang=de)@[]\n".
+      "  webservices.rest.Cookie(session=0x6100)@[\n".
+      "    Secure => true\n".
+      "  ]\n".
+      "}",
+      $cookies->toString()
+    );
+  }
 }

@@ -108,7 +108,15 @@ class Cookies implements Value, \IteratorAggregate {
   }
 
   /** @return string */
-  public function toString() { return nameof($this).'@'.Objects::stringOf($this->list); }
+  public function toString() {
+    $s= nameof($this)."@{\n";
+    foreach ($this->list as $lookup) {
+      foreach ($lookup as $cookie) {
+        $s.= '  '.str_replace("\n", "\n  ", $cookie->toString())."\n";
+      }
+    }
+    return $s.'}';
+  }
 
   /** @return string */
   public function hashCode() { return Objects::hashOf($this->list); }
