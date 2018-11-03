@@ -165,6 +165,21 @@ class RestResponseTest extends TestCase {
   }
 
   #[@test]
+  public function secure_prefix() {
+    $headers= ['Set-Cookie' => '__Secure-SID=12345; Secure'];
+    $list= [new Cookie('SID', '12345', ['Secure' => true])];
+
+    $this->assertEquals(new Cookies($list), (new RestResponse(200, 'OK', $headers))->cookies());
+  }
+
+  #[@test]
+  public function secure_prefix_rejects_insecure_cookies() {
+    $headers= ['Set-Cookie' => '__Secure-SID=12345'];
+
+    $this->assertEquals(Cookies::$EMPTY, (new RestResponse(200, 'OK', $headers))->cookies());
+  }
+
+  #[@test]
   public function host_prefix() {
     $headers= ['Set-Cookie' => '__Host-SID=12345; Secure; Path=/'];
     $list= [new Cookie('SID', '12345', ['Domain' => 'app.example.com', 'Path' => '/', 'Secure' => true])];
