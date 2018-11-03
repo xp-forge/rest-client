@@ -80,8 +80,11 @@ class RestResponse implements Value {
         }
       }
 
+      // Cookies names with the prefixes __Secure- and __Host- can be used only if they are
+      // set with the secure directive. In addition, cookies with the __Host-prefix must have
+      // a path of "/" (the entire host) and must not have a domain attribute
       if (0 === strncmp($matches[1], '__Host-', 7)) {
-        if (isset($attr['Domain']) || !isset($attr['Path']) || '/' !== $attr['Path'] || !isset($attr['Secure'])) continue;
+        if (!isset($attr['Secure']) || !isset($attr['Path']) || '/' !== $attr['Path'] || isset($attr['Domain'])) continue;
         $name= substr($matches[1], 7);
       } else if (0 === strncmp($matches[1], '__Secure-', 9)) {
         if (!isset($attr['Secure'])) continue;
