@@ -63,6 +63,7 @@ class RestResponse implements Value {
    * However, it does *not* take https://publicsuffix.org/list/ into account!
    *
    * @see    https://tools.ietf.org/html/rfc6265
+   * @see    https://tools.ietf.org/html/draft-ietf-httpbis-rfc6265bis-02
    * @return webservices.rest.Cookies
    */
   public function cookies() {
@@ -77,6 +78,13 @@ class RestResponse implements Value {
           $r= sscanf(trim($attribute), "%[^=]=%[^\r]", $name, $value);
           $attr[$name]= 2 === $r ? urldecode($value) : true;
         }
+      }
+
+      if (0 === strncmp($matches[1], '__Host-', 7)) {
+        if (isset($attr['Domain']) || !isset($attr['Path']) || '/' !== $attr['Path']) continue;
+        $name= substr($matches[1], 7);
+      } else {
+        $name= $matches[1];
       }
 
       // Reject cookies if:
@@ -95,7 +103,7 @@ class RestResponse implements Value {
         $attr['Domain']= $this->uri->host();
       }
 
-      $list[]= new Cookie($matches[1], isset($matches[2]) ? urldecode($matches[2]) : null, $attr);
+      $list[]= new Cookie($name, isset($matches[2]) ? urldecode($matches[2]) : null, $attr);
     }
     return new Cookies($list);
   }

@@ -126,7 +126,7 @@ class RestResponseTest extends TestCase {
     $list= [
       new Cookie('session', '0x6100', ['Max-Age' => '3600']),
       new Cookie('lang', 'de', ['Secure' => true]),
-      new Cookie('test', null)
+      new Cookie('test', null),
     ];
 
     $this->assertEquals(new Cookies($list), (new RestResponse(200, 'OK', $headers))->cookies());
@@ -160,6 +160,29 @@ class RestResponseTest extends TestCase {
   public function secure_cookies_cannot_be_set_by_inssecure_sites() {
     $headers= ['Set-Cookie' => 'session=0x6100; Secure'];
     $uri= new URI('http://app.example.com/');
+
+    $this->assertEquals(Cookies::$EMPTY, (new RestResponse(200, 'OK', $headers, null, $uri))->cookies());
+  }
+
+  #[@test]
+  public function host_prefix() {
+    $headers= ['Set-Cookie' => '__Host-SID=12345; Secure; Path=/'];
+    $list= [new Cookie('SID', '12345', ['Domain' => 'app.example.com', 'Path' => '/', 'Secure' => true])];
+    $uri= new URI('https://app.example.com/');
+
+    $this->assertEquals(new Cookies($list), (new RestResponse(200, 'OK', $headers, null, $uri))->cookies());
+  }
+
+  #[@test, @values([
+  #  '__Host-SID=12345',
+  #  '__Host-SID=12345; Secure',
+  #  '__Host-SID=12345; Domain=example.com',
+  #  '__Host-SID=12345; Domain=example.com; Path=/',
+  #  '__Host-SID=12345; Secure; Domain=example.com; Path=/',
+  #])]
+  public function host_prefix_rejects($cookie) {
+    $headers= ['Set-Cookie' => $cookie];
+    $uri= new URI('https://app.example.com/');
 
     $this->assertEquals(Cookies::$EMPTY, (new RestResponse(200, 'OK', $headers, null, $uri))->cookies());
   }
