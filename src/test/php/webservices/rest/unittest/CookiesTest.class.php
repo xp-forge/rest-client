@@ -2,6 +2,7 @@
 
 use lang\ElementNotFoundException;
 use unittest\TestCase;
+use unittest\actions\RuntimeVersion;
 use webservices\rest\Cookie;
 use webservices\rest\Cookies;
 
@@ -76,7 +77,7 @@ class CookiesTest extends TestCase {
     );
   }
 
-  #[@test]
+  #[@test, @action(new RuntimeVersion('>=7.0'))]
   public function string_representation() {
     $cookies= new Cookies([
       new Cookie('session', '0x6100', ['Secure' => true]),
