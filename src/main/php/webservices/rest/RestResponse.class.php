@@ -59,59 +59,15 @@ class RestResponse implements Value {
   }
 
   /**
-   * Returns cookies sent by server; rejecting cookies from invalid domains.
-   * However, it does *not* take https://publicsuffix.org/list/ into account!
+   * Returns cookies sent by server.
    *
-   * @see    https://tools.ietf.org/html/rfc6265
-   * @see    https://tools.ietf.org/html/draft-ietf-httpbis-rfc6265bis-02
    * @return webservices.rest.Cookies
    */
   public function cookies() {
-    if (!isset($this->lookup['set-cookie'])) return Cookies::$EMPTY;
-
-    $list= [];
-    foreach ($this->headers[$this->lookup['set-cookie']] as $cookie) {
-      $attr= [];
-      preg_match('/([^=]+)=("([^"]+)"|([^;]+))?(;(.+))*/', $cookie, $matches);
-      if (isset($matches[6])) {
-        foreach (explode(';', $matches[6]) as $attribute) {
-          $r= sscanf(trim($attribute), "%[^=]=%[^\r]", $name, $value);
-          $attr[$name]= 2 === $r ? urldecode($value) : true;
-        }
-      }
-
-      // Cookies names with the prefixes __Secure- and __Host- can be used only if they are
-      // set with the secure directive. In addition, cookies with the __Host-prefix must have
-      // a path of "/" (the entire host) and must not have a domain attribute
-      if (0 === strncmp($matches[1], '__Host-', 7)) {
-        if (!isset($attr['Secure']) || !isset($attr['Path']) || '/' !== $attr['Path'] || isset($attr['Domain'])) continue;
-        $name= substr($matches[1], 7);
-      } else if (0 === strncmp($matches[1], '__Secure-', 9)) {
-        if (!isset($attr['Secure'])) continue;
-        $name= substr($matches[1], 9);
-      } else {
-        $name= $matches[1];
-      }
-
-      // Reject cookies if:
-      // * They belong to a domain that does not include the origin server
-      // * An insecure site tries to set a cookie with a "Secure" directive
-      if ($this->uri && (
-        (isset($attr['Domain']) && !preg_match('/^.+'.preg_quote($attr['Domain']).'$/', $this->uri->host())) ||
-        (isset($attr['Secure']) && 'https' !== $this->uri->scheme())
-      )) continue;
-
-      // Normalize domain: If a domain is specified, subdomains are always included.
-      // Otherwise, defaults to current host; not including subdomains.
-      if (isset($attr['Domain'])) {
-        $attr['Domain']= '.'.ltrim($attr['Domain'], '.');
-      } else if ($this->uri) {
-        $attr['Domain']= $this->uri->host();
-      }
-
-      $list[]= new Cookie($name, isset($matches[2]) ? urldecode($matches[2]) : null, $attr);
-    }
-    return new Cookies($list);
+    return isset($this->lookup['set-cookie'])
+      ? Cookies::parse($this->headers[$this->lookup['set-cookie']], $this->uri)
+      : Cookies::$EMPTY
+    ;
   }
 
   /**
