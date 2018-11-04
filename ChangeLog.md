@@ -3,6 +3,10 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 0.6.0 / 2018-11-04
+
+* Merged PR #6: Cookies - @thekid
+
 ## 0.5.1 / 2018-11-02
 
 * Merged PR #5: Add new static `Links::in()` method which accepts null
