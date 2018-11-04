@@ -20,7 +20,7 @@ class TestConnection extends HttpConnection {
 
   public function finish(HttpOutputStream $stream) {
     return new HttpResponse(new MemoryInputStream(sprintf(
-      "HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",
+      "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",
       strlen($stream->bytes),
       $stream->bytes
     )));

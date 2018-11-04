@@ -100,7 +100,6 @@ class Endpoint implements Traceable {
   public function execute(RestRequest $request) {
     $uri= $this->base->resolve($request->path());
     $conn= $this->connections->__invoke($uri);
-    $conn->setTrace($this->cat);
     $headers= $request->headers();
 
     // RFC 6265: When the user agent generates an HTTP request, the user agent
@@ -118,6 +117,7 @@ class Endpoint implements Traceable {
     $s->setParameters($request->parameters());
 
     try {
+      $this->cat && $this->cat->info('>>>', $s->getHeaderString());
       if ($payload= $request->payload()) {
         $input= $this->formats->named($request->header('Content-Type'));
         $writer= $this->transfer->writer($s, $payload->value(), $input, $this->marshalling);
@@ -127,6 +127,8 @@ class Endpoint implements Traceable {
       }
 
       $r= $conn->finish($stream);
+      $this->cat && $this->cat->info('<<<', $r->getHeaderString());
+
       $output= $this->formats->named(current($r->header('Content-Type')));
       $reader= new Reader($r->in(), $output, $this->marshalling);
       return new RestResponse($r->statusCode(), $r->message(), $r->headers(), $reader, $uri);
