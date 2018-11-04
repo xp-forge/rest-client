@@ -64,7 +64,7 @@ class CookiesTest extends TestCase {
     $cookies= new Cookies(['session' => '0x6100']);
     $this->assertEquals(
       [new Cookie('session', '0x6200')],
-      iterator_to_array($cookies->merge(['session' => '0x6200']))
+      iterator_to_array($cookies->update(['session' => '0x6200']))
     );
   }
 
@@ -73,7 +73,7 @@ class CookiesTest extends TestCase {
     $cookies= new Cookies(['session' => '0x6100', 'lang' => 'de']);
     $this->assertEquals(
       [new Cookie('lang', 'de')],
-      iterator_to_array($cookies->merge(['session' => null]))
+      iterator_to_array($cookies->update(['session' => null]))
     );
   }
 

@@ -23,7 +23,7 @@ class Cookies implements Value, \IteratorAggregate {
 
   /** @param webservices.rest.Cookie[]|[:?string] $cookies */
   public function __construct($cookies) {
-    $this->merge($cookies);
+    $this->update($cookies);
   }
 
   /**
@@ -88,12 +88,12 @@ class Cookies implements Value, \IteratorAggregate {
   public function clear() { $this->list= []; return $this; }
 
   /**
-   * Merges these cookies with a given list of cookies
+   * Update these cookies with a given list of cookies
    *
    * @param  webservices.rest.Cookie[]|[:?string] $cookies
    * @return self
    */
-  public function merge($cookies) {
+  public function update($cookies) {
     foreach ($cookies as $name => $cookie) {
       if ($cookie instanceof Cookie) {
         $domain= $cookie->domain();
