@@ -5,6 +5,7 @@ use peer\http\HttpConnection;
 use peer\http\HttpRequest;
 use util\URI;
 use util\data\Marshalling;
+use util\log\Traceable;
 use webservices\rest\io\Buffered;
 use webservices\rest\io\Reader;
 use webservices\rest\io\Streamed;
@@ -14,8 +15,9 @@ use webservices\rest\io\Streamed;
  *
  * @test  xp://web.rest.unittest.EndpointTest
  */
-class Endpoint {
+class Endpoint implements Traceable {
   private $base, $formats, $transfer, $marshalling;
+  private $cat= null;
 
   /**
    * Creates a new REST endpoint with a given base URI. The base URI may contain
@@ -79,6 +81,16 @@ class Endpoint {
   }
 
   /**
+   * Sets a log category for debugging
+   *
+   * @param  ?util.log.LogCategory $cat
+   * @return void
+   */
+  public function setTrace($cat) {
+    $this->cat= $cat;
+  }
+
+  /**
    * Sends a request and returns the response
    *
    * @param  web.rest.RestRequest $request
@@ -88,6 +100,7 @@ class Endpoint {
   public function execute(RestRequest $request) {
     $uri= $this->base->resolve($request->path());
     $conn= $this->connections->__invoke($uri);
+    $conn->setTrace($this->cat);
     $headers= $request->headers();
 
     // RFC 6265: When the user agent generates an HTTP request, the user agent
