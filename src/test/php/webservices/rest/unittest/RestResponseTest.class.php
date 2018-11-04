@@ -5,6 +5,8 @@ use lang\IllegalStateException;
 use unittest\TestCase;
 use util\URI;
 use util\data\Marshalling;
+use webservices\rest\Cookie;
+use webservices\rest\Cookies;
 use webservices\rest\RestResponse;
 use webservices\rest\format\Json;
 use webservices\rest\io\Reader;
@@ -103,5 +105,100 @@ class RestResponseTest extends TestCase {
     $stream= new MemoryInputStream('{"key":200}');
     $reader= new Reader($stream, new Json(), new Marshalling());
     $this->assertEquals(['key' => '200'], (new RestResponse(200, 'OK', [], $reader))->value('[:string]'));
+  }
+
+  #[@test]
+  public function no_cookies() {
+    $this->assertEquals(Cookies::$EMPTY, (new RestResponse(200, 'OK', []))->cookies());
+  }
+
+  #[@test]
+  public function one_cookie() {
+    $headers= ['Set-Cookie' => 'session=0x6100; HttpOnly; Path=/'];
+    $list= [new Cookie('session', '0x6100', ['HttpOnly' => true, 'Path' => '/'])];
+
+    $this->assertEquals(new Cookies($list), (new RestResponse(200, 'OK', $headers))->cookies());
+  }
+
+  #[@test]
+  public function multiple_cookies() {
+    $headers= ['Set-Cookie' => ['session=0x6100; Max-Age=3600', 'lang=de; Secure', 'test=']];
+    $list= [
+      new Cookie('session', '0x6100', ['Max-Age' => '3600']),
+      new Cookie('lang', 'de', ['Secure' => true]),
+      new Cookie('test', null),
+    ];
+
+    $this->assertEquals(new Cookies($list), (new RestResponse(200, 'OK', $headers))->cookies());
+  }
+
+  #[@test, @values([
+  #  'evil.example.com',
+  #  'evil.example',
+  #  'example',
+  #  'example.tld',
+  #  'evil-example.com',
+  #  'evil.example.com.tld',
+  #])]
+  public function cookie_from_invalid_domain_rejected($domain) {
+    $headers= ['Set-Cookie' => 'session=0x6100; Domain='.$domain];
+    $uri= new URI('http://app.example.com/');
+
+    $this->assertEquals(Cookies::$EMPTY, (new RestResponse(200, 'OK', $headers, null, $uri))->cookies());
+  }
+
+  #[@test]
+  public function cookie_from_parent_domain_accepted() {
+    $headers= ['Set-Cookie' => 'session=0x6100; Domain=example.com'];
+    $list= [new Cookie('session', '0x6100', ['Domain' => '.example.com'])];
+    $uri= new URI('http://app.example.com/');
+
+    $this->assertEquals(new Cookies($list), (new RestResponse(200, 'OK', $headers, null, $uri))->cookies());
+  }
+
+  #[@test]
+  public function secure_cookies_cannot_be_set_by_inssecure_sites() {
+    $headers= ['Set-Cookie' => 'session=0x6100; Secure'];
+    $uri= new URI('http://app.example.com/');
+
+    $this->assertEquals(Cookies::$EMPTY, (new RestResponse(200, 'OK', $headers, null, $uri))->cookies());
+  }
+
+  #[@test]
+  public function secure_prefix() {
+    $headers= ['Set-Cookie' => '__Secure-SID=12345; Secure'];
+    $list= [new Cookie('SID', '12345', ['Secure' => true])];
+
+    $this->assertEquals(new Cookies($list), (new RestResponse(200, 'OK', $headers))->cookies());
+  }
+
+  #[@test]
+  public function secure_prefix_rejects_insecure_cookies() {
+    $headers= ['Set-Cookie' => '__Secure-SID=12345'];
+
+    $this->assertEquals(Cookies::$EMPTY, (new RestResponse(200, 'OK', $headers))->cookies());
+  }
+
+  #[@test]
+  public function host_prefix() {
+    $headers= ['Set-Cookie' => '__Host-SID=12345; Secure; Path=/'];
+    $list= [new Cookie('SID', '12345', ['Domain' => 'app.example.com', 'Path' => '/', 'Secure' => true])];
+    $uri= new URI('https://app.example.com/');
+
+    $this->assertEquals(new Cookies($list), (new RestResponse(200, 'OK', $headers, null, $uri))->cookies());
+  }
+
+  #[@test, @values([
+  #  '__Host-SID=12345',
+  #  '__Host-SID=12345; Secure',
+  #  '__Host-SID=12345; Domain=example.com',
+  #  '__Host-SID=12345; Domain=example.com; Path=/',
+  #  '__Host-SID=12345; Secure; Domain=example.com; Path=/',
+  #])]
+  public function host_prefix_rejects($cookie) {
+    $headers= ['Set-Cookie' => $cookie];
+    $uri= new URI('https://app.example.com/');
+
+    $this->assertEquals(Cookies::$EMPTY, (new RestResponse(200, 'OK', $headers, null, $uri))->cookies());
   }
 }

@@ -92,6 +92,17 @@ class RestResource {
     return $this;
   }
 
+  /**
+   * Includes given cookies. Encodes value using URL encoding.
+   *
+   * @param  [:?string]|webservices.rest.Cookie[]|webservices.rest.Cookies $cookies
+   * @return self
+   */
+  public function including($cookies) {
+    $this->request->including($cookies);
+    return $this;
+  }
+
   public function get($parameters= []) {
     $request= clone $this->request;
     return $this->endpoint->execute($request->using('GET')

@@ -8,7 +8,7 @@
 class RestRequest {
   use Headers;
 
-  private $method, $path;
+  private $method, $path, $cookies;
   private $parameters= [];
   private $payload= null;
 
@@ -23,6 +23,7 @@ class RestRequest {
     $this->method= $method;
     $this->path= $path;
     $this->add($headers);
+    $this->cookies= Cookies::$EMPTY;
   }
 
   /** @return string */
@@ -33,6 +34,9 @@ class RestRequest {
 
   /** @return [:string] */
   public function parameters() { return $this->parameters; }
+
+  /** @return webservices.rest.Cookies */
+  public function cookies() { return $this->cookies; }
 
   /** @return webservices.rest.Payload */
   public function payload() { return $this->payload; }
@@ -56,6 +60,17 @@ class RestRequest {
    */
   public function with($headers) {
     $this->add($headers);
+    return $this;
+  }
+
+  /**
+   * Includes given cookies
+   *
+   * @param  [:?string]|webservices.rest.Cookie[]|webservices.rest.Cookies $cookies
+   * @return self
+   */
+  public function including($cookies) {
+    $this->cookies= $cookies instanceof Cookies ? $cookies : new Cookies($cookies);
     return $this;
   }
 

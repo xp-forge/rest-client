@@ -88,11 +88,20 @@ class Endpoint {
   public function execute(RestRequest $request) {
     $uri= $this->base->resolve($request->path());
     $conn= $this->connections->__invoke($uri);
+    $headers= $request->headers();
+
+    // RFC 6265: When the user agent generates an HTTP request, the user agent
+    // MUST NOT attach more than one Cookie header field.
+    $cookies= (array)$request->header('Cookie');
+    foreach ($request->cookies()->validFor($uri) as $cookie) {
+      $cookies[]= $cookie->name().'='.urlencode($cookie->value());
+    }
+    $cookies && $headers['Cookie']= implode('; ', $cookies);
 
     $s= $conn->create(new HttpRequest());
     $s->setMethod($request->method());
     $s->setTarget($uri->path());
-    $s->addHeaders($request->headers());
+    $s->addHeaders($headers);
     $s->setParameters($request->parameters());
 
     try {
