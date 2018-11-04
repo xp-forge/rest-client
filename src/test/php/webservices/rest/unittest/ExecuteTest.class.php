@@ -9,7 +9,7 @@ class ExecuteTest extends TestCase {
 
   #[@test]
   public function get() {
-    $fixture= (new Endpoint('http://test'))->connecting(function($uri) { return new TestConnection($uri); });
+    $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new']);
 
     $response= $fixture->resource('/test');
     $this->assertEquals(
@@ -20,7 +20,7 @@ class ExecuteTest extends TestCase {
 
   #[@test]
   public function get_with_parameters() {
-    $fixture= (new Endpoint('http://test'))->connecting(function($uri) { return new TestConnection($uri); });
+    $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new']);
 
     $response= $fixture->resource('/')->get(['username' => 'test']);
     $this->assertEquals("GET /?username=test HTTP/1.1\r\nConnection: close\r\nHost: test\r\n\r\n", $response->content());
@@ -28,7 +28,7 @@ class ExecuteTest extends TestCase {
 
   #[@test]
   public function get_with_parameters_in_resource() {
-    $fixture= (new Endpoint('http://test'))->connecting(function($uri) { return new TestConnection($uri); });
+    $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new']);
 
     $resource= $fixture->resource('/?username={0}', ['test']);
     $this->assertEquals(
@@ -39,7 +39,7 @@ class ExecuteTest extends TestCase {
 
   #[@test]
   public function get_with_cookies() {
-    $fixture= (new Endpoint('http://test'))->connecting(function($uri) { return new TestConnection($uri); });
+    $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new']);
 
     $resource= $fixture->resource('/')->including(['session' => '0x6100', 'lang' => 'de']);
     $this->assertEquals(
@@ -50,7 +50,7 @@ class ExecuteTest extends TestCase {
 
   #[@test]
   public function get_with_cookies_merges_cookie_header() {
-    $fixture= (new Endpoint('http://test'))->connecting(function($uri) { return new TestConnection($uri); });
+    $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new']);
 
     $resource= $fixture->resource('/')->with(['Cookie' => 'session=0x6100'])->including(['lang' => 'de']);
     $this->assertEquals(

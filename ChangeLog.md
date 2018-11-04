@@ -3,6 +3,10 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+* Improved `Endpoint::connecting()` to also accept callables using either
+  the array or "Class::method" string syntax.
+  (@thekid)
+
 ## 0.6.0 / 2018-11-04
 
 * Merged PR #6: Cookies - @thekid

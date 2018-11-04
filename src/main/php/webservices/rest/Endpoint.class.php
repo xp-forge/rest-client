@@ -54,13 +54,14 @@ class Endpoint {
   }
 
   /**
-   * Specify a connection function
+   * Specify a connection function, which gets passed a URI and returns a
+   * `HttpConnection` instance.
    *
-   * @param  function(util.URI): peer.http.HttpConnection $connections
+   * @param  function(var): peer.http.HttpConnection $connections
    * @return self
    */
   public function connecting($connections) {
-    $this->connections= $connections;
+    $this->connections= cast($connections, 'function(var): peer.http.HttpConnection');
     return $this;
   }
 
