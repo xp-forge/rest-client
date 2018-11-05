@@ -8,6 +8,7 @@
   "require" : {
     "xp-framework/core": "^9.0 | ^8.0 | ^7.0",
     "xp-framework/http": "^9.1",
+    "xp-framework/logging": "^9.0",
     "xp-framework/tokenize": "^8.0",
     "xp-forge/json": "^3.1",
     "xp-forge/uri": "^1.3",

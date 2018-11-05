@@ -5,17 +5,20 @@ use peer\http\HttpConnection;
 use peer\http\HttpRequest;
 use util\URI;
 use util\data\Marshalling;
+use util\log\Traceable;
 use webservices\rest\io\Buffered;
 use webservices\rest\io\Reader;
 use webservices\rest\io\Streamed;
+use webservices\rest\io\Traced;
 
 /**
  * Entry point class
  *
  * @test  xp://web.rest.unittest.EndpointTest
  */
-class Endpoint {
+class Endpoint implements Traceable {
   private $base, $formats, $transfer, $marshalling;
+  private $cat= null;
 
   /**
    * Creates a new REST endpoint with a given base URI. The base URI may contain
@@ -80,6 +83,20 @@ class Endpoint {
   }
 
   /**
+   * Sets a log category for debugging
+   *
+   * @param  ?util.log.LogCategory $cat
+   * @return void
+   */
+  public function setTrace($cat) {
+    if (null === $cat) {
+      $this->transfer= $this->transfer->untraced();
+    } else {
+      $this->transfer= new Traced($this->transfer, $cat);
+    }
+  }
+
+  /**
    * Sends a request and returns the response
    *
    * @param  web.rest.RestRequest $request
@@ -106,17 +123,12 @@ class Endpoint {
     $s->setParameters($request->parameters());
 
     try {
-      if ($payload= $request->payload()) {
-        $input= $this->formats->named($request->header('Content-Type'));
-        $writer= $this->transfer->writer($s, $payload->value(), $input, $this->marshalling);
-        $stream= $writer($conn->open($s));
-      } else {
-        $stream= $conn->open($s);
-      }
+      $input= $this->formats->named($request->header('Content-Type'));
+      $writer= $this->transfer->writer($s, $request->payload(), $input, $this->marshalling);
+      $r= $writer($conn);
 
-      $r= $conn->finish($stream);
       $output= $this->formats->named(current($r->header('Content-Type')));
-      $reader= new Reader($r->in(), $output, $this->marshalling);
+      $reader= $this->transfer->reader($r, $output, $this->marshalling);
       return new RestResponse($r->statusCode(), $r->message(), $r->headers(), $reader, $uri);
     } catch (Throwable $e) {
       throw new RestException('Cannot send request', $e);
