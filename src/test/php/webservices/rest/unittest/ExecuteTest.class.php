@@ -63,7 +63,7 @@ class ExecuteTest extends TestCase {
 
   #[@test]
   public function logging() {
-    $fixture= (new Endpoint('http://test'))->connecting(function($uri) { return new TestConnection($uri); });
+    $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new']);
 
     $log= new BufferedAppender();
     $fixture->setTrace(Logging::all()->to($log));
