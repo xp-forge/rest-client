@@ -2,7 +2,7 @@
 
 use io\streams\MemoryOutputStream;
 
-class Buffered implements Transfer {
+class Buffered extends Transfer {
 
   public function writer($request, $payload, $format, $marshalling) {
     $bytes= $format->serialize($marshalling->marshal($payload), new MemoryOutputStream())->getBytes();

@@ -1,6 +1,6 @@
 <?php namespace webservices\rest\io;
 
-class Streamed implements Transfer {
+class Streamed extends Transfer {
 
   public function writer($request, $payload, $format, $marshalling) {
     $request->setHeader('Transfer-Encoding', 'chunked');

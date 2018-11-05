@@ -1,6 +1,17 @@
 <?php namespace webservices\rest\io;
 
-interface Transfer {
+abstract class Transfer {
 
-  public function writer($request, $payload, $format, $marshalling);
+  /** @return self */
+  public function untraced() { return $this; }
+
+  public function header($request) {
+    // NOOP
+  }
+
+  public abstract function writer($request, $payload, $format, $marshalling);
+
+  public function reader($response, $format, $marshalling) {
+    return new Reader($response->in(), $format, $marshalling);
+  }
 }

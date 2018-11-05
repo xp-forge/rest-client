@@ -9,6 +9,7 @@ use util\log\Traceable;
 use webservices\rest\io\Buffered;
 use webservices\rest\io\Reader;
 use webservices\rest\io\Streamed;
+use webservices\rest\io\Traced;
 
 /**
  * Entry point class
@@ -87,7 +88,11 @@ class Endpoint implements Traceable {
    * @return void
    */
   public function setTrace($cat) {
-    $this->cat= $cat;
+    if (null === $cat) {
+      $this->transfer= $this->transfer->untraced();
+    } else {
+      $this->transfer= new Traced($this->transfer, $cat);
+    }
   }
 
   /**
@@ -117,20 +122,18 @@ class Endpoint implements Traceable {
     $s->setParameters($request->parameters());
 
     try {
-      $this->cat && $this->cat->info('>>>', $s->getHeaderString());
       if ($payload= $request->payload()) {
         $input= $this->formats->named($request->header('Content-Type'));
         $writer= $this->transfer->writer($s, $payload->value(), $input, $this->marshalling);
         $stream= $writer($conn->open($s));
       } else {
+        $this->transfer->header($s);
         $stream= $conn->open($s);
       }
 
       $r= $conn->finish($stream);
-      $this->cat && $this->cat->info('<<<', $r->getHeaderString());
-
       $output= $this->formats->named(current($r->header('Content-Type')));
-      $reader= new Reader($r->in(), $output, $this->marshalling);
+      $reader= $this->transfer->reader($r, $output, $this->marshalling);
       return new RestResponse($r->statusCode(), $r->message(), $r->headers(), $reader, $uri);
     } catch (Throwable $e) {
       throw new RestException('Cannot send request', $e);
