@@ -8,21 +8,27 @@ use peer\http\HttpResponse;
 
 class TestConnection extends HttpConnection {
 
-  public function open(HttpRequest $request) {
+  private function header($request) {
     $header= $request->method.' '.$request->target().' HTTP/'.$request->version."\r\n";
     foreach ($request->headers as $name => $values) {
       foreach ($values as $value) {
         $header.= $name.': '.$value."\r\n";
       }
     }
-    return new TestOutputStream($header);
+    return $header;
   }
 
-  public function finish(HttpOutputStream $stream) {
+  private function response($bytes) {
     return new HttpResponse(new MemoryInputStream(sprintf(
       "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",
-      strlen($stream->bytes),
-      $stream->bytes
+      strlen($bytes),
+      $bytes
     )));
   }
+
+  public function send(HttpRequest $request) { return $this->response($this->header($request)."\r\n"); }
+
+  public function open(HttpRequest $request) { return new TestOutputStream($this->header($request)); }
+
+  public function finish(HttpOutputStream $stream) { return $this->response($stream->bytes); }
 }

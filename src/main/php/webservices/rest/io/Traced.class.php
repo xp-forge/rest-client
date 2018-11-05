@@ -21,20 +21,19 @@ class Traced extends Transfer {
   /** @return parent */
   public function untraced() { return $this->untraced; }
 
-  public function header($request) {
-    $this->cat->info('>>>', substr($request->getHeaderString(), 0, -2));
-  }
-
   public function writer($request, $payload, $format, $marshalling) {
     $this->cat->info('>>>', substr($request->getHeaderString(), 0, -2));
-    $bytes= $format->serialize($marshalling->marshal($payload), new MemoryOutputStream())->getBytes();
+    if (null === $payload) return function($conn) use($request) { return $conn->send($request); };
+
+    $bytes= $format->serialize($marshalling->marshal($payload->value()), new MemoryOutputStream())->getBytes();
     $this->cat->debug($bytes);
 
     // We've created it anyway, now simply transfer the bytes in a buffered manner
     $request->setHeader('Content-Length', strlen($bytes));
-    return function($stream) use($bytes) {
+    return function($conn) use($request, $bytes) {
+      $stream= $conn->open($request);
       $stream->write($bytes);
-      return $stream;
+      return $conn->finish($stream);
     };
   }
 

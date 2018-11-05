@@ -13,10 +13,10 @@ class ExecuteTest extends TestCase {
   public function get() {
     $fixture= (new Endpoint('http://test'))->connecting(function($uri) { return new TestConnection($uri); });
 
-    $response= $fixture->resource('/test');
+    $response= $fixture->resource('/test')->get();
     $this->assertEquals(
       "GET /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\n\r\n",
-      $response->get()->content()
+      $response->content()
     );
   }
 
