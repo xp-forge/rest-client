@@ -3,6 +3,10 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 0.7.1 / 2018-11-05
+
+* Added compatibility with older xp-framework/logging releases - @thekid
+
 ## 0.7.0 / 2018-11-05
 
 * Merged PR #8: RestFormat - @thekid
