@@ -3,6 +3,9 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 0.7.0 / 2018-11-05
+
+* Merge PR #7: Logging - @thekid
 * Improved `Endpoint::connecting()` to also accept callables using either
   the array or "Class::method" string syntax.
   (@thekid)
