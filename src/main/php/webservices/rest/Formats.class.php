@@ -7,7 +7,7 @@ use webservices\rest\format\Unsupported;
 /**
  * Formats registry
  *
- * @test  xp://web.rest.unittest.FormatsTest
+ * @test  xp://webservices.rest.unittest.FormatsTest
  */
 class Formats {
   private $matches= [], $patterns= [];
@@ -28,7 +28,7 @@ class Formats {
    * Adds a mime type
    *
    * @param  string $mime
-   * @param  web.rest.format.Format $format
+   * @param  webservices.rest.format.Format $format
    * @return self
    */
   public function with($mime, $format) {
@@ -40,7 +40,7 @@ class Formats {
    * Adds a mime type pattern 
    *
    * @param  string $pattern Pattern, using `*` as placeholder for one or more characters
-   * @param  web.rest.format.Format $format
+   * @param  webservices.rest.format.Format $format
    * @return self
    */
   public function matching($pattern, $format) {
@@ -51,8 +51,8 @@ class Formats {
   /**
    * Returns a type for a given header
    *
-   * @param  string $header
-   * @return web.rest.format.Format
+   * @param  string|webservices.rest.RestFormat $header
+   * @return webservices.rest.format.Format
    */
   public function named($header) {
     $mime= substr($header, 0, strcspn($header, ';'));    // FIXME: What to do with charset?

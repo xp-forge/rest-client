@@ -2,6 +2,7 @@
 
 use unittest\TestCase;
 use webservices\rest\Formats;
+use webservices\rest\RestFormat;
 use webservices\rest\format\FormUrlencoded;
 use webservices\rest\format\Format;
 use webservices\rest\format\Json;
@@ -27,6 +28,11 @@ class FormatsTest extends TestCase {
   #[@test]
   public function supports_json_vendor_types_by_default() {
     $this->assertInstanceOf(Json::class, Formats::defaults()->named('application/vnd.github.v3+json'));
+  }
+
+  #[@test]
+  public function using_restformat_enum() {
+    $this->assertInstanceOf(Json::class, Formats::defaults()->named(RestFormat::$JSON));
   }
 
   #[@test]
