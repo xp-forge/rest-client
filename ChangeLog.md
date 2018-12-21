@@ -3,6 +3,10 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 0.7.2 / 2018-12-21
+
+* Fixed issue #9: Added missing RestException class - @thekid
+
 ## 0.7.1 / 2018-11-05
 
 * Added compatibility with older xp-framework/logging releases - @thekid
