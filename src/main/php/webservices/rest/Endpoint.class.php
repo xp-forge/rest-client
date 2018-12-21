@@ -14,7 +14,7 @@ use webservices\rest\io\Traced;
 /**
  * Entry point class
  *
- * @test  xp://web.rest.unittest.EndpointTest
+ * @test  xp://webservices.rest.unittest.EndpointTest
  */
 class Endpoint implements Traceable {
   private $base, $formats, $transfer, $marshalling;
@@ -25,7 +25,7 @@ class Endpoint implements Traceable {
    * basic auth credentials, and a path, which is treated as a directory.
    * 
    * @param  string|util.URI|peer.URL $base
-   * @param  ?web.rest.Formats $formats
+   * @param  ?webservices.rest.Formats $formats
    */
   public function __construct($base, Formats $formats= null) {
     if ($base instanceof URI) {
@@ -76,7 +76,7 @@ class Endpoint implements Traceable {
    *
    * @param  string $path
    * @param  [:string] $segments
-   * @return web.rest.RestResource
+   * @return webservices.rest.RestResource
    */
   public function resource($path, $segments= []) {
     return new RestResource($this, $path, $segments);
@@ -99,9 +99,9 @@ class Endpoint implements Traceable {
   /**
    * Sends a request and returns the response
    *
-   * @param  web.rest.RestRequest $request
-   * @return web.rest.RestResponse
-   * @throws web.rest.RestException
+   * @param  webservices.rest.RestRequest $request
+   * @return webservices.rest.RestResponse
+   * @throws webservices.rest.RestException
    */
   public function execute(RestRequest $request) {
     $uri= $this->base->resolve($request->path());
