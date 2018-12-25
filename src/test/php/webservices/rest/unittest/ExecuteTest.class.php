@@ -3,6 +3,7 @@
 use lang\ClassLoader;
 use peer\ConnectException;
 use peer\http\HttpConnection;
+use peer\http\HttpRequest;
 use unittest\TestCase;
 use util\log\BufferedAppender;
 use util\log\Logging;
@@ -84,7 +85,7 @@ class ExecuteTest extends TestCase {
   public function exceptions_from_sending_requests_are_wrapped() {
     $fixture= (new Endpoint('http://test'))->connecting(function($uri) {
       return newinstance(HttpConnection::class, [$uri], [
-        'send' => function($req) { throw new ConnectException('Test'); }
+        'send' => function(HttpRequest $req) { throw new ConnectException('Test'); }
       ]);
     });
 
