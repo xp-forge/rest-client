@@ -3,6 +3,11 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 0.7.3 / 2018-12-25
+
+* Fixed wrapping of exceptions from `execute()` in `RestException`s.
+  (@thekid)
+
 ## 0.7.2 / 2018-12-21
 
 * Fixed issue #9: Added missing RestException class - @thekid

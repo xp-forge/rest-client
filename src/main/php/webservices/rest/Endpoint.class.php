@@ -1,5 +1,6 @@
 <?php namespace webservices\rest;
 
+use lang\Throwable;
 use peer\URL;
 use peer\http\HttpConnection;
 use peer\http\HttpRequest;

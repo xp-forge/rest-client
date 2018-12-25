@@ -1,11 +1,13 @@
 <?php namespace webservices\rest\unittest;
 
 use lang\ClassLoader;
+use peer\ConnectException;
 use peer\http\HttpConnection;
 use unittest\TestCase;
 use util\log\BufferedAppender;
 use util\log\Logging;
 use webservices\rest\Endpoint;
+use webservices\rest\RestException;
 
 class ExecuteTest extends TestCase {
 
@@ -76,5 +78,16 @@ class ExecuteTest extends TestCase {
       ['req' => preg_match('~GET /users/0 HTTP/1\.1~', $buf), 'res' => preg_match('~HTTP/1\.1 200 OK~', $buf)],
       $buf
     );
+  }
+
+  #[@test, @expect(RestException::class)]
+  public function exceptions_from_sending_requests_are_wrapped() {
+    $fixture= (new Endpoint('http://test'))->connecting(function($uri) {
+      return newinstance(HttpConnection::class, [$uri], [
+        'send' => function($req) { throw new ConnectException('Test'); }
+      ]);
+    });
+
+    $fixture->resource('/fails')->get();
   }
 }
