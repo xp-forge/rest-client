@@ -1,9 +1,11 @@
 <?php namespace webservices\rest\format;
 
+use Traversable;
 use io\streams\LinesIn;
 use text\json\Format as WireFormat;
 use text\json\StringInput;
 use text\json\StreamOutput;
+use util\XPIterator;
 /**
  * Implements ndjson.
  *
@@ -31,10 +33,15 @@ class NdJson extends Format {
    */
   public function serialize($value, $stream) {
     $out= new StreamOutput($stream, $this->format);
-    if (is_array($value) && is_int(key($value))) {
+    if ($value instanceof Traversable) {
       foreach ($value as $val) {
         $out->write($val); // ensure our value is written as JSON to the stream
         $stream->write("\n"); // write newline to stream directly so it's not encoded as JSON string
+      }
+    } else if ($value instanceof XPIterator) {
+      while ($value->hasNext()) {
+        $out->write($value->next());
+        $stream->write("\n");
       }
     } else {
       $out->write($value);
@@ -47,14 +54,11 @@ class NdJson extends Format {
    * Deserialize a value from a given stream
    *
    * @param  io.streams.InputStream
-   * @return var
+   * @return Generator
    */
   public function deserialize($stream) {
-    $vals= [];
     foreach ((new LinesIn($stream)) as $line) {
-      $vals[]= (new StringInput($line))->read();
+      yield (new StringInput($line))->read();
     }
-
-    return $vals;
   }
 }
