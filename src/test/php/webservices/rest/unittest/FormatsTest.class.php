@@ -6,6 +6,7 @@ use webservices\rest\RestFormat;
 use webservices\rest\format\FormUrlencoded;
 use webservices\rest\format\Format;
 use webservices\rest\format\Json;
+use webservices\rest\format\NdJson;
 use webservices\rest\format\Unsupported;
 
 class FormatsTest extends TestCase {
@@ -18,6 +19,11 @@ class FormatsTest extends TestCase {
   #[@test]
   public function supports_json_by_default() {
     $this->assertInstanceOf(Json::class, Formats::defaults()->named('application/json'));
+  }
+
+  #[@test]
+  public function supports_ndjson_by_default() {
+    $this->assertInstanceOf(NdJson::class, Formats::defaults()->named(NdJson::MIMETYPE));
   }
 
   #[@test]
