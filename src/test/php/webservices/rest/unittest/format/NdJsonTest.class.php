@@ -4,7 +4,6 @@ use io\streams\MemoryInputStream;
 use io\streams\MemoryOutputStream;
 use lang\XPException;
 use unittest\TestCase;
-use util\XPIterator;
 use webservices\rest\format\NdJson;
 
 class NdJsonTest extends TestCase {
@@ -21,16 +20,6 @@ class NdJsonTest extends TestCase {
   #])]
   public function serialize($value, $expected) {
     $this->assertEquals($expected, (new NdJson())->serialize(new \ArrayIterator($value), new MemoryOutputStream())->getBytes());
-  }
-
-  #[@test]
-  public function serialize_util_Iterators() {
-    $i= newinstance(XPIterator::class, [], [
-      'backing' => [1, 2, 3],
-      'next' => function() { return array_shift($this->backing); },
-      'hasNext' => function() { return !empty($this->backing); }
-    ]);
-    $this->assertEquals("1\n2\n3\n", (new NdJson())->serialize($i, new MemoryOutputStream())->getBytes());
   }
 
   #[@test, @values([

@@ -5,7 +5,6 @@ use io\streams\LinesIn;
 use text\json\Format as WireFormat;
 use text\json\StringInput;
 use text\json\StreamOutput;
-use util\XPIterator;
 /**
  * Implements ndjson.
  *
@@ -37,11 +36,6 @@ class NdJson extends Format {
       foreach ($value as $val) {
         $out->write($val); // ensure our value is written as JSON to the stream
         $stream->write("\n"); // write newline to stream directly so it's not encoded as JSON string
-      }
-    } else if ($value instanceof XPIterator) {
-      while ($value->hasNext()) {
-        $out->write($value->next());
-        $stream->write("\n");
       }
     } else {
       $out->write($value);
