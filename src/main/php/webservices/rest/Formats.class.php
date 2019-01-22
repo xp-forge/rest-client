@@ -2,6 +2,7 @@
 
 use webservices\rest\format\FormUrlencoded;
 use webservices\rest\format\Json;
+use webservices\rest\format\NdJson;
 use webservices\rest\format\Unsupported;
 
 /**
@@ -19,6 +20,7 @@ class Formats {
    */
   public static function defaults() {
     $self= new self();
+    $self->matches[NdJson::MIMETYPE]= new NdJson();
     $self->patterns['#^application/vnd\.(.+)\+json$#']= $self->matches['application/json']= new Json();
     $self->matches['application/x-www-form-urlencoded']= new FormUrlencoded();
     return $self;
@@ -37,7 +39,7 @@ class Formats {
   }
 
   /**
-   * Adds a mime type pattern 
+   * Adds a mime type pattern
    *
    * @param  string $pattern Pattern, using `*` as placeholder for one or more characters
    * @param  webservices.rest.format.Format $format
