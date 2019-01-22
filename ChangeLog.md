@@ -3,6 +3,10 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 0.8.0 / 2019-01-22
+
+* Merged PR #9: Implement support for ndjson - @mikey179
+
 ## 0.7.3 / 2018-12-25
 
 * Fixed wrapping of exceptions from `execute()` in `RestException`s.
