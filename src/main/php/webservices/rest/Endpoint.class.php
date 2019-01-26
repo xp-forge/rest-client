@@ -19,6 +19,7 @@ use webservices\rest\io\Traced;
  */
 class Endpoint implements Traceable {
   private $base, $formats, $transfer, $marshalling;
+  private $headers= [];
   private $cat= null;
 
   /**
@@ -73,6 +74,22 @@ class Endpoint implements Traceable {
   public function base() { return $this->base; }
 
   /**
+   * Adds headers to be sent with every request
+   *
+   * @param  string|[:string] $arg
+   * @param  string $value
+   * @return self
+   */
+  public function with($arg, $value= null) {
+    if (is_array($arg)) {
+      $this->headers= array_merge($this->headers, $arg);
+    } else {
+      $this->headers[$arg]= $value;
+    }
+    return $this;
+  }
+
+  /**
    * Returns a REST resource
    *
    * @param  string $path
@@ -107,7 +124,7 @@ class Endpoint implements Traceable {
   public function execute(RestRequest $request) {
     $uri= $this->base->resolve($request->path());
     $conn= $this->connections->__invoke($uri);
-    $headers= $request->headers();
+    $headers= array_merge($this->headers, $request->headers());
 
     // RFC 6265: When the user agent generates an HTTP request, the user agent
     // MUST NOT attach more than one Cookie header field.

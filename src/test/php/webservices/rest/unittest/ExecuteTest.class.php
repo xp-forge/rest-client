@@ -65,6 +65,28 @@ class ExecuteTest extends TestCase {
   }
 
   #[@test]
+  public function get_with_header() {
+    $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new'])->with('User-Agent', 'XP');
+
+    $response= $fixture->resource('/test')->get();
+    $this->assertEquals(
+      "GET /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\nUser-Agent: XP\r\n\r\n",
+      $response->content()
+    );
+  }
+
+  #[@test]
+  public function get_with_headers() {
+    $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new'])->with(['User-Agent' => 'XP']);
+
+    $response= $fixture->resource('/test')->get();
+    $this->assertEquals(
+      "GET /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\nUser-Agent: XP\r\n\r\n",
+      $response->content()
+    );
+  }
+
+  #[@test]
   public function logging() {
     $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new']);
 

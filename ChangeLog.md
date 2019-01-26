@@ -3,6 +3,12 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 0.9.0 / 2019-01-22
+
+* Add method to supply headers to be sent with every request using
+  `Endpoint::with()`.
+  (@thekid)
+
 ## 0.8.0 / 2019-01-22
 
 * Merged PR #11: Implement support for ndjson - @mikey179
