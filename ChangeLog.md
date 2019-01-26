@@ -3,7 +3,7 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
-## 0.9.0 / 2019-01-22
+## 1.0.0 / 2019-01-22
 
 * Add method to supply headers to be sent with every request using
   `Endpoint::with()`.
