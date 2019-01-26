@@ -7,6 +7,7 @@ use util\URI;
 use util\data\Marshalling;
 use webservices\rest\Cookie;
 use webservices\rest\Cookies;
+use webservices\rest\Link;
 use webservices\rest\RestResponse;
 use webservices\rest\format\Json;
 use webservices\rest\io\Reader;
@@ -49,6 +50,19 @@ class RestResponseTest extends TestCase {
     $stream= new MemoryInputStream('...');
     $reader= new Reader($stream, new Json(), new Marshalling());
     $this->assertEquals($stream, (new RestResponse(200, 'OK', [], $reader))->stream());
+  }
+
+  #[@test]
+  public function without_links() {
+    $this->assertEquals([], iterator_to_array((new RestResponse(200, 'OK', []))->links()->all()));
+  }
+
+  #[@test]
+  public function link() {
+    $this->assertEquals(
+      [new Link('meta.rdf', ['rel' => 'meta'])],
+      iterator_to_array((new RestResponse(200, 'OK', ['Link' => '<meta.rdf>;rel=meta']))->links()->all())
+    );
   }
 
   #[@test]

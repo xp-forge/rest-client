@@ -3,9 +3,11 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
-## 1.0.0 / 2019-01-22
+## 1.0.0 / 2019-01-26
 
-* Add method to supply headers to be sent with every request using
+* Added `RestResponse::links()` method to access the *Link* header
+  (@thekid)
+* Added method to supply headers to be sent with every request using
   `Endpoint::with()`.
   (@thekid)
 

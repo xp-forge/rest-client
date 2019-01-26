@@ -59,6 +59,15 @@ class RestResponse implements Value {
   }
 
   /**
+   * Returns links sent by server.
+   *
+   * @return webservices.rest.Links
+   */
+  public function links() {
+    return Links::in($this->header('Link'));
+  }
+
+  /**
    * Returns cookies sent by server.
    *
    * @return webservices.rest.Cookies
