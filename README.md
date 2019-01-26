@@ -48,6 +48,15 @@ $exists= (200 === $api->resource('users/1549')->head()->status());
 
 // Pass parameters
 $list= $api->resource('user')->get(['page' => 1, 'per_page' => 50])->value();
+
+// Access pagination
+$resource= 'groups';
+do {
+  $response= $this->endpoint->resource($resource)->get(['per_page' => 200]);
+  foreach ($response->value() as $group) {
+    yield $group['id'] => $group;
+  }
+} while ($resource= $response->links()->uri(['rel' => 'next']));
 ```
 
 ### Updating: put / patch
