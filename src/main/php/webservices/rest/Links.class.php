@@ -3,6 +3,7 @@
 use lang\FormatException;
 use lang\Value;
 use text\StringTokenizer;
+use util\Objects;
 
 /**
  * Link header
@@ -25,7 +26,7 @@ class Links implements Value {
   private function expect($st, $tokens) {
     $parsed= $st->nextToken($tokens);
     if (null === $parsed || false === strpos($tokens, $parsed)) {
-      throw new FormatException('Expected ['.$tokens.'], have '.\xp::stringOf($parsed));
+      throw new FormatException('Expected ['.$tokens.'], have '.Objects::stringOf($parsed));
     }
     return $parsed;
   }
