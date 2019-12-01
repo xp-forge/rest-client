@@ -3,6 +3,10 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 1.0.1 / 2019-12-01
+
+* Made compatible with XP 10 - @thekid
+
 ## 1.0.0 / 2019-01-26
 
 * Added `RestResponse::links()` method to access the *Link* header
