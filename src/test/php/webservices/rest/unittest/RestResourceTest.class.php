@@ -9,13 +9,13 @@ class RestResourceTest extends TestCase {
 
   /** @return void */
   public function setUp() {
-    $this->endpoint= newinstance(Endpoint::class, ['https://api.example.com/'], [
-      'sent'    => [],
-      'execute' => function(RestRequest $request) {
+    $this->endpoint= new class('https://api.example.com/') extends Endpoint {
+      public $sent= [];
+      public function execute(RestRequest $request) {
         $this->sent[]= $request;
         return new RestResponse(200, 'OK');
       }
-    ]);
+    };
   }
 
   #[@test]

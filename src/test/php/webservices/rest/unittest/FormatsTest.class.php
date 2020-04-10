@@ -1,8 +1,8 @@
 <?php namespace webservices\rest\unittest;
 
 use unittest\TestCase;
-use webservices\rest\{Formats, RestFormat};
 use webservices\rest\format\{FormUrlencoded, Format, Json, NdJson, Unsupported};
+use webservices\rest\{Formats, RestFormat};
 
 class FormatsTest extends TestCase {
 
@@ -44,10 +44,10 @@ class FormatsTest extends TestCase {
   #[@test]
   public function with_vendor_mimetype() {
     $mime= 'application/vnd.php.serialized';
-    $format= newinstance(Format::class, [], [
-      'serialize'   => function($value, $stream) { /* TBI */ },
-      'deserialize' => function($stream) { /* TBI */ }
-    ]);
+    $format= new class() extends Format {
+      public function serialize($value, $stream) { /* TBI */ }
+      public function deserialize($stream) { /* TBI */ }
+    };
 
     $this->assertEquals($format, (new Formats())->with($mime, $format)->named($mime));
   }
@@ -58,10 +58,10 @@ class FormatsTest extends TestCase {
   #])]
   public function matching_vendor_mimetype($mime) {
     $pattern= 'application/vnd.*+xml';
-    $format= newinstance(Format::class, [], [
-      'serialize'   => function($value, $stream) { /* TBI */ },
-      'deserialize' => function($stream) { /* TBI */ }
-    ]);
+    $format= new class() extends Format {
+      public function serialize($value, $stream) { /* TBI */ }
+      public function deserialize($stream) { /* TBI */ }
+    };
 
     $this->assertEquals($format, (new Formats())->matching($pattern, $format)->named($mime));
   }
