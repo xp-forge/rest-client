@@ -3,6 +3,10 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 1.0.3 / 2020-04-10
+
+* Made compatible with `xp-forge/uri` version 2.0.0 - @thekid
+
 ## 1.0.2 / 2020-04-10
 
 * Implemented RFC #335: Remove deprecated key/value pair annotation syntax
