@@ -2,13 +2,10 @@
 
 use lang\ClassLoader;
 use peer\ConnectException;
-use peer\http\HttpConnection;
-use peer\http\HttpRequest;
+use peer\http\{HttpConnection, HttpRequest};
 use unittest\TestCase;
-use util\log\BufferedAppender;
-use util\log\Logging;
-use webservices\rest\Endpoint;
-use webservices\rest\RestException;
+use util\log\{BufferedAppender, Logging};
+use webservices\rest\{Endpoint, RestException};
 
 class ExecuteTest extends TestCase {
 

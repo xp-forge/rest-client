@@ -1,8 +1,6 @@
 <?php namespace webservices\rest\io;
 
-use io\streams\MemoryInputStream;
-use io\streams\MemoryOutputStream;
-use io\streams\Streams;
+use io\streams\{MemoryInputStream, MemoryOutputStream, Streams};
 
 class Traced extends Transfer {
   private $untraced, $cat;

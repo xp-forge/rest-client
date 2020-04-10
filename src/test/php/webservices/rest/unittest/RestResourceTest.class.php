@@ -2,12 +2,7 @@
 
 use lang\ElementNotFoundException;
 use unittest\TestCase;
-use webservices\rest\Cookie;
-use webservices\rest\Cookies;
-use webservices\rest\Endpoint;
-use webservices\rest\RestRequest;
-use webservices\rest\RestResource;
-use webservices\rest\RestResponse;
+use webservices\rest\{Cookie, Cookies, Endpoint, RestRequest, RestResource, RestResponse};
 
 class RestResourceTest extends TestCase {
   private $endpoint;

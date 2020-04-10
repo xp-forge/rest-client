@@ -3,8 +3,7 @@
 use lang\ElementNotFoundException;
 use unittest\TestCase;
 use unittest\actions\RuntimeVersion;
-use webservices\rest\Cookie;
-use webservices\rest\Cookies;
+use webservices\rest\{Cookie, Cookies};
 
 class CookiesTest extends TestCase {
 

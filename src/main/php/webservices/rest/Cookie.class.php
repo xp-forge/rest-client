@@ -1,8 +1,7 @@
 <?php namespace webservices\rest;
 
 use lang\Value;
-use util\Date;
-use util\Objects;
+use util\{Date, Objects};
 
 class Cookie implements Value {
   private $name, $value, $attributes;

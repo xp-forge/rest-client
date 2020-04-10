@@ -1,8 +1,7 @@
 <?php namespace webservices\rest\unittest;
 
 use lang\FormatException;
-use webservices\rest\Link;
-use webservices\rest\Links;
+use webservices\rest\{Link, Links};
 
 class LinksTest extends \unittest\TestCase {
 

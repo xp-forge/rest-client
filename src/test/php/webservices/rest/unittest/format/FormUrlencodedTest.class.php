@@ -1,7 +1,6 @@
 <?php namespace webservices\rest\unittest\format;
 
-use io\streams\MemoryInputStream;
-use io\streams\MemoryOutputStream;
+use io\streams\{MemoryInputStream, MemoryOutputStream};
 use unittest\TestCase;
 use webservices\rest\format\FormUrlencoded;
 

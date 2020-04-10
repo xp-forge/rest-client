@@ -1,13 +1,8 @@
 <?php namespace webservices\rest\unittest;
 
 use unittest\TestCase;
-use webservices\rest\Formats;
-use webservices\rest\RestFormat;
-use webservices\rest\format\FormUrlencoded;
-use webservices\rest\format\Format;
-use webservices\rest\format\Json;
-use webservices\rest\format\NdJson;
-use webservices\rest\format\Unsupported;
+use webservices\rest\{Formats, RestFormat};
+use webservices\rest\format\{FormUrlencoded, Format, Json, NdJson, Unsupported};
 
 class FormatsTest extends TestCase {
 

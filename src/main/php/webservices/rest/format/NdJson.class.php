@@ -1,10 +1,8 @@
 <?php namespace webservices\rest\format;
 
-use Traversable;
 use io\streams\LinesIn;
-use text\json\Format as WireFormat;
-use text\json\StringInput;
-use text\json\StreamOutput;
+use text\json\{Format as WireFormat, StreamOutput, StringInput};
+
 /**
  * Implements ndjson.
  *
@@ -32,7 +30,7 @@ class NdJson extends Format {
    */
   public function serialize($value, $stream) {
     $out= new StreamOutput($stream, $this->format);
-    if ($value instanceof Traversable) {
+    if ($value instanceof \Traversable) {
       foreach ($value as $val) {
         $out->write($val); // ensure our value is written as JSON to the stream
         $stream->write("\n"); // write newline to stream directly so it's not encoded as JSON string

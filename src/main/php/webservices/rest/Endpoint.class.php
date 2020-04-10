@@ -2,15 +2,11 @@
 
 use lang\Throwable;
 use peer\URL;
-use peer\http\HttpConnection;
-use peer\http\HttpRequest;
+use peer\http\{HttpConnection, HttpRequest};
 use util\URI;
 use util\data\Marshalling;
 use util\log\Traceable;
-use webservices\rest\io\Buffered;
-use webservices\rest\io\Reader;
-use webservices\rest\io\Streamed;
-use webservices\rest\io\Traced;
+use webservices\rest\io\{Buffered, Reader, Streamed, Traced};
 
 /**
  * Entry point class

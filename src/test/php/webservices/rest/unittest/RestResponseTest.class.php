@@ -5,10 +5,7 @@ use lang\IllegalStateException;
 use unittest\TestCase;
 use util\URI;
 use util\data\Marshalling;
-use webservices\rest\Cookie;
-use webservices\rest\Cookies;
-use webservices\rest\Link;
-use webservices\rest\RestResponse;
+use webservices\rest\{Cookie, Cookies, Link, RestResponse};
 use webservices\rest\format\Json;
 use webservices\rest\io\Reader;
 

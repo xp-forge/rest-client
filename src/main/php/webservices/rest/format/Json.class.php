@@ -1,8 +1,6 @@
 <?php namespace webservices\rest\format;
 
-use text\json\Format as WireFormat;
-use text\json\StreamInput;
-use text\json\StreamOutput;
+use text\json\{Format as WireFormat, StreamInput, StreamOutput};
 
 /**
  * Represents `application/json`

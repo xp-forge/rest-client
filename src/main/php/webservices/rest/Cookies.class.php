@@ -1,10 +1,7 @@
 <?php namespace webservices\rest;
 
-use lang\ElementNotFoundException;
-use lang\Value;
-use util\Date;
-use util\Objects;
-use util\URI;
+use lang\{ElementNotFoundException, Value};
+use util\{Date, Objects, URI};
 
 /**
  * Cookie JAR

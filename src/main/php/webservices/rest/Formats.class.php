@@ -1,9 +1,6 @@
 <?php namespace webservices\rest;
 
-use webservices\rest\format\FormUrlencoded;
-use webservices\rest\format\Json;
-use webservices\rest\format\NdJson;
-use webservices\rest\format\Unsupported;
+use webservices\rest\format\{FormUrlencoded, Json, NdJson, Unsupported};
 
 /**
  * Formats registry

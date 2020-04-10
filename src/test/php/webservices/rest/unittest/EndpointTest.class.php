@@ -1,14 +1,11 @@
 <?php namespace webservices\rest\unittest;
 
-use lang\Error;
-use lang\FormatException;
-use lang\IllegalArgumentException;
+use lang\{Error, FormatException, IllegalArgumentException};
 use peer\URL;
 use unittest\TestCase;
 use unittest\actions\RuntimeVersion;
 use util\URI;
-use webservices\rest\Endpoint;
-use webservices\rest\RestResource;
+use webservices\rest\{Endpoint, RestResource};
 
 class EndpointTest extends TestCase {
   const BASE_URL = 'https://api.example.com/';

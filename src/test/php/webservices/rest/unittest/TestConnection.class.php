@@ -1,10 +1,7 @@
 <?php namespace webservices\rest\unittest;
 
 use io\streams\MemoryInputStream;
-use peer\http\HttpConnection;
-use peer\http\HttpOutputStream;
-use peer\http\HttpRequest;
-use peer\http\HttpResponse;
+use peer\http\{HttpConnection, HttpOutputStream, HttpRequest, HttpResponse};
 
 class TestConnection extends HttpConnection {
 

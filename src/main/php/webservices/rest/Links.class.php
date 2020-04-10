@@ -1,7 +1,6 @@
 <?php namespace webservices\rest;
 
-use lang\FormatException;
-use lang\Value;
+use lang\{FormatException, Value};
 use text\StringTokenizer;
 use util\Objects;
 
