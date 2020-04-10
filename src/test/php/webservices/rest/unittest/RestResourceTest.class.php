@@ -38,7 +38,7 @@ class RestResourceTest extends TestCase {
     new RestResource($this->endpoint, '/users/{0}', [6100]);
   }
 
-  #[@test, @expect(class= ElementNotFoundException::class, withMessage= 'No such segment "id"')]
+  #[@test, @expect(['class' => ElementNotFoundException::class, 'withMessage' => 'No such segment "id"'])]
   public function missing_segment_raises_error() {
     new RestResource($this->endpoint, '/users/{id}');
   }
