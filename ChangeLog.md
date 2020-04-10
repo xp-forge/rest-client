@@ -3,6 +3,15 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 2.0.0 / 2020-04-10
+
+* Implemented xp-framework/rfc#334: Drop PHP 5.6:
+  . **Heads up:** Minimum required PHP version now is PHP 7.0.0
+  . Rewrote code base, grouping use statements
+  . Converted `newinstance` to anonymous classes
+  . Rewrote `isset(X) ? X : default` to `X ?? default`
+  (@thekid)
+
 ## 1.0.3 / 2020-04-10
 
 * Made compatible with `xp-forge/uri` version 2.0.0 - @thekid
