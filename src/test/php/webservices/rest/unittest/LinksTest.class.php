@@ -1,65 +1,51 @@
 <?php namespace webservices\rest\unittest;
 
 use lang\FormatException;
+use unittest\{Expect, Test, Values};
 use webservices\rest\{Link, Links};
 
 class LinksTest extends \unittest\TestCase {
 
-  #[@test, @values([
-  #  ['<http://example.com/?page=2>;rel="next"'],
-  #  ['<http://example.com/?page=2>; rel="next"'],
-  #  ['<http://example.com/?page=2>; rel="next"; hreflang=de'],
-  #  ['<http://example.com/?page=3>; rel="next", <http://example.com/?page=1>; rel="prev"'],
-  #  ['<http://example.com/?page=1>; rel="next"; title="next chapter"'],
-  #  ['<http://example.com/?page=1>; rel="next"; title="a;b"'],
-  #  ['<http://example.com/?page=1>; rel="next"; title="a,b"']
-  #])]
+  #[Test, Values([['<http://example.com/?page=2>;rel="next"'], ['<http://example.com/?page=2>; rel="next"'], ['<http://example.com/?page=2>; rel="next"; hreflang=de'], ['<http://example.com/?page=3>; rel="next", <http://example.com/?page=1>; rel="prev"'], ['<http://example.com/?page=1>; rel="next"; title="next chapter"'], ['<http://example.com/?page=1>; rel="next"; title="a;b"'], ['<http://example.com/?page=1>; rel="next"; title="a,b"']])]
   public function can_create($header) {
     new Links($header);
   }
 
-  #[@test]
+  #[Test]
   public function can_create_from_array() {
     $list= [new Link('http://example.com/?page=2', ['rel' => 'next'])];
     $this->assertEquals($list, iterator_to_array((new Links($list))->all()));
   }
 
-  #[@test, @expect(FormatException::class), @values([
-  #  [null],
-  #  [''],
-  #  ['<>'],
-  #  ['<http://example.com/?page=2'],
-  #  ['<http://example.com/?page=2>; rel'],
-  #  ['<http://example.com/?page=2>; rel="next']
-  #])]
+  #[Test, Expect(FormatException::class), Values([[null], [''], ['<>'], ['<http://example.com/?page=2'], ['<http://example.com/?page=2>; rel'], ['<http://example.com/?page=2>; rel="next']])]
   public function malformed($header) {
     new Links($header);
   }
 
-  #[@test]
+  #[Test]
   public function all() {
     $links= new Links('<http://example.com/?page=2>; rel="next"');
     $this->assertEquals([new Link('http://example.com/?page=2', ['rel' => 'next'])], iterator_to_array($links->all()));
   }
 
-  #[@test]
+  #[Test]
   public function all_with_rel() {
     $links= new Links('<http://example.com/?page=2>; rel="next", <http://example.com/>; title="Home"');
     $this->assertEquals([new Link('http://example.com/?page=2', ['rel' => 'next'])], iterator_to_array($links->all(['rel' => null])));
   }
 
-  #[@test, @values([null, ''])]
+  #[Test, Values([null, ''])]
   public function in($header) {
     $links= Links::in('<http://example.com/?page=2>; rel="next"');
     $this->assertEquals([new Link('http://example.com/?page=2', ['rel' => 'next'])], iterator_to_array($links->all()));
   }
 
-  #[@test]
+  #[Test]
   public function in_can_handle_empty() {
     $this->assertEquals([], iterator_to_array(Links::in(null)->all()));
   }
 
-  #[@test]
+  #[Test]
   public function uri_by_rel() {
     $links= new Links('<http://example.com/?page=3>; rel="next", <http://example.com/?page=1>; rel="prev"');
     $this->assertEquals(
@@ -68,19 +54,19 @@ class LinksTest extends \unittest\TestCase {
     );
   }
 
-  #[@test]
+  #[Test]
   public function uri_by_non_existant_rel_returns_null() {
     $links= new Links('<http://example.com/?page=2>; rel="next"');
     $this->assertEquals(null, $links->uri(['rel' => 'prev']));
   }
 
-  #[@test]
+  #[Test]
   public function uri_by_non_existant_rel_returns_default() {
     $links= new Links('<http://example.com/?page=2>; rel="next"');
     $this->assertEquals('http://example.com', $links->uri(['rel' => 'prev'], 'http://example.com'));
   }
 
-  #[@test]
+  #[Test]
   public function mapping_by_rel() {
     $links= new Links('<http://example.com/?page=3>; rel="next", <http://example.com/?page=3>; rel="last", <http://example.com/?page=1>; rel="prev"');
     $this->assertEquals(
@@ -93,7 +79,7 @@ class LinksTest extends \unittest\TestCase {
     );
   }
 
-  #[@test]
+  #[Test]
   public function mapping_by_title_excludes_links_without_title() {
     $links= new Links('<http://example.com/?page=3>; rel="next", <http://example.com/>; title="Home"');
     $this->assertEquals(
@@ -102,7 +88,7 @@ class LinksTest extends \unittest\TestCase {
     );
   }
 
-  #[@test]
+  #[Test]
   public function string_representation() {
     $links= new Links('<http://example.com/?page=3>; rel="next", <http://example.com/>; title="Home"');
     $this->assertEquals(

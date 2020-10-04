@@ -1,47 +1,47 @@
 <?php namespace webservices\rest\unittest;
 
-use unittest\TestCase;
+use unittest\{Test, TestCase, Values};
 use webservices\rest\format\{FormUrlencoded, Format, Json, NdJson, Unsupported};
 use webservices\rest\{Formats, RestFormat};
 
 class FormatsTest extends TestCase {
 
-  #[@test]
+  #[Test]
   public function can_create() {
     new Formats();
   }
 
-  #[@test]
+  #[Test]
   public function supports_json_by_default() {
     $this->assertInstanceOf(Json::class, Formats::defaults()->named('application/json'));
   }
 
-  #[@test]
+  #[Test]
   public function supports_ndjson_by_default() {
     $this->assertInstanceOf(NdJson::class, Formats::defaults()->named(NdJson::MIMETYPE));
   }
 
-  #[@test]
+  #[Test]
   public function supports_form_urlencoded_by_default() {
     $this->assertInstanceOf(FormUrlencoded::class, Formats::defaults()->named('application/x-www-form-urlencoded'));
   }
 
-  #[@test]
+  #[Test]
   public function supports_json_vendor_types_by_default() {
     $this->assertInstanceOf(Json::class, Formats::defaults()->named('application/vnd.github.v3+json'));
   }
 
-  #[@test]
+  #[Test]
   public function using_restformat_enum() {
     $this->assertInstanceOf(Json::class, Formats::defaults()->named(RestFormat::$JSON));
   }
 
-  #[@test]
+  #[Test]
   public function unsupported_mimetype() {
     $this->assertInstanceOf(Unsupported::class, Formats::defaults()->named('application/vnd.php.serialized'));
   }
 
-  #[@test]
+  #[Test]
   public function with_vendor_mimetype() {
     $mime= 'application/vnd.php.serialized';
     $format= new class() extends Format {
@@ -52,10 +52,7 @@ class FormatsTest extends TestCase {
     $this->assertEquals($format, (new Formats())->with($mime, $format)->named($mime));
   }
 
-  #[@test, @values([
-  #  'application/vnd.com.example.customer+xml',
-  #  'application/vnd.com.example.customer-v2+xml'
-  #])]
+  #[Test, Values(['application/vnd.com.example.customer+xml', 'application/vnd.com.example.customer-v2+xml'])]
   public function matching_vendor_mimetype($mime) {
     $pattern= 'application/vnd.*+xml';
     $format= new class() extends Format {

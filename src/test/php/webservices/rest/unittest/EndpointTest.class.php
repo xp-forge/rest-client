@@ -2,8 +2,7 @@
 
 use lang\{Error, FormatException, IllegalArgumentException};
 use peer\URL;
-use unittest\TestCase;
-use unittest\actions\RuntimeVersion;
+use unittest\{Expect, Test, TestCase, Values};
 use util\URI;
 use webservices\rest\{Endpoint, RestResource};
 
@@ -20,42 +19,37 @@ class EndpointTest extends TestCase {
     return new Endpoint($base);
   }
 
-  #[@test, @values([self::BASE_URL, new URL(self::BASE_URL)])]
+  #[Test, Values(eval: '[self::BASE_URL, new URL(self::BASE_URL)]')]
   public function can_create($base) {
     $this->newFixture($base);
   }
 
-  #[@test, @values([null, '']), @expect(FormatException::class)]
+  #[Test, Values([null, '']), Expect(FormatException::class)]
   public function cannot_create_with_illegal_url($base) {
     $this->newFixture($base);
   }
 
-  #[@test, @values([self::BASE_URL, new URL(self::BASE_URL)])]
+  #[Test, Values(eval: '[self::BASE_URL, new URL(self::BASE_URL)]')]
   public function base($base) {
     $this->assertEquals(new URI(self::BASE_URL), $this->newFixture($base)->base());
   }
 
-  #[@test]
+  #[Test]
   public function resource() {
     $this->assertInstanceOf(RestResource::class, $this->newFixture()->resource('/users'));
   }
 
-  #[@test]
+  #[Test]
   public function resource_with_named_segment() {
     $this->assertInstanceOf(RestResource::class, $this->newFixture()->resource('/users/{id}', ['id' => 6100]));
   }
 
-  #[@test]
+  #[Test]
   public function resource_with_positional_segment() {
     $this->assertInstanceOf(RestResource::class, $this->newFixture()->resource('/users/{0}', [6100]));
   }
 
-  #[@test, @action(new RuntimeVersion('>=7.0.0')), @expect(Error::class)]
-  public function execute_given_illegal_argument7() {
-    $this->newFixture()->execute(null);
-  }
-
-  #[@test, @action(new RuntimeVersion('<7.0.0')), @expect(IllegalArgumentException::class)]
+  #[Test, Expect(Error::class)]
   public function execute_given_illegal_argument() {
     $this->newFixture()->execute(null);
   }

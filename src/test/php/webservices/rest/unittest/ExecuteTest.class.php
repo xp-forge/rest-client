@@ -3,13 +3,13 @@
 use lang\ClassLoader;
 use peer\ConnectException;
 use peer\http\{HttpConnection, HttpRequest};
-use unittest\TestCase;
+use unittest\{Expect, Test, TestCase};
 use util\log\{BufferedAppender, Logging};
 use webservices\rest\{Endpoint, RestException};
 
 class ExecuteTest extends TestCase {
 
-  #[@test]
+  #[Test]
   public function get() {
     $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new']);
 
@@ -20,7 +20,7 @@ class ExecuteTest extends TestCase {
     );
   }
 
-  #[@test]
+  #[Test]
   public function get_with_parameters() {
     $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new']);
 
@@ -28,7 +28,7 @@ class ExecuteTest extends TestCase {
     $this->assertEquals("GET /?username=test HTTP/1.1\r\nConnection: close\r\nHost: test\r\n\r\n", $response->content());
   }
 
-  #[@test]
+  #[Test]
   public function get_with_parameters_in_resource() {
     $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new']);
 
@@ -39,7 +39,7 @@ class ExecuteTest extends TestCase {
     );
   }
 
-  #[@test]
+  #[Test]
   public function get_with_cookies() {
     $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new']);
 
@@ -50,7 +50,7 @@ class ExecuteTest extends TestCase {
     );
   }
 
-  #[@test]
+  #[Test]
   public function get_with_cookies_merges_cookie_header() {
     $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new']);
 
@@ -61,7 +61,7 @@ class ExecuteTest extends TestCase {
     );
   }
 
-  #[@test]
+  #[Test]
   public function get_with_header() {
     $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new'])->with('User-Agent', 'XP');
 
@@ -72,7 +72,7 @@ class ExecuteTest extends TestCase {
     );
   }
 
-  #[@test]
+  #[Test]
   public function get_with_headers() {
     $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new'])->with(['User-Agent' => 'XP']);
 
@@ -83,7 +83,7 @@ class ExecuteTest extends TestCase {
     );
   }
 
-  #[@test]
+  #[Test]
   public function logging() {
     $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new']);
 
@@ -100,7 +100,7 @@ class ExecuteTest extends TestCase {
     );
   }
 
-  #[@test, @expect(RestException::class)]
+  #[Test, Expect(RestException::class)]
   public function exceptions_from_sending_requests_are_wrapped() {
     $fixture= (new Endpoint('http://test'))->connecting(function($uri) {
       return newinstance(HttpConnection::class, [$uri], [

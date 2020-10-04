@@ -2,59 +2,59 @@
 
 use io\streams\MemoryInputStream;
 use lang\IllegalStateException;
-use unittest\TestCase;
+use unittest\{Test, TestCase, Values};
 use util\URI;
 use util\data\Marshalling;
-use webservices\rest\{Cookie, Cookies, Link, RestResponse};
 use webservices\rest\format\Json;
 use webservices\rest\io\Reader;
+use webservices\rest\{Cookie, Cookies, Link, RestResponse};
 
 class RestResponseTest extends TestCase {
 
-  #[@test]
+  #[Test]
   public function can_create() {
     new RestResponse(200, 'OK');
   }
 
-  #[@test]
+  #[Test]
   public function can_create_with_headers() {
     new RestResponse(200, 'OK', ['Content-Type' => 'text/html']);
   }
 
-  #[@test]
+  #[Test]
   public function can_create_with_reader() {
     $reader= new Reader(new MemoryInputStream('...'), new Json(), new Marshalling());
     new RestResponse(200, 'OK', [], $reader);
   }
 
-  #[@test, @values(['http://localhost/', new URI('http://localhost/')])]
+  #[Test, Values(eval: '["http://localhost/", new URI("http://localhost/")])]')]
   public function can_create_with_uri($uri) {
     new RestResponse(200, 'OK', [], null, $uri);
   }
 
-  #[@test]
+  #[Test]
   public function status() {
     $this->assertEquals(200, (new RestResponse(200, 'OK'))->status());
   }
 
-  #[@test]
+  #[Test]
   public function message() {
     $this->assertEquals('OK', (new RestResponse(200, 'OK'))->message());
   }
 
-  #[@test]
+  #[Test]
   public function stream() {
     $stream= new MemoryInputStream('...');
     $reader= new Reader($stream, new Json(), new Marshalling());
     $this->assertEquals($stream, (new RestResponse(200, 'OK', [], $reader))->stream());
   }
 
-  #[@test]
+  #[Test]
   public function without_links() {
     $this->assertEquals([], iterator_to_array((new RestResponse(200, 'OK', []))->links()->all()));
   }
 
-  #[@test]
+  #[Test]
   public function link() {
     $this->assertEquals(
       [new Link('meta.rdf', ['rel' => 'meta'])],
@@ -62,41 +62,41 @@ class RestResponseTest extends TestCase {
     );
   }
 
-  #[@test]
+  #[Test]
   public function headers() {
     $headers= ['Content-Type' => 'text/html'];
     $this->assertEquals($headers, (new RestResponse(200, 'OK', $headers))->headers());
   }
 
-  #[@test, @values(['content-type', 'Content-type', 'Content-Type'])]
+  #[Test, Values(['content-type', 'Content-type', 'Content-Type'])]
   public function header($name) {
     $headers= ['Content-Type' => 'text/html'];
     $this->assertEquals('text/html', (new RestResponse(200, 'OK', $headers))->header($name));
   }
 
-  #[@test]
+  #[Test]
   public function non_existant_header() {
     $this->assertNull((new RestResponse(200, 'OK', []))->header('Content-Type'));
   }
 
-  #[@test]
+  #[Test]
   public function non_existant_header_uses_default() {
     $default= 'application/octet-stream';
     $this->assertEquals($default, (new RestResponse(200, 'OK', []))->header('Content-Type', $default));
   }
 
-  #[@test]
+  #[Test]
   public function location_header() {
     $location= 'http://localhost/redirect';
     $this->assertEquals(new URI($location), (new RestResponse(200, 'OK', ['Location' => $location]))->location());
   }
 
-  #[@test]
+  #[Test]
   public function non_existant_location_header() {
     $this->assertNull((new RestResponse(200, 'OK', []))->location());
   }
 
-  #[@test]
+  #[Test]
   public function location_header_resolved() {
     $this->assertEquals(
       new URI('http://localhost/redirect'),
@@ -104,26 +104,26 @@ class RestResponseTest extends TestCase {
     );
   }
 
-  #[@test]
+  #[Test]
   public function value() {
     $stream= new MemoryInputStream('{"key":"value"}');
     $reader= new Reader($stream, new Json(), new Marshalling());
     $this->assertEquals(['key' => 'value'], (new RestResponse(200, 'OK', [], $reader))->value());
   }
 
-  #[@test]
+  #[Test]
   public function type_coercion() {
     $stream= new MemoryInputStream('{"key":200}');
     $reader= new Reader($stream, new Json(), new Marshalling());
     $this->assertEquals(['key' => '200'], (new RestResponse(200, 'OK', [], $reader))->value('[:string]'));
   }
 
-  #[@test]
+  #[Test]
   public function no_cookies() {
     $this->assertEquals(Cookies::$EMPTY, (new RestResponse(200, 'OK', []))->cookies());
   }
 
-  #[@test]
+  #[Test]
   public function one_cookie() {
     $headers= ['Set-Cookie' => 'session=0x6100; HttpOnly; Path=/'];
     $list= [new Cookie('session', '0x6100', ['HttpOnly' => true, 'Path' => '/'])];
@@ -131,7 +131,7 @@ class RestResponseTest extends TestCase {
     $this->assertEquals(new Cookies($list), (new RestResponse(200, 'OK', $headers))->cookies());
   }
 
-  #[@test]
+  #[Test]
   public function multiple_cookies() {
     $headers= ['Set-Cookie' => ['session=0x6100; Max-Age=3600', 'lang=de; Secure', 'test=']];
     $list= [
@@ -143,14 +143,7 @@ class RestResponseTest extends TestCase {
     $this->assertEquals(new Cookies($list), (new RestResponse(200, 'OK', $headers))->cookies());
   }
 
-  #[@test, @values([
-  #  'evil.example.com',
-  #  'evil.example',
-  #  'example',
-  #  'example.tld',
-  #  'evil-example.com',
-  #  'evil.example.com.tld',
-  #])]
+  #[Test, Values(['evil.example.com', 'evil.example', 'example', 'example.tld', 'evil-example.com', 'evil.example.com.tld',])]
   public function cookie_from_invalid_domain_rejected($domain) {
     $headers= ['Set-Cookie' => 'session=0x6100; Domain='.$domain];
     $uri= new URI('http://app.example.com/');
@@ -158,7 +151,7 @@ class RestResponseTest extends TestCase {
     $this->assertEquals(Cookies::$EMPTY, (new RestResponse(200, 'OK', $headers, null, $uri))->cookies());
   }
 
-  #[@test]
+  #[Test]
   public function cookie_from_parent_domain_accepted() {
     $headers= ['Set-Cookie' => 'session=0x6100; Domain=example.com'];
     $list= [new Cookie('session', '0x6100', ['Domain' => '.example.com'])];
@@ -167,7 +160,7 @@ class RestResponseTest extends TestCase {
     $this->assertEquals(new Cookies($list), (new RestResponse(200, 'OK', $headers, null, $uri))->cookies());
   }
 
-  #[@test]
+  #[Test]
   public function secure_cookies_cannot_be_set_by_inssecure_sites() {
     $headers= ['Set-Cookie' => 'session=0x6100; Secure'];
     $uri= new URI('http://app.example.com/');
@@ -175,7 +168,7 @@ class RestResponseTest extends TestCase {
     $this->assertEquals(Cookies::$EMPTY, (new RestResponse(200, 'OK', $headers, null, $uri))->cookies());
   }
 
-  #[@test]
+  #[Test]
   public function secure_prefix() {
     $headers= ['Set-Cookie' => '__Secure-SID=12345; Secure'];
     $list= [new Cookie('SID', '12345', ['Secure' => true])];
@@ -183,14 +176,14 @@ class RestResponseTest extends TestCase {
     $this->assertEquals(new Cookies($list), (new RestResponse(200, 'OK', $headers))->cookies());
   }
 
-  #[@test]
+  #[Test]
   public function secure_prefix_rejects_insecure_cookies() {
     $headers= ['Set-Cookie' => '__Secure-SID=12345'];
 
     $this->assertEquals(Cookies::$EMPTY, (new RestResponse(200, 'OK', $headers))->cookies());
   }
 
-  #[@test]
+  #[Test]
   public function host_prefix() {
     $headers= ['Set-Cookie' => '__Host-SID=12345; Secure; Path=/'];
     $list= [new Cookie('SID', '12345', ['Domain' => 'app.example.com', 'Path' => '/', 'Secure' => true])];
@@ -199,13 +192,7 @@ class RestResponseTest extends TestCase {
     $this->assertEquals(new Cookies($list), (new RestResponse(200, 'OK', $headers, null, $uri))->cookies());
   }
 
-  #[@test, @values([
-  #  '__Host-SID=12345',
-  #  '__Host-SID=12345; Secure',
-  #  '__Host-SID=12345; Domain=example.com',
-  #  '__Host-SID=12345; Domain=example.com; Path=/',
-  #  '__Host-SID=12345; Secure; Domain=example.com; Path=/',
-  #])]
+  #[Test, Values(['__Host-SID=12345', '__Host-SID=12345; Secure', '__Host-SID=12345; Domain=example.com', '__Host-SID=12345; Domain=example.com; Path=/', '__Host-SID=12345; Secure; Domain=example.com; Path=/',])]
   public function host_prefix_rejects($cookie) {
     $headers= ['Set-Cookie' => $cookie];
     $uri= new URI('https://app.example.com/');
