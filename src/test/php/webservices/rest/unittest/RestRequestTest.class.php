@@ -36,7 +36,7 @@ class RestRequestTest extends TestCase {
     $this->assertNull((new RestRequest('GET', '/users'))->payload());
   }
 
-  #[Test, Values([null, 'Test', ['key' => 'value']])]
+  #[Test, Values([[null], ['Test'], [['key' => 'value']]])]
   public function payload($value) {
     $this->assertEquals($value, (new RestRequest('GET', '/users'))->transfer($value)->payload()->value());
   }
