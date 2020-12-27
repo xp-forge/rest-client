@@ -1,8 +1,9 @@
 <?php namespace webservices\rest\unittest;
 
+use io\streams\MemoryInputStream;
 use lang\ClassLoader;
 use peer\ConnectException;
-use peer\http\{HttpConnection, HttpRequest};
+use peer\http\{HttpConnection, HttpRequest, HttpResponse};
 use unittest\{Expect, Test, TestCase};
 use util\log\{BufferedAppender, Logging};
 use webservices\rest\{Endpoint, RestException};
@@ -109,5 +110,18 @@ class ExecuteTest extends TestCase {
     });
 
     $fixture->resource('/fails')->get();
+  }
+
+  #[Test]
+  public function handles_responses_without_content_type() {
+    $fixture= (new Endpoint('http://test'))->connecting(function($uri) {
+      return newinstance(HttpConnection::class, [$uri], [
+        'send' => function(HttpRequest $req) {
+          return new HttpResponse(new MemoryInputStream("HTTP/1.1 403 Forbidden\r\nContent-Length: 0\r\n\r\n"));
+        }
+      ]);
+    });
+
+    $this->assertEquals(403, $fixture->resource('/')->get()->status());
   }
 }

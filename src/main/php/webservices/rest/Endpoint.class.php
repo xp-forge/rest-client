@@ -141,7 +141,7 @@ class Endpoint implements Traceable {
       $writer= $this->transfer->writer($s, $request->payload(), $input, $this->marshalling);
       $r= $writer($conn);
 
-      $output= $this->formats->named(current($r->header('Content-Type')));
+      $output= $this->formats->named($r->header('Content-Type')[0] ?? null);
       $reader= $this->transfer->reader($r, $output, $this->marshalling);
       return new RestResponse($r->statusCode(), $r->message(), $r->headers(), $reader, $uri);
     } catch (Throwable $e) {
