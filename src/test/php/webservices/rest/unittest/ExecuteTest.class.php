@@ -81,7 +81,7 @@ class ExecuteTest extends TestCase {
   #[Test]
   public function get_with_authorization() {
     $authorization= new class() extends Authorization {
-      public function sign($request) {
+      public function sign(HttpRequest $request) {
         $request->setHeader('Authorization', 'OAuth Bearer TOKEN');
       }
     };
