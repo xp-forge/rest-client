@@ -3,7 +3,7 @@
 use io\streams\MemoryInputStream;
 use lang\ClassLoader;
 use peer\ConnectException;
-use peer\http\{HttpConnection, HttpRequest, HttpResponse};
+use peer\http\{HttpConnection, HttpRequest, HttpResponse, Authorization};
 use unittest\{Expect, Test, TestCase};
 use util\log\{BufferedAppender, Logging};
 use webservices\rest\{Endpoint, RestException};
@@ -80,6 +80,22 @@ class ExecuteTest extends TestCase {
     $response= $fixture->resource('/test')->get();
     $this->assertEquals(
       "GET /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\nUser-Agent: XP\r\n\r\n",
+      $response->content()
+    );
+  }
+
+  #[Test]
+  public function get_with_authorization() {
+    $authorization= new class() extends Authorization {
+      public function sign($request) {
+        $request->setHeader('Authorization', 'OAuth Bearer TOKEN');
+      }
+    };
+    $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new'])->with('Authorization', $authorization);
+
+    $response= $fixture->resource('/test')->get();
+    $this->assertEquals(
+      "GET /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\nAuthorization: OAuth Bearer TOKEN\r\n\r\n",
       $response->content()
     );
   }
