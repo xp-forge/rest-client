@@ -10,30 +10,32 @@ use webservices\rest\{Endpoint, RestException};
 
 class ExecuteTest extends TestCase {
 
+  /** Returns a new endpoint using the `TestConnection` class */
+  private function newFixture() {
+    return (new Endpoint('http://test'))->connecting([TestConnection::class, 'new']);
+  }
+
   #[Test]
   public function get() {
-    $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new']);
-
-    $response= $fixture->resource('/test')->get();
+    $resource= $this->newFixture()->resource('/test');
     $this->assertEquals(
       "GET /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\n\r\n",
-      $response->content()
+      $resource->get()->content()
     );
   }
 
   #[Test]
   public function get_with_parameters() {
-    $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new']);
-
-    $response= $fixture->resource('/')->get(['username' => 'test']);
-    $this->assertEquals("GET /?username=test HTTP/1.1\r\nConnection: close\r\nHost: test\r\n\r\n", $response->content());
+    $resource= $this->newFixture()->resource('/');
+    $this->assertEquals(
+      "GET /?username=test HTTP/1.1\r\nConnection: close\r\nHost: test\r\n\r\n",
+      $resource->get(['username' => 'test'])->content()
+    );
   }
 
   #[Test]
   public function get_with_parameters_in_resource() {
-    $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new']);
-
-    $resource= $fixture->resource('/?username={0}', ['test']);
+    $resource= $this->newFixture()->resource('/?username={0}', ['test']);
     $this->assertEquals(
       "GET /?username=test HTTP/1.1\r\nConnection: close\r\nHost: test\r\n\r\n",
       $resource->get()->content()
@@ -42,9 +44,7 @@ class ExecuteTest extends TestCase {
 
   #[Test]
   public function get_with_cookies() {
-    $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new']);
-
-    $resource= $fixture->resource('/')->including(['session' => '0x6100', 'lang' => 'de']);
+    $resource= $this->newFixture()->resource('/')->including(['session' => '0x6100', 'lang' => 'de']);
     $this->assertEquals(
       "GET / HTTP/1.1\r\nConnection: close\r\nHost: test\r\nCookie: session=0x6100; lang=de\r\n\r\n",
       $resource->get()->content()
@@ -53,9 +53,7 @@ class ExecuteTest extends TestCase {
 
   #[Test]
   public function get_with_cookies_merges_cookie_header() {
-    $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new']);
-
-    $resource= $fixture->resource('/')->with(['Cookie' => 'session=0x6100'])->including(['lang' => 'de']);
+    $resource= $this->newFixture()->resource('/')->with(['Cookie' => 'session=0x6100'])->including(['lang' => 'de']);
     $this->assertEquals(
       "GET / HTTP/1.1\r\nConnection: close\r\nHost: test\r\nCookie: session=0x6100; lang=de\r\n\r\n",
       $resource->get()->content()
@@ -64,23 +62,19 @@ class ExecuteTest extends TestCase {
 
   #[Test]
   public function get_with_header() {
-    $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new'])->with('User-Agent', 'XP');
-
-    $response= $fixture->resource('/test')->get();
+    $resource= $this->newFixture()->with('User-Agent', 'XP')->resource('/test');
     $this->assertEquals(
       "GET /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\nUser-Agent: XP\r\n\r\n",
-      $response->content()
+      $resource->get()->content()
     );
   }
 
   #[Test]
   public function get_with_headers() {
-    $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new'])->with(['User-Agent' => 'XP']);
-
-    $response= $fixture->resource('/test')->get();
+    $resource= $this->newFixture()->with(['User-Agent' => 'XP'])->resource('/test');
     $this->assertEquals(
       "GET /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\nUser-Agent: XP\r\n\r\n",
-      $response->content()
+      $resource->get()->content()
     );
   }
 
@@ -91,9 +85,7 @@ class ExecuteTest extends TestCase {
         $request->setHeader('Authorization', 'OAuth Bearer TOKEN');
       }
     };
-    $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new'])->with('Authorization', $authorization);
-
-    $response= $fixture->resource('/test')->get();
+    $response= $this->newFixture()->with('Authorization', $authorization)->resource('/test')->get();
     $this->assertEquals(
       "GET /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\nAuthorization: OAuth Bearer TOKEN\r\n\r\n",
       $response->content()
@@ -102,7 +94,7 @@ class ExecuteTest extends TestCase {
 
   #[Test]
   public function logging() {
-    $fixture= (new Endpoint('http://test'))->connecting([TestConnection::class, 'new']);
+    $fixture= $this->newFixture();
 
     $log= new BufferedAppender();
     $fixture->setTrace(Logging::all()->to($log));
