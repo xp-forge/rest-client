@@ -119,6 +119,13 @@ class RestResponseTest extends TestCase {
   }
 
   #[Test]
+  public function result() {
+    $stream= new MemoryInputStream('{"key":"value"}');
+    $reader= new Reader($stream, new Json(), new Marshalling());
+    $this->assertEquals(['key' => 'value'], (new RestResponse(200, 'OK', [], $reader))->result()->value());
+  }
+
+  #[Test]
   public function no_cookies() {
     $this->assertEquals(Cookies::$EMPTY, (new RestResponse(200, 'OK', []))->cookies());
   }

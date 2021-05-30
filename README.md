@@ -19,18 +19,13 @@ The `Endpoint` class serves as the entry point to this API. Create a new instanc
 
 ```php
 use webservices\rest\Endpoint;
-use lang\IllegalStateException;
 
 $api= new Endpoint('https://api.example.com/');
-$response= $api->resource('users')->post(['name' => 'Test'], 'application/json');
+$result= $api->resource('users')->post(['name' => 'Test'], 'application/json')->result();
 
-// Check status codes
-if (201 !== $response->status()) {
-  throw new IllegalStateException('Could not create user!');
-}
-
-// Retrieve location header
-$url= $response->location();
+// Get location from created response, raising an UnexpectedStatus
+// exception for any statuscode outside of the range 200-299.
+$url= $response->result()->location();
 ```
 
 ### Reading: get / head
@@ -41,19 +36,22 @@ use webservices\rest\Endpoint;
 $api= new Endpoint('https://api.example.com/');
 
 // Unmarshal to object by optionally passing a type; otherwise returned as map
-$user= $api->resource('users/self')->get()->value(User::class);
+$user= $api->resource('users/self')->get()->result()->value(User::class);
+
+// Return a user object on success or NULL for 404s
+$user= $api->resource('users/{0}', [$id])->get()->result()->optional(User::class);
 
 // Test for existance with HEAD
 $exists= (200 === $api->resource('users/1549')->head()->status());
 
 // Pass parameters
-$list= $api->resource('user')->get(['page' => 1, 'per_page' => 50])->value();
+$list= $api->resource('user')->get(['page' => 1, 'per_page' => 50])->result()->value();
 
 // Access pagination
 $resource= 'groups';
 do {
   $response= $this->endpoint->resource($resource)->get(['per_page' => 200]);
-  foreach ($response->value() as $group) {
+  foreach ($response->result()->value() as $group) {
     yield $group['id'] => $group;
   }
 } while ($resource= $response->links()->uri(['rel' => 'next']));
@@ -71,10 +69,10 @@ $resource= $api->resource('users/self')
 ;
 
 // Default content type and accept types set on resource used
-$updated= $resource->put(['name' => 'Tested', 'login' => $mail])->value();
+$updated= $resource->put(['name' => 'Tested', 'login' => $mail])->result()->value();
 
 // Resources can be reused!
-$updated= $resource->patch(['name' => 'Changed'])->value();
+$updated= $resource->patch(['name' => 'Changed'])->result()->value();
 ```
 
 ### Deleting: delete
@@ -84,8 +82,12 @@ use webservices\rest\Endpoint;
 
 $api= new Endpoint('https://api.example.com/');
 
-// Pass segments
-$api->resource('user/{id}', ['id' => 6100])->delete();
+// Pass segments, map 204 to true, 404 to null, raise UnexpectedStatus
+// exception otherwise
+$api->resource('user/{id}', ['id' => 6100])->delete()->result()->match([
+  204 => true,
+  404 => null
+]);
 ```
 
 ### Deserialization
@@ -95,9 +97,9 @@ The REST API supports automatic result deserialization by passing a type to the 
 ```php
 use com\example\api\types\Person;
 
-$person= $response->value(Person::class);
-$strings= $response->value('string[]');
-$codes= $response->value('[:int]');
+$person= $result->value(Person::class);
+$strings= $result->value('string[]');
+$codes= $result->value('[:int]');
 ```
 
 ### Authentication
@@ -107,5 +109,13 @@ Basic authentication is supported by embedding the credentials in the endpoint U
 ```php
 use webservices\rest\Endpoint;
 
-$api= new Endpoint('http://user:pass@api.example.com/');
+$api= new Endpoint('https://user:pass@api.example.com/');
+```
+
+Header-based authentication can be passed along as follows:
+
+```php
+use webservices\rest\Endpoint;
+
+$api= (new Endpoint('https://api.example.com/'))->with(['Authorization' => 'Bearer '.$token]);
 ```
