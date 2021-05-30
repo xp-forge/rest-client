@@ -96,7 +96,7 @@ class Result {
    */
   public function value($type= null) {
     $s= $this->response->status();
-    if ($s >= 200 && $s < 300) return $this->response->reader()->read($type ?? 'var');
+    if ($s >= 200 && $s < 300) return $this->response->reader()->read($type);
 
     throw new UnexpectedStatus($this->response);
   }
@@ -113,7 +113,7 @@ class Result {
    */
   public function optional($type= null, $absent= [404]) {
     $s= $this->response->status();
-    if ($s >= 200 && $s < 300) return $this->response->reader()->read($type ?? 'var');
+    if ($s >= 200 && $s < 300) return $this->response->reader()->read($type);
     if (in_array($s, $absent)) return null;
 
     throw new UnexpectedStatus($this->response);
@@ -131,6 +131,6 @@ class Result {
     if ($this->response->status() < 400) return null;
 
     $r= $this->response->reader();
-    return $r->format() instanceof Unsupported ? $r->content() : $r->read($type ?? 'var');
+    return $r->format() instanceof Unsupported ? $r->content() : $r->read($type);
   }
 }

@@ -39,10 +39,10 @@ class Reader {
   /**
    * Reads the payload and unmarshals it to data
    *
-   * @param  string $type
+   * @param  ?string $type
    * @return var
    */
-  public function read($type= 'var') {
-    return $this->marshalling->unmarshal($this->format->deserialize($this->stream), $type);
+  public function read($type= null) {
+    return $this->marshalling->unmarshal($this->format->deserialize($this->stream), $type ?? 'var');
   }
 }
