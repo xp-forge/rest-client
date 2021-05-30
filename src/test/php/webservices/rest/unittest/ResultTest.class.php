@@ -59,4 +59,28 @@ class ResultTest {
     $response= new RestResponse(504, 'Gateway Timeout', ...$this->text('Could not reach database'));
     Assert::equals('Could not reach database', (new Result($response))->error());
   }
+
+  #[Test]
+  public function optional_on_success() {
+    $response= new RestResponse(200, 'OK', ...$this->json('{"key":"value"}'));
+    Assert::equals(['key' => 'value'], (new Result($response))->optional());
+  }
+
+  #[Test]
+  public function optional_on_404() {
+    $response= new RestResponse(404, 'Not Found', ...$this->json('{"error":"No such test #0"}'));
+    Assert::null((new Result($response))->optional());
+  }
+
+  #[Test]
+  public function optional_on_supplied_status_code() {
+    $response= new RestResponse(406, 'Not Acceptable', ...$this->json('{"error":"This is an XML-free API"}'));
+    Assert::null((new Result($response))->optional(null, [404, 406]));
+  }
+
+  #[Test, Expect(class: UnexpectedError::class, withMessage: 'Unexpected 504 (Gateway Timeout)')]
+  public function optional_on_error() {
+    $response= new RestResponse(504, 'Gateway Timeout', ...$this->text('Could not reach database'));
+    (new Result($response))->value();
+  }
 }
