@@ -26,6 +26,12 @@ class ResultTest {
     ];
   }
 
+  /** @return iterable */
+  private function creation() {
+    yield new RestResponse(200, 'OK', ...$this->json('{"id":6100,"value":"Created"}'));
+    yield new RestResponse(201, 'Created', ['Location' => 'http://example.org/test/6100']);
+  }
+
   #[Test]
   public function can_create() {
     new Result(new RestResponse(200, 'OK'));
@@ -33,8 +39,8 @@ class ResultTest {
 
   #[Test]
   public function location_on_creation() {
-    $response= new RestResponse(201, 'Created', ['Location' => 'http://example.org/test/0']);
-    Assert::equals(new URI('http://example.org/test/0'), (new Result($response))->location());
+    $response= new RestResponse(201, 'Created', ['Location' => 'http://example.org/test/6100']);
+    Assert::equals(new URI('http://example.org/test/6100'), (new Result($response))->location());
   }
 
   #[Test, Expect(class: UnexpectedStatus::class, withMessage: 'Unexpected 200 (OK)')]
@@ -47,6 +53,32 @@ class ResultTest {
   public function location_on_error() {
     $response= new RestResponse(422, 'Unprocessable Entity', ...$this->json('{"error":"Validation failed"}'));
     (new Result($response))->location();
+  }
+
+  #[Test]
+  public function match_204() {
+    $response= new RestResponse(204, 'No Content');
+    Assert::true((new Result($response))->match([204 => true]));
+  }
+
+  #[Test]
+  public function match_304() {
+    $response= new RestResponse(304, 'Not Modified');
+    Assert::null((new Result($response))->match([304 => null]));
+  }
+
+  #[Test, Values('creation')]
+  public function match_200_or_201($response) {
+    Assert::equals(6100, (new Result($response))->match([
+      200 => function($r) { return $r->value()['id']; },
+      201 => function($r) { return (int)basename($r->location()); }
+    ]));
+  }
+
+  #[Test, Expect(class: UnexpectedStatus::class, withMessage: 'Unexpected 403 (Forbidden)')]
+  public function match_on_error() {
+    $response= new RestResponse(403, 'Forbidden');
+    (new Result($response))->match([204 => true]);
   }
 
   #[Test]

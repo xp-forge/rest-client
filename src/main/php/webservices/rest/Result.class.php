@@ -8,8 +8,34 @@ class Result {
   /** @param webservices.rest.RestResponse */
   public function __construct($response) { $this->response= $response; }
 
+  /**
+   * Returns the resolved `Location` header from the response. Throws an
+   * exception if the header is not present.
+   *
+   * @return util.URI
+   * @throws webservices.rest.UnexpectedStatus
+   */
   public function location() {
     if ($l= $this->response->location()) return $l;
+
+    throw new UnexpectedStatus($this->response);
+  }
+
+  /**
+   * Matches response status codes and returns values based on the given cases.
+   * A case is an integer status code mapped to either a given value or a
+   * function which receives a `RestResponse` and returns a value.
+   *
+   * @param  [:var] $cases
+   * @return var
+   * @throws webservices.rest.UnexpectedStatus
+   */
+  public function match(array $cases) {
+    $s= $this->response->status();
+    if (array_key_exists($s, $cases)) return $cases[$s] instanceof \Closure
+      ? $cases[$s]($this->response)
+      : $cases[$s]
+    ;
 
     throw new UnexpectedStatus($this->response);
   }
