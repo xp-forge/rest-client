@@ -13,6 +13,9 @@ class Reader {
     $this->marshalling= $marshalling;
   }
 
+  /** @return webservices.rest.format.Format */
+  public function format() { return $this->format; }
+
   /** @return io.streams.InputStream */
   public function stream() { return $this->stream; }
 

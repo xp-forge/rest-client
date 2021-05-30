@@ -90,11 +90,11 @@ class RestResponse implements Value {
   }
 
   /**
-   * Returns a result instance representing the data in this response.
+   * Returns a format instance representing the data format in this response.
    *
-   * @return webservices.rest.Result
+   * @return webservices.rest.format.Format
    */
-  public function result() { return new Result($this); }
+  public function format() { return $this->reader->format(); }
 
   /**
    * Returns the response as a stream
@@ -120,6 +120,13 @@ class RestResponse implements Value {
       $s->close();
     }
   }
+
+  /**
+   * Returns a result instance representing the data in this response.
+   *
+   * @return webservices.rest.Result
+   */
+  public function result() { return new Result($this); }
 
   /** @return string */
   public function hashCode() { return spl_object_hash($this); }
