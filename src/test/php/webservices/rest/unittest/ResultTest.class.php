@@ -2,6 +2,7 @@
 
 use io\streams\MemoryInputStream;
 use unittest\{Assert, AssertionFailedError, Test, Values};
+use util\URI;
 use util\data\Marshalling;
 use webservices\rest\format\{Json, Unsupported};
 use webservices\rest\io\Reader;
@@ -31,6 +32,24 @@ class ResultTest {
   }
 
   #[Test]
+  public function location_on_creation() {
+    $response= new RestResponse(201, 'Created', ['Location' => 'http://example.org/test/0']);
+    Assert::equals(new URI('http://example.org/test/0'), (new Result($response))->location());
+  }
+
+  #[Test, Expect(class: UnexpectedStatus::class, withMessage: 'Unexpected 200 (OK)')]
+  public function location_without_header() {
+    $response= new RestResponse(200, 'OK', ...$this->json('{"id":6100}'));
+    (new Result($response))->location();
+  }
+
+  #[Test, Expect(class: UnexpectedStatus::class, withMessage: 'Unexpected 422 (Unprocessable Entity)')]
+  public function location_on_error() {
+    $response= new RestResponse(422, 'Unprocessable Entity', ...$this->json('{"error":"Validation failed"}'));
+    (new Result($response))->location();
+  }
+
+  #[Test]
   public function value_on_success() {
     $response= new RestResponse(200, 'OK', ...$this->json('{"key":"value"}'));
     Assert::equals(['key' => 'value'], (new Result($response))->value());
@@ -46,18 +65,6 @@ class ResultTest {
   public function value_on_redirect() {
     $response= new RestResponse(302, 'Found', ['Location' => 'http://example.org/']);
     (new Result($response))->value();
-  }
-
-  #[Test]
-  public function access_body_of_unexpected_status() {
-    $response= new RestResponse(404, 'Not Found', ...$this->json('{"error":"No such test #0"}'));
-    try {
-      (new Result($response))->value();
-      throw new AssertionFailedError('No exception raised');
-    } catch (UnexpectedStatus $e) {
-      Assert::equals(404, $e->status());
-      Assert::equals(['error' => 'No such test #0'], $e->cause());
-    }
   }
 
   #[Test]
@@ -118,5 +125,17 @@ class ResultTest {
   public function optional_type_coercion($body, $result) {
     $response= new RestResponse(200, 'OK', ...$this->json($body));
     Assert::equals($result, (new Result($response))->optional('bool'));
+  }
+
+  #[Test]
+  public function access_body_of_unexpected_status() {
+    $response= new RestResponse(404, 'Not Found', ...$this->json('{"error":"No such test #0"}'));
+    try {
+      (new Result($response))->value();
+      throw new AssertionFailedError('No exception raised');
+    } catch (UnexpectedStatus $e) {
+      Assert::equals(404, $e->status());
+      Assert::equals(['error' => 'No such test #0'], $e->cause());
+    }
   }
 }

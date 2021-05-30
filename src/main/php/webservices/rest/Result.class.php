@@ -8,6 +8,12 @@ class Result {
   /** @param webservices.rest.RestResponse */
   public function __construct($response) { $this->response= $response; }
 
+  public function location() {
+    if ($l= $this->response->location()) return $l;
+
+    throw new UnexpectedStatus($this->response);
+  }
+
   /**
    * Returns a value from the response, using the given type for deserialization.
    * Throws an exception if the HTTP statuscode is 400 and above.
