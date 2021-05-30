@@ -93,13 +93,13 @@ class Cookies implements Value, \IteratorAggregate {
   public function update($cookies) {
     foreach ($cookies as $name => $cookie) {
       if ($cookie instanceof Cookie) {
-        $domain= $cookie->domain();
+        $domain= $cookie->domain() ?? '';
         $key= sprintf(
           '#^%s://%s%s/%s#',
           $cookie->secure() ? 'https': 'https?',
           0 === strncmp($domain, '.', 1) ? '.+' : '',
           preg_quote($domain),
-          ltrim($cookie->path(), '/')
+          ltrim($cookie->path() ?? '', '/')
         );
         if (null === ($value= $cookie->value())) {
           unset($this->list[$key][$cookie->name()]);

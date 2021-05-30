@@ -50,10 +50,12 @@ class Formats {
   /**
    * Returns a type for a given header
    *
-   * @param  string|webservices.rest.RestFormat $header
+   * @param  ?string|webservices.rest.RestFormat $header
    * @return webservices.rest.format.Format
    */
   public function named($header) {
+    if (null === $header) return new Unsupported('(no content type)');
+
     $mime= substr($header, 0, strcspn($header, ';'));    // FIXME: What to do with charset?
 
     // Check for direct match
