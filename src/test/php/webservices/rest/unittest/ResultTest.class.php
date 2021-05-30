@@ -56,6 +56,34 @@ class ResultTest {
   }
 
   #[Test]
+  public function next_link() {
+    $response= new RestResponse(200, 'OK', [
+      'Link' => '<https://api.example.org/users?page=2>; rel="next"'
+    ]);
+    Assert::equals(new URI('https://api.example.org/users?page=2'), (new Result($response))->link('next'));
+  }
+
+  #[Test]
+  public function no_next_link() {
+    $response= new RestResponse(200, 'OK', [
+      'Link' => '<https://api.example.org/users?page=1>; rel="prev"'
+    ]);
+    Assert::null((new Result($response))->link('next'));
+  }
+
+  #[Test]
+  public function no_links() {
+    $response= new RestResponse(200, 'OK', []);
+    Assert::null((new Result($response))->link('next'));
+  }
+
+  #[Test, Expect(class: UnexpectedStatus::class, withMessage: 'Unexpected 404 (Not Found)')]
+  public function link_on_error() {
+    $response= new RestResponse(404, 'Not Found', ...$this->json('{"error":"No such resource"}'));
+    (new Result($response))->link('next');
+  }
+
+  #[Test]
   public function match_204() {
     $response= new RestResponse(204, 'No Content');
     Assert::true((new Result($response))->match([204 => true]));

@@ -1,5 +1,6 @@
 <?php namespace webservices\rest;
 
+use util\URI;
 use webservices\rest\format\Unsupported;
 
 /**
@@ -29,9 +30,31 @@ class Result {
   }
 
   /**
+   * Returns link URI with a given `rel` attribute or NULL if the given
+   * link is not present (or no `Link` header is present at all). Throws
+   * an exception if the HTTP statuscode is not in the 200-299 range.
+   *
+   * @param  string $rel
+   * @return ?util.URI
+   * @throws webservices.rest.UnexpectedStatus
+   */
+  public function link($rel) {
+    $s= $this->response->status();
+    if ($s >= 200 && $s < 300) {
+      foreach ($this->response->links()->all(['rel' => $rel]) as $link) {
+        return new URI($link->uri());
+      }
+      return null;
+    }
+
+    throw new UnexpectedStatus($this->response);
+  }
+
+  /**
    * Matches response status codes and returns values based on the given cases.
    * A case is an integer status code mapped to either a given value or a
-   * function which receives a `RestResponse` and returns a value.
+   * function which receives a `RestResponse` and returns a value. Throws an
+   * exception if the HTTP statuscode is not in the 200-299 range.
    *
    * @param  [:var] $cases
    * @return var
@@ -49,7 +72,7 @@ class Result {
 
   /**
    * Returns a value from the response, using the given type for deserialization.
-   * Throws an exception if the HTTP statuscode is 400 and above.
+   * Throws an exception if the HTTP statuscode not in the 200-299 range.
    *
    * @param  ?string $type
    * @return var
@@ -65,7 +88,7 @@ class Result {
   /**
    * Returns a value from the response, using the given type for deserialization.
    * Returns NULL for a given list of status codes indicating absence, defaulting
-   * to 404s. Throws an exception if the HTTP statuscode is 400 and above.
+   * to 404s. Throws an exception if the HTTP statuscode not in the 200-299 range.
    *
    * @param  ?string $type
    * @param  int[] $absent Status code indicating absence

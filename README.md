@@ -25,7 +25,7 @@ $result= $api->resource('users')->post(['name' => 'Test'], 'application/json')->
 
 // Get location from created response, raising an UnexpectedStatus
 // exception for any statuscode outside of the range 200-299.
-$url= $response->result()->location();
+$url= $result->location();
 ```
 
 ### Reading: get / head
@@ -35,14 +35,14 @@ use webservices\rest\Endpoint;
 
 $api= new Endpoint('https://api.example.com/');
 
+// Test for existance with HEAD
+$exists= (200 === $api->resource('users/1549')->head()->status());
+
 // Unmarshal to object by optionally passing a type; otherwise returned as map
 $user= $api->resource('users/self')->get()->result()->value(User::class);
 
 // Return a user object on success or NULL for 404s
 $user= $api->resource('users/{0}', [$id])->get()->result()->optional(User::class);
-
-// Test for existance with HEAD
-$exists= (200 === $api->resource('users/1549')->head()->status());
 
 // Pass parameters
 $list= $api->resource('user')->get(['page' => 1, 'per_page' => 50])->result()->value();
@@ -50,11 +50,11 @@ $list= $api->resource('user')->get(['page' => 1, 'per_page' => 50])->result()->v
 // Access pagination
 $resource= 'groups';
 do {
-  $response= $this->endpoint->resource($resource)->get(['per_page' => 200]);
-  foreach ($response->result()->value() as $group) {
+  $result= $this->endpoint->resource($resource)->get(['per_page' => 200])->result();
+  foreach ($result->value() as $group) {
     yield $group['id'] => $group;
   }
-} while ($resource= $response->links()->uri(['rel' => 'next']));
+} while ($resource= $result->link('next'));
 ```
 
 ### Updating: put / patch
