@@ -43,6 +43,14 @@ class RestResponseTest extends TestCase {
   }
 
   #[Test]
+  public function uri() {
+    $this->assertEquals(
+      new URI('http://example.com/'),
+      (new RestResponse(200, 'OK', [], null, 'http://example.com/'))->uri()
+    );
+  }
+
+  #[Test]
   public function stream() {
     $stream= new MemoryInputStream('...');
     $reader= new Reader($stream, new Json(), new Marshalling());
