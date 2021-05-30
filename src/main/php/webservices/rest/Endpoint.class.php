@@ -31,7 +31,7 @@ class Endpoint implements Traceable {
     } else if ($base instanceof URL) {
       $uri= new URI($base->getURL());
     } else {
-      $uri= new URI($base);
+      $uri= new URI((string)$base);
     }
 
     $this->base= $uri->using()->path(rtrim($uri->path() ?? '', '/').'/')->create();
