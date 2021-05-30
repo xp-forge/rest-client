@@ -35,8 +35,12 @@ use webservices\rest\Endpoint;
 
 $api= new Endpoint('https://api.example.com/');
 
-// Test for existance with HEAD
-$exists= (200 === $api->resource('users/1549')->head()->result()->status());
+// Test for existance with HEAD, raising UnexpectedStatus exceptions
+// for any status code other than 200 and 404.
+$exists= $api->resource('users/1549')->head()->result()->match([
+  200 => true,
+  404 => false
+]);
 
 // Return user object, raising an UnexpectedStatus exception for any
 // statuscode outside of the range 200-299.
@@ -124,13 +128,13 @@ use util\cmd\Console;
 try {
   $user= $api->resource('users/self')->get()->result()->value();
 } catch (UnexpectedStatus $e) {
-  Console::writeLine('Unexpected error ', $e->reason());
+  Console::writeLine('Unexpected ', $e->status(), ': ', $e->reason());
 }
 
 // More graceful handling
 $result= $api->resource('users/self')->get()->result();
 if ($error= $result->error()) {
-  Console::writeLine('Unexpected error ', $error);
+  Console::writeLine('Unexpected ', $result->status(), ': ', $error);
 }
 ```
 
