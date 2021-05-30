@@ -36,7 +36,7 @@ use webservices\rest\Endpoint;
 $api= new Endpoint('https://api.example.com/');
 
 // Test for existance with HEAD
-$exists= (200 === $api->resource('users/1549')->head()->status());
+$exists= (200 === $api->resource('users/1549')->head()->result()->status());
 
 // Return user object, raising an UnexpectedStatus exception for any
 // statuscode outside of the range 200-299.

@@ -16,6 +16,9 @@ class Result {
   /** @param webservices.rest.RestResponse */
   public function __construct($response) { $this->response= $response; }
 
+  /** @param int */
+  public function status() { return $this->response->status(); }
+
   /**
    * Returns the resolved `Location` header from the response. Throws an
    * exception if the header is not present.

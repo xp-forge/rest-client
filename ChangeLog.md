@@ -5,6 +5,8 @@ Rest client change log
 
 ## 2.1.0 / 2021-05-30
 
+* Added `webservices.rest.Result::status()` method to access HTTP status
+  (@thekid)
 * Added `webservices.rest.Result::link()` method to access links with a
   given `rel` attribute, see for example how GitHub implements pagination:
   https://docs.github.com/en/rest/overview/resources-in-the-rest-api#pagination

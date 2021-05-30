@@ -38,6 +38,12 @@ class ResultTest {
   }
 
   #[Test]
+  public function status() {
+    $response= new RestResponse(200, 'OK');
+    Assert::equals(200, (new Result($response))->status());
+  }
+
+  #[Test]
   public function location_on_creation() {
     $response= new RestResponse(201, 'Created', ['Location' => 'http://example.org/test/6100']);
     Assert::equals(new URI('http://example.org/test/6100'), (new Result($response))->location());
