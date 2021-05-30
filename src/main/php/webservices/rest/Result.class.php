@@ -2,6 +2,13 @@
 
 use webservices\rest\format\Unsupported;
 
+/**
+ * Result is a high-level abstraction of a REST API's results.
+ *
+ * @see   https://github.com/xp-forge/rest-client/pull/14
+ * @see   webservices.rest.RestResponse::result()
+ * @test  webservices.rest.unittest.ResultTest
+ */
 class Result {
   private $response;
 
