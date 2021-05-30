@@ -160,14 +160,14 @@ class ResultTest {
   }
 
   #[Test]
-  public function access_body_of_unexpected_status() {
+  public function access_reason_of_unexpected_status() {
     $response= new RestResponse(404, 'Not Found', ...$this->json('{"error":"No such test #0"}'));
     try {
       (new Result($response))->value();
       throw new AssertionFailedError('No exception raised');
     } catch (UnexpectedStatus $e) {
       Assert::equals(404, $e->status());
-      Assert::equals(['error' => 'No such test #0'], $e->cause());
+      Assert::equals(['error' => 'No such test #0'], $e->reason());
     }
   }
 }
