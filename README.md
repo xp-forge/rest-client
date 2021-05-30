@@ -26,6 +26,13 @@ $result= $api->resource('users')->post(['name' => 'Test'], 'application/json')->
 // Get location from created response, raising an UnexpectedStatus
 // exception for any statuscode outside of the range 200-299.
 $url= $result->location();
+
+// Same as above, but handle 201 *AND* 200 status codes - see
+// https://stackoverflow.com/questions/1860645
+$id= $result->match([
+  200 => fn($r) => $r->value()['id'],
+  201 => fn($r) => (int)basename($r->location())
+]);
 ```
 
 ### Reading: get / head
