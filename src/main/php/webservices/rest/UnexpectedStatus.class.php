@@ -16,13 +16,13 @@ class UnexpectedStatus extends IllegalStateException {
   public function status() { return $this->response->status(); }
 
   /**
-   * Returns error from this response, deserializing content if possible.
+   * Returns body from this response, deserializing if possible.
    *
    * @see    webservices.rest.Result::error()
    * @param  ?string $type
    * @return var
    */
-  public function error($type= null) {
+  public function cause($type= null) {
     return $this->response->format() instanceof Unsupported
       ? $this->response->content()
       : $this->response->value($type ?? 'var')
