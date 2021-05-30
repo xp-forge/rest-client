@@ -90,18 +90,11 @@ class RestResponse implements Value {
   }
 
   /**
-   * Returns a value from the response, using the given type for deserialization.
-   * Like value() but throws an exception if the HTTP statuscode is 400 and above.
+   * Returns a result instance representing the data in this response.
    *
-   * @param  string $type
-   * @return var
-   * @throws webservices.rest.UnexpectedError
+   * @return webservices.rest.Result
    */
-  public function result($type= 'var') {
-    if ($this->status < 400) return $this->reader->read($type);
-
-    throw new UnexpectedError($this->status, $this->message, $this->reader->stream());
-  }
+  public function result() { return new Result($this); }
 
   /**
    * Returns the response as a stream

@@ -3,25 +3,18 @@
 use lang\IllegalStateException;
 
 class UnexpectedError extends IllegalStateException {
-  private $status, $stream;
+  private $response;
 
-  /**
-   * Creates a new instance
-   *
-   * @param  int $status
-   * @param  string $message
-   * @param  io.stream.InputStream $stream
-   */
-  public function __construct($status, $message, $stream) {
-    parent::__construct('Unexpected '.$status.' ('.$message.')');
-    $this->status= $status;
-    $this->stream= $stream;
+  /** @param webservices.rest.RestResponse */
+  public function __construct($response) {
+    parent::__construct('Unexpected '.$response->status().' ('.$response->message().')');
+    $this->response= $response;
   }
 
   /** @return int */
-  public function status() { return $this->status; }
+  public function status() { return $this->response->status(); }
 
-  /** @return io.stream.InputStream */
-  public function stream() { return $this->stream; }
+  /** @return webservices.rest.RestResponse */
+  public function response() { return $this->response; }
 
 }
