@@ -85,7 +85,7 @@ $api= new Endpoint('https://api.example.com/');
 
 // Pass segments, map 204 to true, 404 to null, raise UnexpectedStatus
 // exception otherwise
-$api->resource('users/{id}', ['id' => 6100])->delete()->result()->match([
+$api->resource('users/{id}', $user)->delete()->result()->match([
   204 => true,
   404 => null
 ]);
@@ -96,13 +96,17 @@ $api->resource('users/{id}', ['id' => 6100])->delete()->result()->match([
 The REST API supports automatic result deserialization by passing a type to the `value()` method.
 
 ```php
-use com\example\api\types\Person;
+use com\example\api\types\User;
 
-$result= $api->resource('users/self')->get()->result();
+$result= $api->resource('users/{0}', [$id])->get()->result();
 
 // If a type is passed, the result will be unmarshalled to an object
 $map= $result->value();
 $object= $result->value(User::class);
+
+// Same for optional, but map and object will be NULL for 404s
+$map= $result->optional();
+$object= $result->optional(User::class);
 
 // Works with any type from the XP typesystem, e.g. arrays of objects
 $list= $api->resource('users')->get()->value('org.example.User[]');
