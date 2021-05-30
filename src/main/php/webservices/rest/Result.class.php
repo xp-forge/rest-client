@@ -27,9 +27,22 @@ class Result {
    * @throws webservices.rest.UnexpectedStatus
    */
   public function location() {
-    if ($l= $this->response->location()) return $l;
+    if ($h= $this->response->header('Location')) return $this->response->resolve($h);
 
     throw new UnexpectedStatus($this->response);
+  }
+
+  /**
+   * Returns links sent by server as a map indexed by the `rel` attribute.
+   *
+   * @return [:util.URI]
+   */
+  public function links() {
+    $r= [];
+    foreach (Links::in($this->response->header('Link'))->all() as $link) {
+      $r[$link->param('rel')]= $this->response->resolve($link->uri());
+    }
+    return $r;
   }
 
   /**
@@ -44,8 +57,8 @@ class Result {
   public function link($rel) {
     $s= $this->response->status();
     if ($s >= 200 && $s < 300) {
-      foreach ($this->response->links()->all(['rel' => $rel]) as $link) {
-        return new URI($link->uri());
+      foreach (Links::in($this->response->header('Link'))->all(['rel' => $rel]) as $link) {
+        return $this->response->resolve($link->uri());
       }
       return null;
     }
@@ -56,8 +69,8 @@ class Result {
   /**
    * Matches response status codes and returns values based on the given cases.
    * A case is an integer status code mapped to either a given value or a
-   * function which receives a `RestResponse` and returns a value. Throws an
-   * exception if the HTTP statuscode is not in the 200-299 range.
+   * function which receives this result instance and returns a value. Throws
+   * an exception if the HTTP statuscode is not in the 200-299 range.
    *
    * @param  [:var] $cases
    * @return var
@@ -66,7 +79,7 @@ class Result {
   public function match(array $cases) {
     $s= $this->response->status();
     if (array_key_exists($s, $cases)) return $cases[$s] instanceof \Closure
-      ? $cases[$s]($this->response)
+      ? $cases[$s]($this)
       : $cases[$s]
     ;
 

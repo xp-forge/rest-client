@@ -26,10 +26,19 @@ class ResultTest {
     ];
   }
 
+  /** Returns a link header */
+  private function link($links) {
+    $r= '';
+    foreach ($links as $rel => $uri) {
+      $r.= sprintf(', <https://example.org/%s>; rel="%s"', ltrim($uri, '/'), $rel);
+    }
+    return ['Link' => substr($r, 2)];
+  }
+
   /** @return iterable */
   private function creation() {
     yield new RestResponse(200, 'OK', ...$this->json('{"id":6100,"value":"Created"}'));
-    yield new RestResponse(201, 'Created', ['Location' => 'http://example.org/test/6100']);
+    yield new RestResponse(201, 'Created', ['Location' => 'https://example.org/test/6100']);
   }
 
   #[Test]
@@ -45,8 +54,14 @@ class ResultTest {
 
   #[Test]
   public function location_on_creation() {
-    $response= new RestResponse(201, 'Created', ['Location' => 'http://example.org/test/6100']);
-    Assert::equals(new URI('http://example.org/test/6100'), (new Result($response))->location());
+    $response= new RestResponse(201, 'Created', ['Location' => 'https://example.org/test/6100']);
+    Assert::equals(new URI('https://example.org/test/6100'), (new Result($response))->location());
+  }
+
+  #[Test]
+  public function location_resolved() {
+    $response= new RestResponse(201, 'Created', ['Location' => '/test/6100'], null, 'https://example.org/');
+    Assert::equals(new URI('https://example.org/test/6100'), (new Result($response))->location());
   }
 
   #[Test, Expect(class: UnexpectedStatus::class, withMessage: 'Unexpected 200 (OK)')]
@@ -63,24 +78,38 @@ class ResultTest {
 
   #[Test]
   public function next_link() {
-    $response= new RestResponse(200, 'OK', [
-      'Link' => '<https://api.example.org/users?page=2>; rel="next"'
-    ]);
-    Assert::equals(new URI('https://api.example.org/users?page=2'), (new Result($response))->link('next'));
+    $response= new RestResponse(200, 'OK', $this->link(['next' => '/users?page=2']));
+    Assert::equals(new URI('https://example.org/users?page=2'), (new Result($response))->link('next'));
+  }
+
+  #[Test]
+  public function next_link_resolved() {
+    $response= new RestResponse(200, 'OK', ['Link' => '</>; rel="home"'], null, 'https://example.org/test/6100');
+    Assert::equals(new URI('https://example.org/'), (new Result($response))->link('home'));
   }
 
   #[Test]
   public function no_next_link() {
-    $response= new RestResponse(200, 'OK', [
-      'Link' => '<https://api.example.org/users?page=1>; rel="prev"'
-    ]);
+    $response= new RestResponse(200, 'OK', $this->link(['prev' => '/users?page=1']));
     Assert::null((new Result($response))->link('next'));
+  }
+
+  #[Test]
+  public function links() {
+    $response= new RestResponse(200, 'OK', $this->link(['prev' => '/users?page=1', 'next' => '/users?page=3']));
+    Assert::equals(
+      [
+        'prev' => new URI('https://example.org/users?page=1'),
+        'next' => new URI('https://example.org/users?page=3')
+      ],
+      (new Result($response))->links()
+    );
   }
 
   #[Test]
   public function no_links() {
     $response= new RestResponse(200, 'OK', []);
-    Assert::null((new Result($response))->link('next'));
+    Assert::equals([], (new Result($response))->links());
   }
 
   #[Test, Expect(class: UnexpectedStatus::class, withMessage: 'Unexpected 404 (Not Found)')]
@@ -129,7 +158,7 @@ class ResultTest {
 
   #[Test, Expect(class: UnexpectedStatus::class, withMessage: 'Unexpected 302 (Found)')]
   public function value_on_redirect() {
-    $response= new RestResponse(302, 'Found', ['Location' => 'http://example.org/']);
+    $response= new RestResponse(302, 'Found', ['Location' => 'https://example.org/']);
     (new Result($response))->value();
   }
 
@@ -171,7 +200,7 @@ class ResultTest {
 
   #[Test, Expect(class: UnexpectedStatus::class, withMessage: 'Unexpected 302 (Found)')]
   public function optional_on_redirect() {
-    $response= new RestResponse(302, 'Found', ['Location' => 'http://example.org/']);
+    $response= new RestResponse(302, 'Found', ['Location' => 'https://example.org/']);
     (new Result($response))->optional();
   }
 
