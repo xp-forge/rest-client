@@ -33,14 +33,14 @@ class Links implements Value {
   /**
    * Parses a Link header into a links structure
    *
-   * @param  string|webservices.rest.Link[] $arg
+   * @param  ?string|webservices.rest.Link[] $arg
    * @throws lang.FormatException If a string is passed and it's malformed
    */
   public function __construct($arg) {
     if (is_array($arg)) {
       $this->links= $arg;
     } else {
-      $this->links= $this->parse($arg);
+      $this->links= $this->parse((string)$arg);
     }
   }
 
