@@ -3,6 +3,14 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 2.1.0 / 2021-05-30
+
+* Merged PR #14: Fluent result interface. This pull request adds a new
+  `RestResponse::result()` method which returns `Result` instances with
+  high-level access to responses including handling of unexpected status
+  codes along typical REST usage patterns.
+  (@thekid)
+
 ## 2.0.2 / 2021-05-30
 
 * Fixed issue #13: PHP 8.1 warnings - @thekid
