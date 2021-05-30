@@ -1,7 +1,7 @@
 <?php namespace webservices\rest\unittest;
 
 use io\streams\MemoryInputStream;
-use unittest\{Assert, Test, Values};
+use unittest\{Assert, AssertionFailedError, Test, Values};
 use util\data\Marshalling;
 use webservices\rest\format\{Json, Unsupported};
 use webservices\rest\io\Reader;
@@ -40,6 +40,18 @@ class ResultTest {
   public function value_on_error() {
     $response= new RestResponse(404, 'Not Found', ...$this->json('{"error":"No such test #0"}'));
     (new Result($response))->value();
+  }
+
+  #[Test]
+  public function access_error() {
+    $response= new RestResponse(404, 'Not Found', ...$this->json('{"error":"No such test #0"}'));
+    try {
+      (new Result($response))->value();
+      throw new AssertionFailedError('No exception raised');
+    } catch (UnexpectedError $e) {
+      Assert::equals(404, $e->status());
+      Assert::equals(['error' => 'No such test #0'], $e->error());
+    }
   }
 
   #[Test]
