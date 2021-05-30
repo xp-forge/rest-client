@@ -20,7 +20,7 @@ class RestResponse implements Value {
    * @param  int $status
    * @param  string $message
    * @param  [:string|string[]] $headers
-   * @param  web.rest.Reader $reader
+   * @param  webservices.rest.io.Reader $reader
    * @param  string|?util.URI $uri The request URI, if available
    */
   public function __construct($status, $message, $headers= [], Reader $reader= null, $uri= null) {
@@ -45,27 +45,17 @@ class RestResponse implements Value {
   /** @return string */
   public function message() { return $this->message; }
 
-  /**
-   * Returns the value of the "Location" header, or NULL if it not present.
-   * The URI is resolved against the request URI.
-   *
-   * @return ?util.URI
-   */
-  public function location() {
-    if ($location= $this->header('Location')) {
-      return $this->uri ? $this->uri->resolve($location) : new URI($location);
-    }
-    return null;
-  }
+  /** @return ?util.URI */
+  public function uri() { return $this->uri; }
 
-  /**
-   * Returns links sent by server.
-   *
-   * @return webservices.rest.Links
-   */
-  public function links() {
-    return Links::in($this->header('Link'));
-  }
+  /** @return webservices.rest.io.Reader */
+  public function reader() { return $this->reader; }
+
+  /** @return io.stream.InputStream */
+  public function stream() { return $this->reader->stream(); }
+
+  /** @return string */
+  public function content() { return $this->reader->content(); }
 
   /**
    * Returns cookies sent by server.
@@ -80,45 +70,52 @@ class RestResponse implements Value {
   }
 
   /**
+   * Resolves a URI
+   *
+   * @param  ?string|util.URI $uri
+   * @return ?util.URI
+   */
+  public function resolve($uri) {
+    if ($this->uri) {
+      return null === $uri ? $this->uri : $this->uri->resolve($uri);
+    } else {
+      return null === $uri ? null : new URI((string)$uri);
+    }
+  }
+
+  /**
+   * Returns the value of the "Location" header, or NULL if it not present.
+   * The URI is resolved against the request URI.
+   *
+   * @deprecated Use `self::result()->location()` or `self::header('Location')`
+   * @return ?util.URI
+   */
+  public function location() {
+    if ($location= $this->header('Location')) {
+      return $this->uri ? $this->uri->resolve($location) : new URI($location);
+    }
+    return null;
+  }
+
+  /**
+   * Returns links sent by server.
+   *
+   * @deprecated Use `self::result()->links()` or `self::header('Link')`
+   * @return webservices.rest.Links
+   */
+  public function links() {
+    return Links::in($this->header('Link'));
+  }
+
+  /**
    * Returns a value from the response, using the given type for deserialization
    *
+   * @deprecated Use `self::result()->value()`
    * @param  string $type
    * @return var
    */
   public function value($type= 'var') {
     return $this->reader->read($type);
-  }
-
-  /**
-   * Returns a format instance representing the data format in this response.
-   *
-   * @return webservices.rest.format.Format
-   */
-  public function format() { return $this->reader->format(); }
-
-  /**
-   * Returns the response as a stream
-   *
-   * @return io.stream.InputStream
-   */
-  public function stream() { return $this->reader->stream(); }
-
-  /**
-   * Returns the response as a string
-   *
-   * @return string
-   */
-  public function content() {
-    $s= $this->reader->stream();
-    try {
-      $r= '';
-      while ($s->available()) {
-        $r.= $s->read();
-      }
-      return $r;
-    } finally {
-      $s->close();
-    }
   }
 
   /**

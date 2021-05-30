@@ -20,16 +20,16 @@ class Result {
   public function status() { return $this->response->status(); }
 
   /**
-   * Returns the resolved `Location` header from the response. Throws an
-   * exception if the header is not present.
+   * Returns links sent by server as a map indexed by the `rel` attribute.
    *
-   * @return util.URI
-   * @throws webservices.rest.UnexpectedStatus
+   * @return [:util.URI]
    */
-  public function location() {
-    if ($l= $this->response->location()) return $l;
-
-    throw new UnexpectedStatus($this->response);
+  public function links() {
+    $r= [];
+    foreach (Links::in($this->response->header('Link'))->all() as $link) {
+      $r[$link->param('rel')]= $this->response->resolve($link->uri());
+    }
+    return $r;
   }
 
   /**
@@ -44,8 +44,8 @@ class Result {
   public function link($rel) {
     $s= $this->response->status();
     if ($s >= 200 && $s < 300) {
-      foreach ($this->response->links()->all(['rel' => $rel]) as $link) {
-        return new URI($link->uri());
+      foreach (Links::in($this->response->header('Link'))->all(['rel' => $rel]) as $link) {
+        return $this->response->resolve($link->uri());
       }
       return null;
     }
@@ -54,10 +54,23 @@ class Result {
   }
 
   /**
+   * Returns the resolved `Location` header from the response. Throws an
+   * exception if the header is not present.
+   *
+   * @return util.URI
+   * @throws webservices.rest.UnexpectedStatus
+   */
+  public function location() {
+    if ($h= $this->response->header('Location')) return $this->response->resolve($h);
+
+    throw new UnexpectedStatus($this->response);
+  }
+
+  /**
    * Matches response status codes and returns values based on the given cases.
    * A case is an integer status code mapped to either a given value or a
-   * function which receives a `RestResponse` and returns a value. Throws an
-   * exception if the HTTP statuscode is not in the 200-299 range.
+   * function which receives this result instance and returns a value. Throws
+   * an exception if the HTTP statuscode is not in the 200-299 range.
    *
    * @param  [:var] $cases
    * @return var
@@ -66,7 +79,7 @@ class Result {
   public function match(array $cases) {
     $s= $this->response->status();
     if (array_key_exists($s, $cases)) return $cases[$s] instanceof \Closure
-      ? $cases[$s]($this->response)
+      ? $cases[$s]($this)
       : $cases[$s]
     ;
 
@@ -83,7 +96,7 @@ class Result {
    */
   public function value($type= null) {
     $s= $this->response->status();
-    if ($s >= 200 && $s < 300) return $this->response->value($type ?? 'var');
+    if ($s >= 200 && $s < 300) return $this->response->reader()->read($type ?? 'var');
 
     throw new UnexpectedStatus($this->response);
   }
@@ -100,7 +113,7 @@ class Result {
    */
   public function optional($type= null, $absent= [404]) {
     $s= $this->response->status();
-    if ($s >= 200 && $s < 300) return $this->response->value($type ?? 'var');
+    if ($s >= 200 && $s < 300) return $this->response->reader()->read($type ?? 'var');
     if (in_array($s, $absent)) return null;
 
     throw new UnexpectedStatus($this->response);
@@ -117,9 +130,7 @@ class Result {
   public function error($type= null) {
     if ($this->response->status() < 400) return null;
 
-    return $this->response->format() instanceof Unsupported
-      ? $this->response->content()
-      : $this->response->value($type ?? 'var')
-    ;
+    $r= $this->response->reader();
+    return $r->format() instanceof Unsupported ? $r->content() : $r->read($type ?? 'var');
   }
 }
