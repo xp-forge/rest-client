@@ -5,6 +5,8 @@ Rest client change log
 
 ## 2.1.0 / 2021-05-30
 
+* Merged PR #15: Deprecate high-level functions on low-level response
+  (@thekid)
 * Added `webservices.rest.Result::status()` method to access HTTP status
   (@thekid)
 * Added `webservices.rest.Result::link()` method to access links with a
