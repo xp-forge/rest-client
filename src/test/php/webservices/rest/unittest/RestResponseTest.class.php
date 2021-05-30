@@ -10,6 +10,7 @@ use webservices\rest\io\Reader;
 use webservices\rest\{Cookie, Cookies, Link, RestResponse};
 
 class RestResponseTest extends TestCase {
+  const API = 'https://api.example.com/';
 
   #[Test]
   public function can_create() {
@@ -52,6 +53,14 @@ class RestResponseTest extends TestCase {
     $this->assertEquals(
       new URI('http://example.com/'),
       (new RestResponse(200, 'OK', [], null, 'http://example.com/'))->uri()
+    );
+  }
+
+  #[Test, Values([[null, 'http://example.com/test/'], [self::API, self::API], ['/', 'http://example.com/'], ['/user/', 'http://example.com/user/']])]
+  public function resolve_uri($uri, $resolved) {
+    $this->assertEquals(
+      new URI($resolved),
+      (new RestResponse(200, 'OK', [], null, 'http://example.com/test/'))->resolve($uri)
     );
   }
 
