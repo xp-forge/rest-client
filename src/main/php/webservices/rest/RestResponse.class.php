@@ -20,7 +20,7 @@ class RestResponse implements Value {
    * @param  int $status
    * @param  string $message
    * @param  [:string|string[]] $headers
-   * @param  web.rest.Reader $reader
+   * @param  webservices.rest.io.Reader $reader
    * @param  string|?util.URI $uri The request URI, if available
    */
   public function __construct($status, $message, $headers= [], Reader $reader= null, $uri= null) {
@@ -48,11 +48,14 @@ class RestResponse implements Value {
   /** @return ?util.URI */
   public function uri() { return $this->uri; }
 
-  /** @return webservices.rest.format.Format */
-  public function format() { return $this->reader->format(); }
+  /** @return webservices.rest.io.Reader */
+  public function reader() { return $this->reader; }
 
   /** @return io.stream.InputStream */
   public function stream() { return $this->reader->stream(); }
+
+  /** @return string */
+  public function content() { return $this->reader->content(); }
 
   /**
    * Returns cookies sent by server.
@@ -121,24 +124,6 @@ class RestResponse implements Value {
    * @return webservices.rest.Result
    */
   public function result() { return new Result($this); }
-
-  /**
-   * Returns the response as a string
-   *
-   * @return string
-   */
-  public function content() {
-    $s= $this->reader->stream();
-    try {
-      $r= '';
-      while ($s->available()) {
-        $r.= $s->read();
-      }
-      return $r;
-    } finally {
-      $s->close();
-    }
-  }
 
   /** @return string */
   public function hashCode() { return spl_object_hash($this); }

@@ -20,19 +20,6 @@ class Result {
   public function status() { return $this->response->status(); }
 
   /**
-   * Returns the resolved `Location` header from the response. Throws an
-   * exception if the header is not present.
-   *
-   * @return util.URI
-   * @throws webservices.rest.UnexpectedStatus
-   */
-  public function location() {
-    if ($h= $this->response->header('Location')) return $this->response->resolve($h);
-
-    throw new UnexpectedStatus($this->response);
-  }
-
-  /**
    * Returns links sent by server as a map indexed by the `rel` attribute.
    *
    * @return [:util.URI]
@@ -67,6 +54,19 @@ class Result {
   }
 
   /**
+   * Returns the resolved `Location` header from the response. Throws an
+   * exception if the header is not present.
+   *
+   * @return util.URI
+   * @throws webservices.rest.UnexpectedStatus
+   */
+  public function location() {
+    if ($h= $this->response->header('Location')) return $this->response->resolve($h);
+
+    throw new UnexpectedStatus($this->response);
+  }
+
+  /**
    * Matches response status codes and returns values based on the given cases.
    * A case is an integer status code mapped to either a given value or a
    * function which receives this result instance and returns a value. Throws
@@ -96,7 +96,7 @@ class Result {
    */
   public function value($type= null) {
     $s= $this->response->status();
-    if ($s >= 200 && $s < 300) return $this->response->value($type ?? 'var');
+    if ($s >= 200 && $s < 300) return $this->response->reader()->read($type ?? 'var');
 
     throw new UnexpectedStatus($this->response);
   }
@@ -113,7 +113,7 @@ class Result {
    */
   public function optional($type= null, $absent= [404]) {
     $s= $this->response->status();
-    if ($s >= 200 && $s < 300) return $this->response->value($type ?? 'var');
+    if ($s >= 200 && $s < 300) return $this->response->reader()->read($type ?? 'var');
     if (in_array($s, $absent)) return null;
 
     throw new UnexpectedStatus($this->response);
@@ -130,9 +130,7 @@ class Result {
   public function error($type= null) {
     if ($this->response->status() < 400) return null;
 
-    return $this->response->format() instanceof Unsupported
-      ? $this->response->content()
-      : $this->response->value($type ?? 'var')
-    ;
+    $r= $this->response->reader();
+    return $r->format() instanceof Unsupported ? $r->content() : $r->read($type ?? 'var');
   }
 }

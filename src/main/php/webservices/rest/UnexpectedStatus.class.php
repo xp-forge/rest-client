@@ -23,9 +23,7 @@ class UnexpectedStatus extends IllegalStateException {
    * @return var
    */
   public function reason($type= null) {
-    return $this->response->format() instanceof Unsupported
-      ? $this->response->content()
-      : $this->response->value($type ?? 'var')
-    ;
+    $r= $this->response->reader();
+    return $r->format() instanceof Unsupported ? $r->content() : $r->read($type ?? 'var');
   }
 }
