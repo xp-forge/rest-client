@@ -42,6 +42,11 @@ class FormatsTest extends TestCase {
   }
 
   #[Test]
+  public function missing_mimetype() {
+    $this->assertInstanceOf(Unsupported::class, Formats::defaults()->named(null));
+  }
+
+  #[Test]
   public function with_vendor_mimetype() {
     $mime= 'application/vnd.php.serialized';
     $format= new class() extends Format {
