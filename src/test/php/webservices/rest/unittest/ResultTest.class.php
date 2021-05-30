@@ -96,6 +96,12 @@ class ResultTest {
     Assert::null((new Result($response))->optional(null, [404, 406]));
   }
 
+  #[Test, Expect(class: UnexpectedStatus::class, withMessage: 'Unexpected 302 (Found)')]
+  public function optional_on_redirect() {
+    $response= new RestResponse(302, 'Found', ['Location' => 'http://example.org/']);
+    (new Result($response))->optional();
+  }
+
   #[Test, Expect(class: UnexpectedStatus::class, withMessage: 'Unexpected 504 (Gateway Timeout)')]
   public function optional_on_error() {
     $response= new RestResponse(504, 'Gateway Timeout', ...$this->text('Could not reach database'));
