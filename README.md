@@ -112,6 +112,28 @@ $object= $result->optional(User::class);
 $list= $api->resource('users')->get()->value('org.example.User[]');
 ```
 
+### Error handling
+
+Operations on the `Result` class raise `UnexpectedStatus` exceptions. Here's how to access their status and reason:
+
+```php
+use webservices\rest\UnexpectedStatus;
+use util\cmd\Console;
+
+// In unexpected cases
+try {
+  $user= $api->resource('users/self')->get()->result()->value();
+} catch (UnexpectedStatus $e) {
+  Console::writeLine('Unexpected error ', $e->reason());
+}
+
+// More graceful handling
+$result= $api->resource('users/self')->get()->result();
+if ($error= $result->error()) {
+  Console::writeLine('Unexpected error ', $error);
+}
+```
+
 ### Authentication
 
 Basic authentication is supported by embedding the credentials in the endpoint URL:
