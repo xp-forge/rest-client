@@ -84,7 +84,7 @@ $api= new Endpoint('https://api.example.com/');
 
 // Pass segments, map 204 to true, 404 to null, raise UnexpectedStatus
 // exception otherwise
-$api->resource('user/{id}', ['id' => 6100])->delete()->result()->match([
+$api->resource('users/{id}', ['id' => 6100])->delete()->result()->match([
   204 => true,
   404 => null
 ]);
