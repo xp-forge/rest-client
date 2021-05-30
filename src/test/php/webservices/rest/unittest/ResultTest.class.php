@@ -5,7 +5,7 @@ use unittest\{Assert, AssertionFailedError, Test, Values};
 use util\data\Marshalling;
 use webservices\rest\format\{Json, Unsupported};
 use webservices\rest\io\Reader;
-use webservices\rest\{Result, RestResponse, UnexpectedError};
+use webservices\rest\{Result, RestResponse, UnexpectedStatus};
 
 class ResultTest {
 
@@ -36,9 +36,15 @@ class ResultTest {
     Assert::equals(['key' => 'value'], (new Result($response))->value());
   }
 
-  #[Test, Expect(class: UnexpectedError::class, withMessage: 'Unexpected 404 (Not Found)')]
+  #[Test, Expect(class: UnexpectedStatus::class, withMessage: 'Unexpected 404 (Not Found)')]
   public function value_on_error() {
     $response= new RestResponse(404, 'Not Found', ...$this->json('{"error":"No such test #0"}'));
+    (new Result($response))->value();
+  }
+
+  #[Test, Expect(class: UnexpectedStatus::class, withMessage: 'Unexpected 302 (Found)')]
+  public function value_on_redirect() {
+    $response= new RestResponse(302, 'Found', ['Location' => 'http://example.org/']);
     (new Result($response))->value();
   }
 
@@ -48,7 +54,7 @@ class ResultTest {
     try {
       (new Result($response))->value();
       throw new AssertionFailedError('No exception raised');
-    } catch (UnexpectedError $e) {
+    } catch (UnexpectedStatus $e) {
       Assert::equals(404, $e->status());
       Assert::equals(['error' => 'No such test #0'], $e->error());
     }
@@ -90,7 +96,7 @@ class ResultTest {
     Assert::null((new Result($response))->optional(null, [404, 406]));
   }
 
-  #[Test, Expect(class: UnexpectedError::class, withMessage: 'Unexpected 504 (Gateway Timeout)')]
+  #[Test, Expect(class: UnexpectedStatus::class, withMessage: 'Unexpected 504 (Gateway Timeout)')]
   public function optional_on_error() {
     $response= new RestResponse(504, 'Gateway Timeout', ...$this->text('Could not reach database'));
     (new Result($response))->value();

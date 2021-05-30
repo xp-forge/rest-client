@@ -3,7 +3,7 @@
 use lang\IllegalStateException;
 use webservices\rest\format\Unsupported;
 
-class UnexpectedError extends IllegalStateException {
+class UnexpectedStatus extends IllegalStateException {
   private $response;
 
   /** @param webservices.rest.RestResponse */

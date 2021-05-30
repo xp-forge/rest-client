@@ -14,12 +14,13 @@ class Result {
    *
    * @param  ?string $type
    * @return var
-   * @throws webservices.rest.UnexpectedError
+   * @throws webservices.rest.UnexpectedStatus
    */
   public function value($type= null) {
-    if ($this->response->status() < 400) return $this->response->value($type ?? 'var');
+    $s= $this->response->status();
+    if ($s >= 200 && $s < 300) return $this->response->value($type ?? 'var');
 
-    throw new UnexpectedError($this->response);
+    throw new UnexpectedStatus($this->response);
   }
 
   /**
@@ -30,13 +31,14 @@ class Result {
    * @param  ?string $type
    * @param  int[] $absent Status code indicating absence
    * @return var
-   * @throws webservices.rest.UnexpectedError
+   * @throws webservices.rest.UnexpectedStatus
    */
   public function optional($type= null, $absent= [404]) {
-    if ($this->response->status() < 400) return $this->response->value($type ?? 'var');
-    if (in_array($this->response->status(), $absent)) return null;
+    $s= $this->response->status();
+    if ($s >= 200 && $s < 300) return $this->response->value($type ?? 'var');
+    if (in_array($s, $absent)) return null;
 
-    throw new UnexpectedError($this->response);
+    throw new UnexpectedStatus($this->response);
   }
 
   /**
