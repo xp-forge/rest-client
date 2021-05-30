@@ -43,6 +43,11 @@ class RestResponseTest extends TestCase {
   }
 
   #[Test]
+  public function no_uri() {
+    $this->assertNull((new RestResponse(200, 'OK'))->uri());
+  }
+
+  #[Test]
   public function uri() {
     $this->assertEquals(
       new URI('http://example.com/'),
