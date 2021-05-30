@@ -1,7 +1,7 @@
 <?php namespace webservices\rest\unittest;
 
 use io\streams\MemoryInputStream;
-use unittest\{Assert, Test};
+use unittest\{Assert, Test, Values};
 use util\data\Marshalling;
 use webservices\rest\format\{Json, Unsupported};
 use webservices\rest\io\Reader;
@@ -10,7 +10,7 @@ use webservices\rest\{Result, RestResponse, UnexpectedError};
 class ResultTest {
 
   /** Returns a textual response */
-  private function text($body) {
+  private function text(string $body) {
     return [
       ['Content-Type' => 'text/plain'],
       new Reader(new MemoryInputStream($body), new Unsupported('text/plain'), new Marshalling())
@@ -18,7 +18,7 @@ class ResultTest {
   }
 
   /** Returns a JSON response */
-  private function json($body) {
+  private function json(string $body) {
     return [
       ['Content-Type' => 'application/json'],
       new Reader(new MemoryInputStream($body), new Json(), new Marshalling())
@@ -82,5 +82,17 @@ class ResultTest {
   public function optional_on_error() {
     $response= new RestResponse(504, 'Gateway Timeout', ...$this->text('Could not reach database'));
     (new Result($response))->value();
+  }
+
+  #[Test, Values([['0', false], ['false', false], ['""', false], ['1', true], ['true', true], ['"1"', true]])]
+  public function value_type_coercion($body, $result) {
+    $response= new RestResponse(200, 'OK', ...$this->json($body));
+    Assert::equals($result, (new Result($response))->value('bool'));
+  }
+
+  #[Test, Values([['0', false], ['false', false], ['""', false], ['1', true], ['true', true], ['"1"', true]])]
+  public function optional_type_coercion($body, $result) {
+    $response= new RestResponse(200, 'OK', ...$this->json($body));
+    Assert::equals($result, (new Result($response))->optional('bool'));
   }
 }
