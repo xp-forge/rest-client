@@ -3,6 +3,10 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 2.0.2 / 2021-05-30
+
+* Fixed issue #13: PHP 8.1 warnings - @thekid
+
 ## 2.0.1 / 2020-12-27
 
 * Fixed issue #12: Errors for responses without content type - @thekid
