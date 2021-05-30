@@ -5,9 +5,9 @@ use lang\IllegalStateException;
 use unittest\{Test, TestCase, Values};
 use util\URI;
 use util\data\Marshalling;
-use webservices\rest\format\Json;
+use webservices\rest\format\{Json, Unsupported};
 use webservices\rest\io\Reader;
-use webservices\rest\{Cookie, Cookies, Link, RestResponse};
+use webservices\rest\{Cookie, Cookies, Link, RestResponse, UnexpectedError};
 
 class RestResponseTest extends TestCase {
 
@@ -116,6 +116,27 @@ class RestResponseTest extends TestCase {
     $stream= new MemoryInputStream('{"key":200}');
     $reader= new Reader($stream, new Json(), new Marshalling());
     $this->assertEquals(['key' => '200'], (new RestResponse(200, 'OK', [], $reader))->value('[:string]'));
+  }
+
+  #[Test]
+  public function result_on_success() {
+    $stream= new MemoryInputStream('{"key":"value"}');
+    $reader= new Reader($stream, new Json(), new Marshalling());
+    $this->assertEquals(['key' => 'value'], (new RestResponse(200, 'OK', [], $reader))->result());
+  }
+
+  #[Test, Expect(class: UnexpectedError::class, withMessage: 'Unexpected 404 (Not found)')]
+  public function result_on_error() {
+    $stream= new MemoryInputStream('{"error":"No such test #404"}');
+    $reader= new Reader($stream, new Json(), new Marshalling());
+    (new RestResponse(404, 'Not found', [], $reader))->result();
+  }
+
+  #[Test, Expect(class: UnexpectedError::class, withMessage: 'Unexpected 504 (Gateway Timeout)')]
+  public function result_on_raw_error() {
+    $stream= new MemoryInputStream('Could not reach backend');
+    $reader= new Reader($stream, new Unsupported('text/plain'), new Marshalling());
+    (new RestResponse(504, 'Gateway Timeout', [], $reader))->result();
   }
 
   #[Test]
