@@ -38,16 +38,17 @@ $api= new Endpoint('https://api.example.com/');
 // Test for existance with HEAD
 $exists= (200 === $api->resource('users/1549')->head()->status());
 
-// Unmarshal to object by optionally passing a type; otherwise returned as map
-$user= $api->resource('users/self')->get()->result()->value(User::class);
+// Return user object, raising an UnexpectedStatus exception for any
+// statuscode outside of the range 200-299.
+$user= $api->resource('users/self')->get()->result()->value();
 
-// Return a user object on success or NULL for 404s
-$user= $api->resource('users/{0}', [$id])->get()->result()->optional(User::class);
+// Same as above, but returns NULL for 404s instead of an exception
+$user= $api->resource('users/{0}', [$id])->get()->result()->optional();
 
 // Pass parameters
 $list= $api->resource('user')->get(['page' => 1, 'per_page' => 50])->result()->value();
 
-// Access pagination
+// Access pagination via `Link: <...>; rel="next"` header
 $resource= 'groups';
 do {
   $result= $this->endpoint->resource($resource)->get(['per_page' => 200])->result();
@@ -97,9 +98,14 @@ The REST API supports automatic result deserialization by passing a type to the 
 ```php
 use com\example\api\types\Person;
 
-$person= $result->value(Person::class);
-$strings= $result->value('string[]');
-$codes= $result->value('[:int]');
+$result= $api->resource('users/self')->get()->result();
+
+// If a type is passed, the result will be unmarshalled to an object
+$map= $result->value();
+$object= $result->value(User::class);
+
+// Works with any type from the XP typesystem, e.g. arrays of objects
+$list= $api->resource('users')->get()->value('org.example.User[]');
 ```
 
 ### Authentication
