@@ -34,7 +34,7 @@ class Endpoint implements Traceable {
       $uri= new URI($base);
     }
 
-    $this->base= $uri->using()->path(rtrim($uri->path(), '/').'/')->create();
+    $this->base= $uri->using()->path(rtrim($uri->path() ?? '', '/').'/')->create();
     $this->formats= $formats ?: Formats::defaults();
     $this->transfer= new Streamed();
     $this->marshalling= new Marshalling();
