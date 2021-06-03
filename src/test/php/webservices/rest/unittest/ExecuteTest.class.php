@@ -132,4 +132,34 @@ class ExecuteTest extends TestCase {
 
     $this->assertEquals(403, $fixture->resource('/')->get()->status());
   }
+
+  #[Test]
+  public function use_streaming() {
+    $resource= $this->newFixture()->resource('/test');
+    $this->assertEquals(
+      "POST /test HTTP/1.1\r\n".
+      "Connection: close\r\n".
+      "Host: test\r\n".
+      "Content-Type: application/json\r\n".
+      "Transfer-Encoding: chunked\r\n".
+      "\r\n".
+      "{\"test\":true}", // No chunk markers in body because we're using TestConnection
+      $resource->post(['test' => true], 'application/json')->content()
+    );
+  }
+
+  #[Test]
+  public function use_buffering() {
+    $resource= $this->newFixture()->buffered()->resource('/test');
+    $this->assertEquals(
+      "POST /test HTTP/1.1\r\n".
+      "Connection: close\r\n".
+      "Host: test\r\n".
+      "Content-Type: application/json\r\n".
+      "Content-Length: 13\r\n".
+      "\r\n".
+      "{\"test\":true}",
+      $resource->post(['test' => true], 'application/json')->content()
+    );
+  }
 }
