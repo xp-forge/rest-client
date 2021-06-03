@@ -69,11 +69,14 @@ class Endpoint implements Traceable {
   /** @return util.URI */
   public function base() { return $this->base; }
 
+  /** @return [:string] */
+  public function headers() { return $this->headers; }
+
   /**
    * Adds headers to be sent with every request
    *
    * @param  string|[:string] $arg
-   * @param  string $value
+   * @param  ?string $value
    * @return self
    */
   public function with($arg, $value= null) {

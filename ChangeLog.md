@@ -3,6 +3,10 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 2.2.0 / 2021-06-03
+
+* Added `webservices.rest.Endpoint::headers()` accessor - @thekid
+
 ## 2.1.0 / 2021-05-30
 
 * Merged PR #15: Deprecate high-level functions on low-level response

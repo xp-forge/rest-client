@@ -12,14 +12,14 @@ class EndpointTest extends TestCase {
   /**
    * Creates a new Endpoint fixture with a given base
    *
-   * @param  string|utio.URI|peer.URL $base
+   * @param  string|util.URI|peer.URL $base
    * @return web.rest.Endpoint
    */
   private function newFixture($base= self::BASE_URL) {
     return new Endpoint($base);
   }
 
-  #[Test, Values(eval: '[self::BASE_URL, new URL(self::BASE_URL)]')]
+  #[Test, Values(eval: '[self::BASE_URL, new URI(self::BASE_URL), new URL(self::BASE_URL)]')]
   public function can_create($base) {
     $this->newFixture($base);
   }
@@ -29,9 +29,19 @@ class EndpointTest extends TestCase {
     $this->newFixture($base);
   }
 
-  #[Test, Values(eval: '[self::BASE_URL, new URL(self::BASE_URL)]')]
+  #[Test, Values(eval: '[self::BASE_URL, new URI(self::BASE_URL), new URL(self::BASE_URL)]')]
   public function base($base) {
     $this->assertEquals(new URI(self::BASE_URL), $this->newFixture($base)->base());
+  }
+
+  #[Test]
+  public function headers_empty_by_default() {
+    $this->assertEquals([], $this->newFixture()->headers());
+  }
+
+  #[Test]
+  public function headers_added_via_with() {
+    $this->assertEquals(['X-API-Key' => '6100'], $this->newFixture()->with('X-API-Key', '6100')->headers());
   }
 
   #[Test]
