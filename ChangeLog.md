@@ -3,6 +3,12 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 2.2.1 / 2021-08-16
+
+* Fixed PHP 8.1 compatibility by declaring `getIterator()` with correct
+  return type. See issue #16.
+  (@thekid)
+
 ## 2.2.0 / 2021-06-03
 
 * Added `webservices.rest.Endpoint::headers()` accessor - @thekid
