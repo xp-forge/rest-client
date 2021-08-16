@@ -1,5 +1,6 @@
 <?php namespace webservices\rest;
 
+use Traversable, IteratorAggregate;
 use lang\{ElementNotFoundException, Value};
 use util\{Date, Objects, URI};
 
@@ -10,7 +11,7 @@ use util\{Date, Objects, URI};
  * @see   https://tools.ietf.org/html/rfc6265
  * @see   https://tools.ietf.org/html/draft-ietf-httpbis-rfc6265bis-02
  */
-class Cookies implements Value, \IteratorAggregate {
+class Cookies implements Value, IteratorAggregate {
   public static $EMPTY;
   private $list= [];
 
@@ -122,12 +123,8 @@ class Cookies implements Value, \IteratorAggregate {
     return $this;
   }
 
-  /**
-   * Returns all cookies
-   * 
-   * @return iterable
-   */
-  public function getIterator() {
+  /** Returns all cookies */
+  public function getIterator(): Traversable {
     foreach ($this->list as $lookup) {
       foreach ($lookup as $cookie) {
         yield $cookie;
