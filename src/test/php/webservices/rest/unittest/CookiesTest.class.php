@@ -1,10 +1,10 @@
 <?php namespace webservices\rest\unittest;
 
 use lang\ElementNotFoundException;
-use unittest\{Test, TestCase};
+use unittest\{Assert, Test};
 use webservices\rest\{Cookie, Cookies};
 
-class CookiesTest extends TestCase {
+class CookiesTest {
 
   #[Test]
   public function can_create_from_empty() {
@@ -14,25 +14,25 @@ class CookiesTest extends TestCase {
   #[Test]
   public function present() {
     $cookies= new Cookies(['session' => '0x6100']);
-    $this->assertTrue($cookies->present());
+    Assert::true($cookies->present());
   }
 
   #[Test]
   public function not_present() {
     $cookies= Cookies::$EMPTY;
-    $this->assertFalse($cookies->present());
+    Assert::false($cookies->present());
   }
 
   #[Test]
   public function no_longer_present_after_clearing() {
     $cookies= new Cookies(['session' => '0x6100']);
-    $this->assertFalse($cookies->clear()->present());
+    Assert::false($cookies->clear()->present());
   }
 
   #[Test]
   public function can_be_iterated() {
     $cookies= new Cookies(['session' => '0x6100']);
-    $this->assertEquals([new Cookie('session', '0x6100')], iterator_to_array($cookies));
+    Assert::equals([new Cookie('session', '0x6100')], iterator_to_array($cookies));
   }
 
   #[Test]
@@ -54,13 +54,13 @@ class CookiesTest extends TestCase {
     ];
 
     $cookies= new Cookies(array_merge($excluded, $included));
-    $this->assertEquals($included, iterator_to_array($cookies->validFor('http://sub.example.com/path')));
+    Assert::equals($included, iterator_to_array($cookies->validFor('http://sub.example.com/path')));
   }
 
   #[Test]
   public function cookies_with_same_name_overwritten_during_merge() {
     $cookies= new Cookies(['session' => '0x6100']);
-    $this->assertEquals(
+    Assert::equals(
       [new Cookie('session', '0x6200')],
       iterator_to_array($cookies->update(['session' => '0x6200']))
     );
@@ -69,7 +69,7 @@ class CookiesTest extends TestCase {
   #[Test]
   public function cookies_without_value_erased() {
     $cookies= new Cookies(['session' => '0x6100', 'lang' => 'de']);
-    $this->assertEquals(
+    Assert::equals(
       [new Cookie('lang', 'de')],
       iterator_to_array($cookies->update(['session' => null]))
     );
@@ -82,7 +82,7 @@ class CookiesTest extends TestCase {
       new Cookie('lang', 'de'),
     ]);
 
-    $this->assertEquals(
+    Assert::equals(
       "webservices.rest.Cookies@{\n".
       "  webservices.rest.Cookie(lang=de)@[]\n".
       "  webservices.rest.Cookie(session=0x6100)@[\n".

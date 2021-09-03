@@ -1,10 +1,10 @@
 <?php namespace webservices\rest\unittest;
 
-use unittest\{Test, TestCase, Values};
+use unittest\{Assert, Test, Values};
 use webservices\rest\format\{FormUrlencoded, Format, Json, NdJson, Unsupported};
 use webservices\rest\{Formats, RestFormat};
 
-class FormatsTest extends TestCase {
+class FormatsTest {
 
   #[Test]
   public function can_create() {
@@ -13,37 +13,37 @@ class FormatsTest extends TestCase {
 
   #[Test]
   public function supports_json_by_default() {
-    $this->assertInstanceOf(Json::class, Formats::defaults()->named('application/json'));
+    Assert::instance(Json::class, Formats::defaults()->named('application/json'));
   }
 
   #[Test]
   public function supports_ndjson_by_default() {
-    $this->assertInstanceOf(NdJson::class, Formats::defaults()->named(NdJson::MIMETYPE));
+    Assert::instance(NdJson::class, Formats::defaults()->named(NdJson::MIMETYPE));
   }
 
   #[Test]
   public function supports_form_urlencoded_by_default() {
-    $this->assertInstanceOf(FormUrlencoded::class, Formats::defaults()->named('application/x-www-form-urlencoded'));
+    Assert::instance(FormUrlencoded::class, Formats::defaults()->named('application/x-www-form-urlencoded'));
   }
 
   #[Test]
   public function supports_json_vendor_types_by_default() {
-    $this->assertInstanceOf(Json::class, Formats::defaults()->named('application/vnd.github.v3+json'));
+    Assert::instance(Json::class, Formats::defaults()->named('application/vnd.github.v3+json'));
   }
 
   #[Test]
   public function using_restformat_enum() {
-    $this->assertInstanceOf(Json::class, Formats::defaults()->named(RestFormat::$JSON));
+    Assert::instance(Json::class, Formats::defaults()->named(RestFormat::$JSON));
   }
 
   #[Test]
   public function unsupported_mimetype() {
-    $this->assertInstanceOf(Unsupported::class, Formats::defaults()->named('application/vnd.php.serialized'));
+    Assert::instance(Unsupported::class, Formats::defaults()->named('application/vnd.php.serialized'));
   }
 
   #[Test]
   public function missing_mimetype() {
-    $this->assertInstanceOf(Unsupported::class, Formats::defaults()->named(null));
+    Assert::instance(Unsupported::class, Formats::defaults()->named(null));
   }
 
   #[Test]
@@ -54,7 +54,7 @@ class FormatsTest extends TestCase {
       public function deserialize($stream) { /* TBI */ }
     };
 
-    $this->assertEquals($format, (new Formats())->with($mime, $format)->named($mime));
+    Assert::equals($format, (new Formats())->with($mime, $format)->named($mime));
   }
 
   #[Test, Values(['application/vnd.com.example.customer+xml', 'application/vnd.com.example.customer-v2+xml'])]
@@ -65,6 +65,6 @@ class FormatsTest extends TestCase {
       public function deserialize($stream) { /* TBI */ }
     };
 
-    $this->assertEquals($format, (new Formats())->matching($pattern, $format)->named($mime));
+    Assert::equals($format, (new Formats())->matching($pattern, $format)->named($mime));
   }
 }

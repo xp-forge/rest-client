@@ -2,11 +2,11 @@
 
 use lang\{Error, FormatException, IllegalArgumentException};
 use peer\URL;
-use unittest\{Expect, Test, TestCase, Values};
+use unittest\{Assert, Expect, Test, Values};
 use util\URI;
 use webservices\rest\{Endpoint, RestResource};
 
-class EndpointTest extends TestCase {
+class EndpointTest {
   const BASE_URL = 'https://api.example.com/';
 
   /**
@@ -31,32 +31,32 @@ class EndpointTest extends TestCase {
 
   #[Test, Values(eval: '[self::BASE_URL, new URI(self::BASE_URL), new URL(self::BASE_URL)]')]
   public function base($base) {
-    $this->assertEquals(new URI(self::BASE_URL), $this->newFixture($base)->base());
+    Assert::equals(new URI(self::BASE_URL), $this->newFixture($base)->base());
   }
 
   #[Test]
   public function headers_empty_by_default() {
-    $this->assertEquals([], $this->newFixture()->headers());
+    Assert::equals([], $this->newFixture()->headers());
   }
 
   #[Test]
   public function headers_added_via_with() {
-    $this->assertEquals(['X-API-Key' => '6100'], $this->newFixture()->with('X-API-Key', '6100')->headers());
+    Assert::equals(['X-API-Key' => '6100'], $this->newFixture()->with('X-API-Key', '6100')->headers());
   }
 
   #[Test]
   public function resource() {
-    $this->assertInstanceOf(RestResource::class, $this->newFixture()->resource('/users'));
+    Assert::instance(RestResource::class, $this->newFixture()->resource('/users'));
   }
 
   #[Test]
   public function resource_with_named_segment() {
-    $this->assertInstanceOf(RestResource::class, $this->newFixture()->resource('/users/{id}', ['id' => 6100]));
+    Assert::instance(RestResource::class, $this->newFixture()->resource('/users/{id}', ['id' => 6100]));
   }
 
   #[Test]
   public function resource_with_positional_segment() {
-    $this->assertInstanceOf(RestResource::class, $this->newFixture()->resource('/users/{0}', [6100]));
+    Assert::instance(RestResource::class, $this->newFixture()->resource('/users/{0}', [6100]));
   }
 
   #[Test, Expect(Error::class)]

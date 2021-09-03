@@ -6,7 +6,7 @@ use util\URI;
 use util\data\Marshalling;
 use webservices\rest\format\{Json, Unsupported};
 use webservices\rest\io\Reader;
-use webservices\rest\{Result, RestResponse, UnexpectedStatus};
+use webservices\rest\{RestResponse, Result, UnexpectedStatus};
 
 class ResultTest {
 

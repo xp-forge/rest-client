@@ -1,10 +1,11 @@
 <?php namespace webservices\rest\unittest\format;
 
 use io\streams\{MemoryInputStream, MemoryOutputStream};
+use unittest\Assert;
 use unittest\{Test, TestCase};
 use webservices\rest\format\FormUrlencoded;
 
-class FormUrlencodedTest extends TestCase {
+class FormUrlencodedTest {
 
   #[Test]
   public function can_create() {
@@ -14,12 +15,12 @@ class FormUrlencodedTest extends TestCase {
   #[Test]
   public function serialize() {
     $format= new FormUrlencoded();
-    $this->assertEquals('key=value', $format->serialize(['key' => 'value'], new MemoryOutputStream())->getBytes());
+    Assert::equals('key=value', $format->serialize(['key' => 'value'], new MemoryOutputStream())->getBytes());
   }
 
   #[Test]
   public function deserialize() {
     $format= new FormUrlencoded();
-    $this->assertEquals(['key' => 'value'], $format->deserialize(new MemoryInputStream('key=value')));
+    Assert::equals(['key' => 'value'], $format->deserialize(new MemoryInputStream('key=value')));
   }
 }

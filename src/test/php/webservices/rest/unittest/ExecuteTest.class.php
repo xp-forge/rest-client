@@ -3,12 +3,12 @@
 use io\streams\MemoryInputStream;
 use lang\ClassLoader;
 use peer\ConnectException;
-use peer\http\{HttpConnection, HttpRequest, HttpResponse, Authorization};
-use unittest\{Expect, Test, TestCase};
+use peer\http\{Authorization, HttpConnection, HttpRequest, HttpResponse};
+use unittest\{Assert, Expect, Test};
 use util\log\{BufferedAppender, Logging};
 use webservices\rest\{Endpoint, RestException};
 
-class ExecuteTest extends TestCase {
+class ExecuteTest {
 
   /** Returns a new endpoint using the `TestConnection` class */
   private function newFixture() {
@@ -18,7 +18,7 @@ class ExecuteTest extends TestCase {
   #[Test]
   public function get() {
     $resource= $this->newFixture()->resource('/test');
-    $this->assertEquals(
+    Assert::equals(
       "GET /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\n\r\n",
       $resource->get()->content()
     );
@@ -27,7 +27,7 @@ class ExecuteTest extends TestCase {
   #[Test]
   public function get_with_parameters() {
     $resource= $this->newFixture()->resource('/');
-    $this->assertEquals(
+    Assert::equals(
       "GET /?username=test HTTP/1.1\r\nConnection: close\r\nHost: test\r\n\r\n",
       $resource->get(['username' => 'test'])->content()
     );
@@ -36,7 +36,7 @@ class ExecuteTest extends TestCase {
   #[Test]
   public function get_with_parameters_in_resource() {
     $resource= $this->newFixture()->resource('/?username={0}', ['test']);
-    $this->assertEquals(
+    Assert::equals(
       "GET /?username=test HTTP/1.1\r\nConnection: close\r\nHost: test\r\n\r\n",
       $resource->get()->content()
     );
@@ -45,7 +45,7 @@ class ExecuteTest extends TestCase {
   #[Test]
   public function get_with_cookies() {
     $resource= $this->newFixture()->resource('/')->including(['session' => '0x6100', 'lang' => 'de']);
-    $this->assertEquals(
+    Assert::equals(
       "GET / HTTP/1.1\r\nConnection: close\r\nHost: test\r\nCookie: session=0x6100; lang=de\r\n\r\n",
       $resource->get()->content()
     );
@@ -54,7 +54,7 @@ class ExecuteTest extends TestCase {
   #[Test]
   public function get_with_cookies_merges_cookie_header() {
     $resource= $this->newFixture()->resource('/')->with(['Cookie' => 'session=0x6100'])->including(['lang' => 'de']);
-    $this->assertEquals(
+    Assert::equals(
       "GET / HTTP/1.1\r\nConnection: close\r\nHost: test\r\nCookie: session=0x6100; lang=de\r\n\r\n",
       $resource->get()->content()
     );
@@ -63,7 +63,7 @@ class ExecuteTest extends TestCase {
   #[Test]
   public function get_with_header() {
     $resource= $this->newFixture()->with('User-Agent', 'XP')->resource('/test');
-    $this->assertEquals(
+    Assert::equals(
       "GET /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\nUser-Agent: XP\r\n\r\n",
       $resource->get()->content()
     );
@@ -72,7 +72,7 @@ class ExecuteTest extends TestCase {
   #[Test]
   public function get_with_headers() {
     $resource= $this->newFixture()->with(['User-Agent' => 'XP'])->resource('/test');
-    $this->assertEquals(
+    Assert::equals(
       "GET /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\nUser-Agent: XP\r\n\r\n",
       $resource->get()->content()
     );
@@ -86,7 +86,7 @@ class ExecuteTest extends TestCase {
       }
     };
     $response= $this->newFixture()->with('Authorization', $authorization)->resource('/test')->get();
-    $this->assertEquals(
+    Assert::equals(
       "GET /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\nAuthorization: OAuth Bearer TOKEN\r\n\r\n",
       $response->content()
     );
@@ -102,7 +102,7 @@ class ExecuteTest extends TestCase {
     $fixture->resource('/users/0')->get();
 
     $buf= $log->getBuffer();
-    $this->assertEquals(
+    Assert::equals(
       ['req' => 1, 'res' => 1],
       ['req' => preg_match('~GET /users/0 HTTP/1\.1~', $buf), 'res' => preg_match('~HTTP/1\.1 200 OK~', $buf)],
       $buf
@@ -130,13 +130,13 @@ class ExecuteTest extends TestCase {
       ]);
     });
 
-    $this->assertEquals(403, $fixture->resource('/')->get()->status());
+    Assert::equals(403, $fixture->resource('/')->get()->status());
   }
 
   #[Test]
   public function use_streaming() {
     $resource= $this->newFixture()->resource('/test');
-    $this->assertEquals(
+    Assert::equals(
       "POST /test HTTP/1.1\r\n".
       "Connection: close\r\n".
       "Host: test\r\n".
@@ -151,7 +151,7 @@ class ExecuteTest extends TestCase {
   #[Test]
   public function use_buffering() {
     $resource= $this->newFixture()->buffered()->resource('/test');
-    $this->assertEquals(
+    Assert::equals(
       "POST /test HTTP/1.1\r\n".
       "Connection: close\r\n".
       "Host: test\r\n".
