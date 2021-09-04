@@ -1,9 +1,9 @@
-<?php namespace webservices\rest;
+<?php namespace webservices\rest\io;
 
 use io\streams\OutputStream;
 
 class Transmission implements OutputStream {
-  private $conn, $output;
+  protected $conn, $output;
   public $request, $target;
 
   /**

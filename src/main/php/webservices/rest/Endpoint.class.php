@@ -6,7 +6,7 @@ use peer\http\{HttpConnection, HttpRequest};
 use util\URI;
 use util\data\Marshalling;
 use util\log\Traceable;
-use webservices\rest\io\{Buffered, Reader, Streamed, Traced};
+use webservices\rest\io\{Buffered, Reader, Streamed, Traced, Transmission};
 
 /**
  * Entry point class
@@ -117,7 +117,7 @@ class Endpoint implements Traceable {
    * Opens a request and returns a transmission instance
    * 
    * @param  webservices.rest.RestRequest $request
-   * @return webservices.rest.Transmission
+   * @return webservices.rest.io.Transmission
    */
   public function open(RestRequest $request) {
     $target= $this->base->resolve($request->path());
@@ -137,13 +137,13 @@ class Endpoint implements Traceable {
     $s->setTarget($target->path());
     $s->addHeaders($headers);
     $s->setParameters($request->parameters());
-    return new Transmission($conn, $s, $target);
+    return $this->transfer->transmission($conn, $s, $target);
   }
 
   /**
    * Finished a given transmission and returns the response
    * 
-   * @param  webservices.rest.Transmission $transmission
+   * @param  webservices.rest.io.Transmission $transmission
    * @return webservices.rest.RestResponse
    * @throws webservices.rest.RestException
    */

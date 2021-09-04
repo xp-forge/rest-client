@@ -19,17 +19,44 @@ class Traced extends Transfer {
   /** @return parent */
   public function untraced() { return $this->untraced; }
 
+  public function transmission($conn, $s, $target) {
+    return new class($conn, $s, $target, $this->cat) extends Transmission {
+      private $cat;
+
+      public function __construct($conn, $request, $target, $cat) {
+        parent::__construct($conn, $request, $target);
+        $this->cat= $cat;
+      }
+
+      public function write($bytes) {
+        if (null === $this->output) {
+          $this->cat->info('>>>', rtrim($this->request->getHeaderString(), "\r\n"));
+          $this->output= $this->conn->open($this->request);
+        }
+
+        $this->cat->debug($bytes);
+        return $this->output->write($bytes);
+      }
+
+      public function finish() {
+        if (null === $this->output) {
+          $this->cat->info('>>>', rtrim($this->request->getHeaderString(), "\r\n"));
+          return $this->conn->send($this->request);
+        } else {
+          return $this->conn->finish($this->output);
+        }
+      }
+    };
+  }
+
   public function writer($request, $format, $marshalling) {
     $stream= $this->untraced->endpoint->open($request);
 
+    // Send payload in one big chunk to create compact logging output
     if ($payload= $request->payload()) {
       $bytes= $format->serialize($marshalling->marshal($payload->value()), new MemoryOutputStream())->getBytes();
       $stream->request->setHeader('Content-Length', strlen($bytes));
-      $this->cat->info('>>>', rtrim($stream->request->getHeaderString(), "\r\n"));
-      $this->cat->debug($bytes);
       $stream->write($bytes);
-    } else {
-      $this->cat->info('>>>', rtrim($stream->request->getHeaderString(), "\r\n"));
     }
 
     return $this->untraced->endpoint->finish($stream);

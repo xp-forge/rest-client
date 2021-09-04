@@ -10,6 +10,10 @@ abstract class Transfer {
   /** @return self */
   public function untraced() { return $this; }
 
+  public function transmission($conn, $s, $target) {
+    return new Transmission($conn, $s, $target);
+  }
+
   public function stream($request, $format, $payload) {
     throw new MethodNotImplementedException(__METHOD__);
   }
