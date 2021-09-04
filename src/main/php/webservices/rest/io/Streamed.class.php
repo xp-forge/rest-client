@@ -2,12 +2,9 @@
 
 class Streamed extends Transfer {
 
-  protected function payload($request, $payload, $format, $marshalling) {
-    $request->setHeader('Transfer-Encoding', 'chunked');
-    return function($conn) use($request, $payload, $format, $marshalling) {
-      $stream= $conn->open($request);
-      $format->serialize($marshalling->marshal($payload), $stream);
-      return $conn->finish($stream);
-    };
+  public function stream($request, $format, $value) {
+    $stream= $this->endpoint->open($request->with(['Transfer-Encoding' => 'chunked']));
+    $format->serialize($value, $stream);
+    return $stream;
   }
 }

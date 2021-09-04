@@ -36,7 +36,7 @@ class Endpoint implements Traceable {
 
     $this->base= $uri->using()->path(rtrim($uri->path() ?? '', '/').'/')->create();
     $this->formats= $formats ?: Formats::defaults();
-    $this->transfer= new Streamed();
+    $this->transfer= new Streamed($this);
     $this->marshalling= new Marshalling();
     $this->connections= function($uri) { return new HttpConnection($uri); };
   }
@@ -50,7 +50,7 @@ class Endpoint implements Traceable {
    * @return self
    */
   public function buffered() {
-    $this->transfer= new Buffered();
+    $this->transfer= new Buffered($this);
     return $this;
   }
 
@@ -114,6 +114,51 @@ class Endpoint implements Traceable {
   }
 
   /**
+   * Opens a request and returns a transmission instance
+   * 
+   * @param  webservices.rest.RestRequest $request
+   * @return webservices.rest.Transmission
+   */
+  public function open(RestRequest $request) {
+    $target= $this->base->resolve($request->path());
+    $conn= $this->connections->__invoke($target);
+    $headers= array_merge($this->headers, $request->headers());
+
+    // RFC 6265: When the user agent generates an HTTP request, the user agent
+    // MUST NOT attach more than one Cookie header field.
+    $cookies= (array)$request->header('Cookie');
+    foreach ($request->cookies()->validFor($target) as $cookie) {
+      $cookies[]= $cookie->name().'='.urlencode($cookie->value());
+    }
+    $cookies && $headers['Cookie']= implode('; ', $cookies);
+
+    $s= $conn->create(new HttpRequest());
+    $s->setMethod($request->method());
+    $s->setTarget($target->path());
+    $s->addHeaders($headers);
+    $s->setParameters($request->parameters());
+    return new Transmission($conn, $s, $target);
+  }
+
+  /**
+   * Finished a given transmission and returns the response
+   * 
+   * @param  webservices.rest.Transmission $transmission
+   * @return webservices.rest.RestResponse
+   * @throws webservices.rest.RestException
+   */
+  public function finish(Transmission $transmission) {
+    try {
+      $r= $transmission->finish();
+      $output= $this->formats->named($r->header('Content-Type')[0] ?? null);
+      $reader= $this->transfer->reader($r, $output, $this->marshalling);
+      return new RestResponse($r->statusCode(), $r->message(), $r->headers(), $reader, $transmission->target);
+    } catch (Throwable $e) {
+      throw new RestException('Cannot send request', $e);
+    }
+  }
+
+  /**
    * Sends a request and returns the response
    *
    * @param  webservices.rest.RestRequest $request
@@ -121,34 +166,7 @@ class Endpoint implements Traceable {
    * @throws webservices.rest.RestException
    */
   public function execute(RestRequest $request) {
-    $uri= $this->base->resolve($request->path());
-    $conn= $this->connections->__invoke($uri);
-    $headers= array_merge($this->headers, $request->headers());
-
-    // RFC 6265: When the user agent generates an HTTP request, the user agent
-    // MUST NOT attach more than one Cookie header field.
-    $cookies= (array)$request->header('Cookie');
-    foreach ($request->cookies()->validFor($uri) as $cookie) {
-      $cookies[]= $cookie->name().'='.urlencode($cookie->value());
-    }
-    $cookies && $headers['Cookie']= implode('; ', $cookies);
-
-    $s= $conn->create(new HttpRequest());
-    $s->setMethod($request->method());
-    $s->setTarget($uri->path());
-    $s->addHeaders($headers);
-    $s->setParameters($request->parameters());
-
-    try {
-      $input= $this->formats->named($request->header('Content-Type'));
-      $writer= $this->transfer->writer($s, $request->payload(), $input, $this->marshalling);
-      $r= $writer($conn);
-
-      $output= $this->formats->named($r->header('Content-Type')[0] ?? null);
-      $reader= $this->transfer->reader($r, $output, $this->marshalling);
-      return new RestResponse($r->statusCode(), $r->message(), $r->headers(), $reader, $uri);
-    } catch (Throwable $e) {
-      throw new RestException('Cannot send request', $e);
-    }
+    $input= $this->formats->named($request->header('Content-Type'));
+    return $this->transfer->writer($request, $input, $this->marshalling);
   }
 }

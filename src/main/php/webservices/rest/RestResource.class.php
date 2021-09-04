@@ -150,4 +150,11 @@ class RestResource {
       ->transfer($payload)
     );
   }
+
+  public function upload($method= 'POST') {
+    $request= clone $this->request;
+    return new RestUpload($this->endpoint, $request->using($method)
+      ->with($this->headers)
+    );
+  }
 }

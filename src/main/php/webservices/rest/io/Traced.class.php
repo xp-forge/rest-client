@@ -19,24 +19,23 @@ class Traced extends Transfer {
   /** @return parent */
   public function untraced() { return $this->untraced; }
 
-  public function writer($request, $payload, $format, $marshalling) {
-    $this->cat->info('>>>', substr($request->getHeaderString(), 0, -2));
-    if (null === $payload) return function($conn) use($request) { return $conn->send($request); };
+  public function writer($request, $format, $marshalling) {
+    $stream= $this->untraced->endpoint->open($request);
 
-    $bytes= $format->serialize($marshalling->marshal($payload->value()), new MemoryOutputStream())->getBytes();
-    $this->cat->debug($bytes);
+    if ($payload= $request->payload()) {
+      $bytes= $format->serialize($marshalling->marshal($payload->value()), new MemoryOutputStream())->getBytes();
+      $stream->request->setHeader('Content-Length', strlen($bytes));
+      $this->cat->info('>>>', rtrim($stream->request->getHeaderString(), "\r\n"));
+      $this->cat->debug($bytes);
+    } else {
+      $this->cat->info('>>>', rtrim($stream->request->getHeaderString(), "\r\n"));
+    }
 
-    // We've created it anyway, now simply transfer the bytes in a buffered manner
-    $request->setHeader('Content-Length', strlen($bytes));
-    return function($conn) use($request, $bytes) {
-      $stream= $conn->open($request);
-      $stream->write($bytes);
-      return $conn->finish($stream);
-    };
+    return $this->untraced->endpoint->finish($stream);
   }
 
   public function reader($response, $format, $marshalling) {
-    $this->cat->info('<<<', substr($response->getHeaderString(), 0, -2));
+    $this->cat->info('<<<', rtrim($response->getHeaderString(), "\r\n"));
     $bytes= Streams::readAll($response->in());
     $this->cat->debug($bytes);
 

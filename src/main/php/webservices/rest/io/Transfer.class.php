@@ -3,20 +3,25 @@
 use lang\MethodNotImplementedException;
 
 abstract class Transfer {
+  protected $endpoint;
+
+  public function __construct($endpoint) { $this->endpoint= $endpoint; }
 
   /** @return self */
   public function untraced() { return $this; }
 
-  protected function payload($request, $value, $format, $marshalling) {
-    throw new MethodNotImplementedException('payload()');
+  public function stream($request, $format, $payload) {
+    throw new MethodNotImplementedException(__METHOD__);
   }
 
-  public function writer($request, $payload, $format, $marshalling) {
-    if ($payload) {
-      return $this->payload($request, $payload->value(), $format, $marshalling);
+  public function writer($request, $format, $marshalling) {
+    if ($payload= $request->payload()) {
+      $stream= $this->stream($request, $format, $marshalling->marshal($payload->value()));
     } else {
-      return function($conn) use($request) { return $conn->send($request); };
+      $stream= $this->endpoint->open($request);
     }
+
+    return $this->endpoint->finish($stream);
   }
 
   public function reader($response, $format, $marshalling) {

@@ -5,8 +5,9 @@ use lang\ClassLoader;
 use peer\ConnectException;
 use peer\http\{Authorization, HttpConnection, HttpRequest, HttpResponse};
 use unittest\{Assert, Expect, Test};
+use util\log\layout\PatternLayout;
 use util\log\{BufferedAppender, Logging};
-use webservices\rest\{Endpoint, RestException};
+use webservices\rest\{Endpoint, RestException, RestUpload};
 
 class ExecuteTest {
 
@@ -92,20 +93,113 @@ class ExecuteTest {
     );
   }
 
+  #[Test, Values(['POST', 'PUT'])]
+  public function upload($method) {
+    $response= $this->newFixture()->resource('/test')->upload($method)
+      ->pass('submit', 'true')
+      ->transfer('upload', new MemoryInputStream('Test'), 'test.txt', 'text/plain')
+      ->finish()
+    ;
+
+    $expected= implode("\r\n", [
+      '%1$s /test HTTP/1.1',
+      'Connection: close',
+      'Host: test',
+      'Content-Type: multipart/form-data; boundary=%2$s',
+      '',
+      '--%2$s',
+      'Content-Disposition: form-data; name="submit"',
+      '',
+      'true',
+      '--%2$s',
+      'Content-Disposition: form-data; name="upload"; filename="test.txt"',
+      'Content-Type: text/plain',
+      '',
+      'Test',
+      '--%2$s--',
+      '',
+    ]);
+    Assert::equals(sprintf($expected, $method, RestUpload::BOUNDARY), $response->content());
+  }
+
+  #[Test, Values(['POST', 'PUT'])]
+  public function stream($method) {
+    $upload= $this->newFixture()->resource('/test')->upload($method);
+    $stream= $upload->stream('upload', 'test.txt', 'text/plain');
+    $stream->write('Test');
+    $stream->close();
+    $response= $upload->finish();
+
+    $expected= implode("\r\n", [
+      '%1$s /test HTTP/1.1',
+      'Connection: close',
+      'Host: test',
+      'Content-Type: multipart/form-data; boundary=%2$s',
+      '',
+      '--%2$s',
+      'Content-Disposition: form-data; name="upload"; filename="test.txt"',
+      'Content-Type: text/plain',
+      '',
+      'Test',
+      '--%2$s--',
+      '',
+    ]);
+    Assert::equals(sprintf($expected, $method, RestUpload::BOUNDARY), $response->content());
+  }
+
+  #[Test, Values(['POST', 'PUT'])]
+  public function write_to_stream_without_closing($method) {
+    $upload= $this->newFixture()->resource('/test')->upload($method);
+    $upload->stream('upload', 'test.txt', 'text/plain')->write('Test');
+    $response= $upload->finish();
+
+    $expected= implode("\r\n", [
+      '%1$s /test HTTP/1.1',
+      'Connection: close',
+      'Host: test',
+      'Content-Type: multipart/form-data; boundary=%2$s',
+      '',
+      '--%2$s',
+      'Content-Disposition: form-data; name="upload"; filename="test.txt"',
+      'Content-Type: text/plain',
+      '',
+      'Test',
+      '--%2$s--',
+      '',
+    ]);
+    Assert::equals(sprintf($expected, $method, RestUpload::BOUNDARY), $response->content());
+  }
+
   #[Test]
   public function logging() {
-    $fixture= $this->newFixture();
-
     $log= new BufferedAppender();
-    $fixture->setTrace(Logging::all()->to($log));
 
+    $fixture= $this->newFixture();
+    $fixture->setTrace(Logging::all()->using(new PatternLayout('%L %m%n'))->to($log));
     $fixture->resource('/users/0')->get();
 
-    $buf= $log->getBuffer();
     Assert::equals(
-      ['req' => 1, 'res' => 1],
-      ['req' => preg_match('~GET /users/0 HTTP/1\.1~', $buf), 'res' => preg_match('~HTTP/1\.1 200 OK~', $buf)],
-      $buf
+      "INFO >>> GET /users/0 HTTP/1.1\r\nConnection: close\r\nHost: test\n".
+      "INFO <<< HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 56\n".
+      "DEBUG GET /users/0 HTTP/1.1\r\nConnection: close\r\nHost: test\r\n\r\n\n",
+      $log->getBuffer(),
+    );
+  }
+
+  #[Test]
+  public function logging_with_body() {
+    $log= new BufferedAppender();
+
+    $fixture= $this->newFixture();
+    $fixture->setTrace(Logging::all()->using(new PatternLayout('%L %m%n'))->to($log));
+    $fixture->resource('/test')->post(['test' => true], 'application/json');
+
+    Assert::equals(
+      "INFO >>> POST /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\nContent-Type: application/json\r\nContent-Length: 13\n".
+      "DEBUG {\"test\":true}\n".
+      "INFO <<< HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 106\n".
+      "DEBUG POST /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\nContent-Type: application/json\r\nContent-Length: 13\r\n\r\n\n",
+      $log->getBuffer(),
     );
   }
 
