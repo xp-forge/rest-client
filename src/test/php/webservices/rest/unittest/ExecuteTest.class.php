@@ -207,8 +207,8 @@ class ExecuteTest {
     $fixture->resource('/users/0')->get();
 
     Assert::equals(
-      "INFO >>> GET /users/0 HTTP/1.1\r\nConnection: close\r\nHost: test\n".
-      "INFO <<< HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 56\n".
+      "INFO >>> GET /users/0 HTTP/1.1\r\nConnection: close\r\nHost: test\r\n\n".
+      "INFO <<< HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 56\r\n\n".
       "DEBUG GET /users/0 HTTP/1.1\r\nConnection: close\r\nHost: test\r\n\r\n\n",
       $log->getBuffer()
     );
@@ -223,9 +223,9 @@ class ExecuteTest {
     $fixture->resource('/test')->post(['test' => true], 'application/json');
 
     Assert::equals(
-      "INFO >>> POST /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\nContent-Type: application/json\r\nContent-Length: 13\n".
+      "INFO >>> POST /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\nContent-Type: application/json\r\nContent-Length: 13\r\n\n".
       "DEBUG {\"test\":true}\n".
-      "INFO <<< HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 119\n".
+      "INFO <<< HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 119\r\n\n".
       "DEBUG POST /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\nContent-Type: application/json\r\nContent-Length: 13\r\n\r\n{\"test\":true}\n",
       $log->getBuffer()
     );

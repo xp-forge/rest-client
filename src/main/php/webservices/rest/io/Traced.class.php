@@ -30,7 +30,7 @@ class Traced extends Transfer {
 
       public function write($bytes) {
         if (null === $this->output) {
-          $this->cat->info('>>>', rtrim($this->request->getHeaderString(), "\r\n"));
+          $this->cat->info('>>>', substr($this->request->getHeaderString(), 0, -2));
           $this->output= $this->conn->open($this->request);
         }
 
@@ -40,7 +40,7 @@ class Traced extends Transfer {
 
       public function finish() {
         if (null === $this->output) {
-          $this->cat->info('>>>', rtrim($this->request->getHeaderString(), "\r\n"));
+          $this->cat->info('>>>', substr($this->request->getHeaderString(), 0, -2));
           return $this->conn->send($this->request);
         } else {
           return $this->conn->finish($this->output);
@@ -63,7 +63,7 @@ class Traced extends Transfer {
   }
 
   public function reader($response, $format, $marshalling) {
-    $this->cat->info('<<<', rtrim($response->getHeaderString(), "\r\n"));
+    $this->cat->info('<<<', substr($response->getHeaderString(), 0, -2));
     $bytes= Streams::readAll($response->in());
     $this->cat->debug($bytes);
 
