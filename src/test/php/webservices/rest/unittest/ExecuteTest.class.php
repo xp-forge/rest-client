@@ -6,7 +6,7 @@ use peer\ConnectException;
 use peer\http\{Authorization, HttpConnection, HttpRequest, HttpResponse};
 use unittest\{Assert, Expect, Test};
 use util\log\layout\PatternLayout;
-use util\log\{BufferedAppender, Logging};
+use util\log\{Appender, Logging};
 use webservices\rest\{Endpoint, RestException, RestUpload};
 
 class ExecuteTest {
@@ -14,6 +14,16 @@ class ExecuteTest {
   /** Returns a new endpoint using the `TestConnection` class */
   private function newFixture() {
     return (new Endpoint('http://test'))->connecting([TestConnection::class, 'new']);
+  }
+
+  /** Returns a log appender which stores formatted lines */
+  private function newAppender() {
+    return new class() extends Appender {
+      public $lines= [];
+      public function append($event) {
+        $this->lines[]= $this->layout->format($event);
+      }
+    };
   }
 
   #[Test]
@@ -200,35 +210,47 @@ class ExecuteTest {
 
   #[Test]
   public function logging() {
-    $log= new BufferedAppender();
-
+    $appender= $this->newAppender();
     $fixture= $this->newFixture();
-    $fixture->setTrace(Logging::all()->using(new PatternLayout('%L %m%n'))->to($log));
+    $fixture->setTrace(Logging::all()->using(new PatternLayout('%L %m'))->to($appender));
     $fixture->resource('/users/0')->get();
 
-    Assert::equals(
-      "INFO >>> GET /users/0 HTTP/1.1\r\nConnection: close\r\nHost: test\r\n\n".
-      "INFO <<< HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 56\r\n\n".
-      "DEBUG GET /users/0 HTTP/1.1\r\nConnection: close\r\nHost: test\r\n\r\n\n",
-      $log->getBuffer()
-    );
+    $request= implode("\r\n", [
+      'GET /users/0 HTTP/1.1',
+      'Connection: close',
+      'Host: test',
+      '',
+    ]);
+    $expected= [
+      "INFO >>> {$request}",
+      "INFO <<< HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 56\r\n",
+      "DEBUG {$request}\r\n",
+    ];
+    Assert::equals($expected, $appender->lines);
   }
 
   #[Test]
   public function logging_with_body() {
-    $log= new BufferedAppender();
-
+    $appender= $this->newAppender();
     $fixture= $this->newFixture();
-    $fixture->setTrace(Logging::all()->using(new PatternLayout('%L %m%n'))->to($log));
+    $fixture->setTrace(Logging::all()->using(new PatternLayout('%L %m'))->to($appender));
     $fixture->resource('/test')->post(['test' => true], 'application/json');
 
-    Assert::equals(
-      "INFO >>> POST /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\nContent-Type: application/json\r\nContent-Length: 13\r\n\n".
-      "DEBUG {\"test\":true}\n".
-      "INFO <<< HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 119\r\n\n".
-      "DEBUG POST /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\nContent-Type: application/json\r\nContent-Length: 13\r\n\r\n{\"test\":true}\n",
-      $log->getBuffer()
-    );
+    $request= implode("\r\n", [
+      'POST /test HTTP/1.1',
+      'Connection: close',
+      'Host: test',
+      'Content-Type: application/json',
+      'Content-Length: 13',
+      '',
+    ]);
+    $expected= [
+      "INFO >>> {$request}",
+      'DEBUG {"test":true}',
+      "INFO <<< HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 119\r\n",
+      "DEBUG {$request}\r\n{\"test\":true}",
+    ];
+    Assert::equals($expected, $appender->lines);
   }
 
   #[Test, Expect(RestException::class)]
