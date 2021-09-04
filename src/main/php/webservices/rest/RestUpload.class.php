@@ -19,7 +19,8 @@ class RestUpload {
   public function __construct($endpoint, $request) {
     $this->endpoint= $endpoint;
     $this->parts= new Parts(self::BOUNDARY, $this->endpoint->open($request->with([
-      'Content-Type' => 'multipart/form-data; boundary='.self::BOUNDARY
+      'Content-Type'      => 'multipart/form-data; boundary='.self::BOUNDARY,
+      'Transfer-Encoding' => 'chunked'
     ])));
   }
 
