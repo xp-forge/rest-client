@@ -9,8 +9,8 @@ use lang\ElementNotFoundException;
  * @test  xp://web.rest.unittest.RestResourceTest
  */
 class RestResource {
-  private $endpoint, $request;
-  private $headers= [];
+  private $endpoint, $target;
+  private $headers= [], $cookies= [];
 
   /**
    * Creates a new REST resource
@@ -21,7 +21,7 @@ class RestResource {
    */
   public function __construct(Endpoint $endpoint, $path, $segments= []) {
     $this->endpoint= $endpoint;
-    $this->request= new RestRequest('GET', $this->resolve($path, $segments, true));
+    $this->target= $this->resolve($path, $segments, true);
   }
 
   /**
@@ -99,62 +99,62 @@ class RestResource {
    * @return self
    */
   public function including($cookies) {
-    $this->request->including($cookies);
+    $this->cookies= $cookies;
     return $this;
   }
 
   public function get($parameters= []) {
-    $request= clone $this->request;
-    return $this->endpoint->execute($request->using('GET')
+    return $this->endpoint->execute((new RestRequest('GET', $this->target))
       ->with($this->headers)
+      ->including($this->cookies)
       ->passing($parameters)
     );
   }
 
   public function head($parameters= []) {
-    $request= clone $this->request;
-    return $this->endpoint->execute($request->using('HEAD')
+    return $this->endpoint->execute((new RestRequest('HEAD', $this->target))
       ->with($this->headers)
+      ->including($this->cookies)
       ->passing($parameters)
     );
   }
 
   public function delete($parameters= []) {
-    $request= clone $this->request;
-    return $this->endpoint->execute($request->using('DELETE')
+    return $this->endpoint->execute((new RestRequest('DELETE', $this->target))
       ->with($this->headers)
+      ->including($this->cookies)
       ->passing($parameters)
     );
   }
 
   public function post($payload, $type= 'application/x-www-form-urlencoded') {
-    $request= clone $this->request;
-    return $this->endpoint->execute($request->using('POST')
+    return $this->endpoint->execute((new RestRequest('POST', $this->target))
       ->with($this->headers + ['Content-Type' => $type])
+      ->including($this->cookies)
       ->transfer($payload)
     );
   }
 
   public function put($payload, $type= 'application/x-www-form-urlencoded') {
-    $request= clone $this->request;
-    return $this->endpoint->execute($request->using('PUT')
+    return $this->endpoint->execute((new RestRequest('PUT', $this->target))
       ->with($this->headers + ['Content-Type' => $type])
+      ->including($this->cookies)
       ->transfer($payload)
     );
   }
 
   public function patch($payload, $type= 'application/x-www-form-urlencoded') {
-    $request= clone $this->request;
-    return $this->endpoint->execute($request->using('PATCH')
+    return $this->endpoint->execute((new RestRequest('PATCH', $this->target))
       ->with($this->headers + ['Content-Type' => $type])
+      ->including($this->cookies)
       ->transfer($payload)
     );
   }
 
   public function upload($method= 'POST') {
-    $request= clone $this->request;
-    return new RestUpload($this->endpoint, $request->using($method)
+    return new RestUpload($this->endpoint, (new RestRequest($method, $this->target))
       ->with($this->headers)
+      ->including($this->cookies)
     );
   }
 }
