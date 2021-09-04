@@ -27,6 +27,7 @@ class Traced extends Transfer {
       $stream->request->setHeader('Content-Length', strlen($bytes));
       $this->cat->info('>>>', rtrim($stream->request->getHeaderString(), "\r\n"));
       $this->cat->debug($bytes);
+      $stream->write($bytes);
     } else {
       $this->cat->info('>>>', rtrim($stream->request->getHeaderString(), "\r\n"));
     }

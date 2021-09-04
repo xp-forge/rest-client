@@ -221,8 +221,8 @@ class ExecuteTest {
     Assert::equals(
       "INFO >>> POST /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\nContent-Type: application/json\r\nContent-Length: 13\n".
       "DEBUG {\"test\":true}\n".
-      "INFO <<< HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 106\n".
-      "DEBUG POST /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\nContent-Type: application/json\r\nContent-Length: 13\r\n\r\n\n",
+      "INFO <<< HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 119\n".
+      "DEBUG POST /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\nContent-Type: application/json\r\nContent-Length: 13\r\n\r\n{\"test\":true}\n",
       $log->getBuffer()
     );
   }
