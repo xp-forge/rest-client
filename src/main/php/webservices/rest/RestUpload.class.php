@@ -1,6 +1,7 @@
 <?php namespace webservices\rest;
 
 use io\streams\{InputStream, OutputStream};
+use util\MimeType;
 use webservices\rest\io\Parts;
 
 class RestUpload {
@@ -41,13 +42,13 @@ class RestUpload {
    * @param  string $name
    * @param  io.streams.InputStream $in
    * @param  string $filename
-   * @param  string $mime
+   * @param  ?string $mime Uses `util.MimeType` if omitted
    * @return self
    */
-  public function transfer($name, InputStream $in, $filename, $mime= 'application/octet-stream') {
+  public function transfer($name, InputStream $in, $filename, $mime= null) {
     $this->parts->begin([
       "Content-Disposition: form-data; name=\"{$name}\"; filename=\"{$filename}\"",
-      "Content-Type: {$mime}"
+      'Content-Type: '.($mime ?? MimeType::getByFilename($filename))
     ]);
     while ($in->available()) {
       $this->parts->write($in->read());
@@ -60,13 +61,13 @@ class RestUpload {
    *
    * @param  string $name
    * @param  string $filename
-   * @param  string $mime
+   * @param  ?string $mime Uses `util.MimeType` if omitted
    * @return io.streams.OutputStream
    */
-  public function stream($name, $filename, $mime= 'application/octet-stream'): OutputStream {
+  public function stream($name, $filename, $mime= null): OutputStream {
     $this->parts->begin([
       "Content-Disposition: form-data; name=\"{$name}\"; filename=\"{$filename}\"",
-      "Content-Type: {$mime}"
+      'Content-Type: '.($mime ?? MimeType::getByFilename($filename))
     ]);
     return $this->parts;
   }

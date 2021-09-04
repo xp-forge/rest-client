@@ -123,6 +123,30 @@ class ExecuteTest {
   }
 
   #[Test, Values(['POST', 'PUT'])]
+  public function mimetype_detected_from_filename($method) {
+    $response= $this->newFixture()->resource('/test')->upload($method)
+      ->transfer('upload', new MemoryInputStream('Test'), 'test.txt')
+      ->finish()
+    ;
+
+    $expected= implode("\r\n", [
+      '%1$s /test HTTP/1.1',
+      'Connection: close',
+      'Host: test',
+      'Content-Type: multipart/form-data; boundary=%2$s',
+      '',
+      '--%2$s',
+      'Content-Disposition: form-data; name="upload"; filename="test.txt"',
+      'Content-Type: text/plain',
+      '',
+      'Test',
+      '--%2$s--',
+      '',
+    ]);
+    Assert::equals(sprintf($expected, $method, RestUpload::BOUNDARY), $response->content());
+  }
+
+  #[Test, Values(['POST', 'PUT'])]
   public function stream($method) {
     $upload= $this->newFixture()->resource('/test')->upload($method);
     $stream= $upload->stream('upload', 'test.txt', 'text/plain');
