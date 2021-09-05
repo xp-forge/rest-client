@@ -241,14 +241,14 @@ class ExecuteTest {
       'Connection: close',
       'Host: test',
       'Content-Type: application/json',
-      'Content-Length: 13',
+      'Transfer-Encoding: chunked',
       '',
     ]);
     $expected= [
       "INFO >>> {$request}",
       'DEBUG {"test":true}',
       'DEBUG (13 bytes transferred)',
-      "INFO <<< HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 119\r\n",
+      "INFO <<< HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 127\r\n",
       "DEBUG {$request}\r\n{\"test\":true}",
     ];
     Assert::equals($expected, $appender->lines);

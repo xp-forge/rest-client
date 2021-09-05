@@ -3,8 +3,8 @@
 use io\streams\OutputStream;
 
 class Transmission implements OutputStream {
-  protected $conn, $output;
-  public $request, $target;
+  protected $conn, $request, $output;
+  public $target;
 
   /**
    * Creates a new instance

@@ -52,16 +52,16 @@ class Traced extends Transfer {
   }
 
   public function writer($request, $format, $marshalling) {
-    $stream= $this->untraced->endpoint->open($request);
-
-    // Send payload in one big chunk to create compact logging output
     if ($payload= $request->payload()) {
       $bytes= $format->serialize($marshalling->marshal($payload->value()), new MemoryOutputStream())->getBytes();
-      $stream->request->setHeader('Content-Length', strlen($bytes));
+      $stream= $this->untraced->endpoint->open($request->with($this->untraced->headers(strlen($bytes))));
       $stream->start();
 
+      // Include complete payload in debug trace (before sending it).
       $this->cat->debug($bytes);
       $stream->write($bytes);
+    } else {
+      $stream= $this->untraced->endpoint->open($request);
     }
 
     return $this->untraced->endpoint->finish($stream);

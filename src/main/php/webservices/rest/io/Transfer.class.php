@@ -14,6 +14,10 @@ abstract class Transfer {
     return new Transmission($conn, $s, $target);
   }
 
+  public function headers($length) {
+    throw new MethodNotImplementedException(__METHOD__);
+  }
+
   public function stream($request, $format, $payload) {
     throw new MethodNotImplementedException(__METHOD__);
   }
