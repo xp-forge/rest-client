@@ -1,13 +1,16 @@
 <?php namespace webservices\rest\io;
 
 class Streamed extends Transfer {
+  const HEADERS = [
+    'Content-Length'    => [],
+    'Transfer-Encoding' => ['chunked'],
+  ];
 
-  protected function payload($request, $payload, $format, $marshalling) {
-    $request->setHeader('Transfer-Encoding', 'chunked');
-    return function($conn) use($request, $payload, $format, $marshalling) {
-      $stream= $conn->open($request);
-      $format->serialize($marshalling->marshal($payload), $stream);
-      return $conn->finish($stream);
-    };
+  public function headers($length) { return self::HEADERS; }
+
+  public function stream($request, $format, $value) {
+    $stream= $this->endpoint->open($request->with(self::HEADERS));
+    $format->serialize($value, $stream);
+    return $stream;
   }
 }

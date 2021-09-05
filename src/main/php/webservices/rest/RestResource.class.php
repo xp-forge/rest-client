@@ -7,10 +7,11 @@ use lang\ElementNotFoundException;
  * be accessed via HTTP methods, headers, parameters and payloads.
  *
  * @test  xp://web.rest.unittest.RestResourceTest
+ * @see    https://github.com/xp-forge/rest-client/pull/17
  */
 class RestResource {
-  private $endpoint, $request;
-  private $headers= [];
+  private $endpoint, $target;
+  private $headers= [], $cookies= [];
 
   /**
    * Creates a new REST resource
@@ -21,7 +22,7 @@ class RestResource {
    */
   public function __construct(Endpoint $endpoint, $path, $segments= []) {
     $this->endpoint= $endpoint;
-    $this->request= new RestRequest('GET', $this->resolve($path, $segments, true));
+    $this->target= $this->resolve($path, $segments, true);
   }
 
   /**
@@ -99,55 +100,90 @@ class RestResource {
    * @return self
    */
   public function including($cookies) {
-    $this->request->including($cookies);
+    $this->cookies= $cookies;
     return $this;
   }
 
+  /**
+   * Returns a request to this resource without sending it
+   *
+   * @param  string $method
+   * @return webservices.rest.RestRequest
+   */
+  public function request($method) {
+    return new RestRequest($method, $this->target, $this->headers, $this->cookies);
+  }
+
+  /**
+   * Starts an upload
+   *
+   * @param  string $method
+   * @return webservices.rest.RestUpload
+   */
+  public function upload($method= 'POST') {
+    return new RestUpload($this->endpoint, $this->request($method));
+  }
+
+  /**
+   * Executes a `GET` request
+   *
+   * @param  [:var] $parameters
+   * @return webservices.rest.RestResponse
+   */
   public function get($parameters= []) {
-    $request= clone $this->request;
-    return $this->endpoint->execute($request->using('GET')
-      ->with($this->headers)
-      ->passing($parameters)
-    );
+    return $this->endpoint->execute($this->request('GET')->passing($parameters));
   }
 
+  /**
+   * Executes a `HEAD` request
+   *
+   * @param  [:var] $parameters
+   * @return webservices.rest.RestResponse
+   */
   public function head($parameters= []) {
-    $request= clone $this->request;
-    return $this->endpoint->execute($request->using('HEAD')
-      ->with($this->headers)
-      ->passing($parameters)
-    );
+    return $this->endpoint->execute($this->request('HEAD')->passing($parameters));
   }
 
+  /**
+   * Executes a `DELETE` request
+   *
+   * @param  [:var] $parameters
+   * @return webservices.rest.RestResponse
+   */
   public function delete($parameters= []) {
-    $request= clone $this->request;
-    return $this->endpoint->execute($request->using('DELETE')
-      ->with($this->headers)
-      ->passing($parameters)
-    );
+    return $this->endpoint->execute($this->request('DELETE')->passing($parameters));
   }
 
+  /**
+   * Executes a `POST` request with a given payload
+   *
+   * @param  var $paylod
+   * @param  string $type
+   * @return webservices.rest.RestResponse
+   */
   public function post($payload, $type= 'application/x-www-form-urlencoded') {
-    $request= clone $this->request;
-    return $this->endpoint->execute($request->using('POST')
-      ->with($this->headers + ['Content-Type' => $type])
-      ->transfer($payload)
-    );
+    return $this->endpoint->execute($this->request('POST')->with(['Content-Type' => $type])->transfer($payload));
   }
 
+  /**
+   * Executes a `PUT` request with a given payload
+   *
+   * @param  var $paylod
+   * @param  string $type
+   * @return webservices.rest.RestResponse
+   */
   public function put($payload, $type= 'application/x-www-form-urlencoded') {
-    $request= clone $this->request;
-    return $this->endpoint->execute($request->using('PUT')
-      ->with($this->headers + ['Content-Type' => $type])
-      ->transfer($payload)
-    );
+    return $this->endpoint->execute($this->request('PUT')->with(['Content-Type' => $type])->transfer($payload));
   }
 
+  /**
+   * Executes a `PATCH` request with a given payload
+   *
+   * @param  var $paylod
+   * @param  string $type
+   * @return webservices.rest.RestResponse
+   */
   public function patch($payload, $type= 'application/x-www-form-urlencoded') {
-    $request= clone $this->request;
-    return $this->endpoint->execute($request->using('PATCH')
-      ->with($this->headers + ['Content-Type' => $type])
-      ->transfer($payload)
-    );
+    return $this->endpoint->execute($this->request('PATCH')->with(['Content-Type' => $type])->transfer($payload));
   }
 }

@@ -19,20 +19,52 @@ class Traced extends Transfer {
   /** @return parent */
   public function untraced() { return $this->untraced; }
 
-  public function writer($request, $payload, $format, $marshalling) {
-    $this->cat->info('>>>', substr($request->getHeaderString(), 0, -2));
-    if (null === $payload) return function($conn) use($request) { return $conn->send($request); };
+  public function transmission($conn, $s, $target) {
+    return new class($conn, $s, $target, $this->cat) extends Transmission {
+      private $cat;
+      private $transferred= 0;
 
-    $bytes= $format->serialize($marshalling->marshal($payload->value()), new MemoryOutputStream())->getBytes();
-    $this->cat->debug($bytes);
+      public function __construct($conn, $request, $target, $cat) {
+        parent::__construct($conn, $request, $target);
+        $this->cat= $cat;
+      }
 
-    // We've created it anyway, now simply transfer the bytes in a buffered manner
-    $request->setHeader('Content-Length', strlen($bytes));
-    return function($conn) use($request, $bytes) {
-      $stream= $conn->open($request);
-      $stream->write($bytes);
-      return $conn->finish($stream);
+      public function start() {
+        $this->cat->info('>>>', substr($this->request->getHeaderString(), 0, -2));
+        $this->output= $this->conn->open($this->request);
+      }
+
+      public function write($bytes) {
+        $this->transferred+= strlen($bytes);
+        return parent::write($bytes);
+      }
+
+      public function finish() {
+        if (null === $this->output) {
+          $this->cat->info('>>>', substr($this->request->getHeaderString(), 0, -2));
+          return $this->conn->send($this->request);
+        } else {
+          $this->cat->debug("({$this->transferred} bytes transferred)");
+          return $this->conn->finish($this->output);
+        }
+      }
     };
+  }
+
+  public function writer($request, $format, $marshalling) {
+    if ($payload= $request->payload()) {
+      $bytes= $format->serialize($marshalling->marshal($payload->value()), new MemoryOutputStream())->getBytes();
+      $stream= $this->untraced->endpoint->open($request->with($this->untraced->headers(strlen($bytes))));
+      $stream->start();
+
+      // Include complete payload in debug trace (before sending it).
+      $this->cat->debug($bytes);
+      $stream->write($bytes);
+    } else {
+      $stream= $this->untraced->endpoint->open($request);
+    }
+
+    return $this->untraced->endpoint->finish($stream);
   }
 
   public function reader($response, $format, $marshalling) {
