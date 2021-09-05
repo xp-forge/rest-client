@@ -3,6 +3,8 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 2.3.0 / ????-??-??
+
 * Merged PR #17 - Implement file uploads. The new `upload()` method in the
   `webservices.rest.RestResource` class initiates a multipart/form-data
   request, to which both files and parameters can be added.
