@@ -19,6 +19,11 @@ class Transmission implements OutputStream {
     $this->target= $target;
   }
 
+  /** @return void */
+  public function start() {
+    $this->output= $this->conn->open($this->request);
+  }
+
   /**
    * Writes bytes. Opens connection if not previously connected.
    *
@@ -27,7 +32,7 @@ class Transmission implements OutputStream {
    * @throws io.IOException
    */
   public function write($bytes) {
-    $this->output ?? $this->output= $this->conn->open($this->request);
+    $this->output ?? $this->start();
     return $this->output->write($bytes);
   }
 

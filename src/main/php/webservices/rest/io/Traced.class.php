@@ -22,20 +22,21 @@ class Traced extends Transfer {
   public function transmission($conn, $s, $target) {
     return new class($conn, $s, $target, $this->cat) extends Transmission {
       private $cat;
+      private $transferred= 0;
 
       public function __construct($conn, $request, $target, $cat) {
         parent::__construct($conn, $request, $target);
         $this->cat= $cat;
       }
 
-      public function write($bytes) {
-        if (null === $this->output) {
-          $this->cat->info('>>>', substr($this->request->getHeaderString(), 0, -2));
-          $this->output= $this->conn->open($this->request);
-        }
+      public function start() {
+        $this->cat->info('>>>', substr($this->request->getHeaderString(), 0, -2));
+        $this->output= $this->conn->open($this->request);
+      }
 
-        $this->cat->debug($bytes);
-        return $this->output->write($bytes);
+      public function write($bytes) {
+        $this->transferred+= strlen($bytes);
+        return parent::write($bytes);
       }
 
       public function finish() {
@@ -43,6 +44,7 @@ class Traced extends Transfer {
           $this->cat->info('>>>', substr($this->request->getHeaderString(), 0, -2));
           return $this->conn->send($this->request);
         } else {
+          $this->cat->debug("({$this->transferred} bytes transferred)");
           return $this->conn->finish($this->output);
         }
       }
@@ -56,6 +58,9 @@ class Traced extends Transfer {
     if ($payload= $request->payload()) {
       $bytes= $format->serialize($marshalling->marshal($payload->value()), new MemoryOutputStream())->getBytes();
       $stream->request->setHeader('Content-Length', strlen($bytes));
+      $stream->start();
+
+      $this->cat->debug($bytes);
       $stream->write($bytes);
     }
 

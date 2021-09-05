@@ -247,8 +247,42 @@ class ExecuteTest {
     $expected= [
       "INFO >>> {$request}",
       'DEBUG {"test":true}',
+      'DEBUG (13 bytes transferred)',
       "INFO <<< HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 119\r\n",
       "DEBUG {$request}\r\n{\"test\":true}",
+    ];
+    Assert::equals($expected, $appender->lines);
+  }
+
+  #[Test]
+  public function file_contents_not_logged_during_file_upload() {
+    $appender= $this->newAppender();
+    $fixture= $this->newFixture();
+    $fixture->setTrace(Logging::all()->using(new PatternLayout('%L %m'))->to($appender));
+    $fixture->resource('/test')->upload()->transfer('upload', new MemoryInputStream('Test'), 'test.txt')->finish();
+
+    $request= implode("\r\n", [
+      'POST /test HTTP/1.1',
+      'Connection: close',
+      'Host: test',
+      'Content-Type: multipart/form-data; boundary='.RestUpload::BOUNDARY,
+      'Transfer-Encoding: chunked',
+      '',
+    ]);
+    $body= implode("\r\n", [
+      '--'.RestUpload::BOUNDARY,
+      'Content-Disposition: form-data; name="upload"; filename="test.txt"',
+      'Content-Type: text/plain',
+      '',
+      'Test',
+      '--'.RestUpload::BOUNDARY.'--',
+      '',
+    ]);
+    $expected= [
+      "INFO >>> {$request}",
+      'DEBUG (190 bytes transferred)',
+      "INFO <<< HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 357\r\n",
+      "DEBUG {$request}\r\n{$body}",
     ];
     Assert::equals($expected, $appender->lines);
   }
