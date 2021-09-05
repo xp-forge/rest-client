@@ -104,16 +104,21 @@ $api->resource('users/{id}', $user)->delete()->result()->match([
 
 ### Uploads
 
+Multipart file uploads are initiated by the `upload()` method, may include parameters and can upload from any input stream.
+
 ```php
 use io\File;
+use io\streams\MemoryInputStream;
 use webservices\rest\Endpoint;
 
+$stream= new MemoryInputStream('Hello');
 $file= new File(...);
 $endpoint= new Endpoint($url);
 
 $result= $endpoint->resource('files')->upload()
   ->pass('tc', 'accepted')
-  ->transfer('upload', $file->in(), $file->filename)
+  ->transfer('letter', $stream, 'letter.txt', 'text/plain')
+  ->transfer('cv', $file->in(), $file->filename)
   ->finish()
   ->result()
 ;
@@ -121,7 +126,7 @@ $result= $endpoint->resource('files')->upload()
 
 ### Deserialization
 
-The REST API supports automatic result deserialization by passing a type to the `value()` method.
+Automatic result deserialization is supported by passing a type to the `value()` method.
 
 ```php
 use com\example\api\types\User;
