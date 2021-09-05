@@ -3,6 +3,11 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #17 - Implement file uploads. The new `upload()` method in the
+  `webservices.rest.RestResource` class initiates a multipart/form-data
+  request, to which both files and parameters can be added.
+  (@thekid)
+
 ## 2.2.1 / 2021-08-16
 
 * Fixed PHP 8.1 compatibility by declaring `getIterator()` with correct

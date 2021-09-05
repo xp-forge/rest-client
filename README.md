@@ -102,6 +102,23 @@ $api->resource('users/{id}', $user)->delete()->result()->match([
 ]);
 ```
 
+### Uploads
+
+```php
+use io\File;
+use webservices\rest\Endpoint;
+
+$file= new File(...);
+$endpoint= new Endpoint($url);
+
+$result= $endpoint->resource('files')->upload()
+  ->pass('tc', 'accepted')
+  ->transfer('upload', $file->in(), $file->filename)
+  ->finish()
+  ->result()
+;
+```
+
 ### Deserialization
 
 The REST API supports automatic result deserialization by passing a type to the `value()` method.
