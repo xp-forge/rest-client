@@ -18,12 +18,13 @@ class RestRequest {
    * @param  string $method GET HEAD POST ...
    * @param  string $path
    * @param  [:string] $headers
+   * @param  [:?string]|webservices.rest.Cookie[]|webservices.rest.Cookies $cookies
    */
-  public function __construct($method, $path, $headers= []) {
+  public function __construct($method, $path, $headers= [], $cookies= []) {
     $this->method= $method;
     $this->path= $path;
     $this->add($headers);
-    $this->cookies= Cookies::$EMPTY;
+    $this->cookies= $cookies instanceof Cookies ? $cookies : new Cookies($cookies);
   }
 
   /** @return string */

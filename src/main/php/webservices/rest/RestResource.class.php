@@ -111,7 +111,7 @@ class RestResource {
    * @return webservices.rest.RestRequest
    */
   public function request($method) {
-    return (new RestRequest($method, $this->target, $this->headers))->including($this->cookies);
+    return new RestRequest($method, $this->target, $this->headers, $this->cookies);
   }
 
   /**
