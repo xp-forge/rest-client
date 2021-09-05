@@ -6,7 +6,7 @@ use peer\ConnectException;
 use peer\http\{Authorization, HttpConnection, HttpRequest, HttpResponse};
 use unittest\{Assert, Expect, Test};
 use util\log\layout\PatternLayout;
-use util\log\{Appender, Logging};
+use util\log\{Appender, Logging, LoggingEvent};
 use webservices\rest\{Endpoint, RestException, RestUpload};
 
 class ExecuteTest {
@@ -20,7 +20,7 @@ class ExecuteTest {
   private function newAppender() {
     return new class() extends Appender {
       public $lines= [];
-      public function append($event) {
+      public function append(LoggingEvent $event) {
         $this->lines[]= $this->layout->format($event);
       }
     };
