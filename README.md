@@ -120,7 +120,7 @@ $map= $result->optional();
 $object= $result->optional(User::class);
 
 // Works with any type from the XP typesystem, e.g. arrays of objects
-$list= $api->resource('users')->get()->value('org.example.User[]');
+$list= $api->resource('users')->get()->result()->value('org.example.User[]');
 ```
 
 ### Error handling
