@@ -124,26 +124,65 @@ class RestResource {
     return new RestUpload($this->endpoint, $this->request($method));
   }
 
+  /**
+   * Executes a `GET` request
+   *
+   * @param  [:var] $parameters
+   * @return webservices.rest.RestResponse
+   */
   public function get($parameters= []) {
     return $this->endpoint->execute($this->request('GET')->passing($parameters));
   }
 
+  /**
+   * Executes a `HEAD` request
+   *
+   * @param  [:var] $parameters
+   * @return webservices.rest.RestResponse
+   */
   public function head($parameters= []) {
     return $this->endpoint->execute($this->request('HEAD')->passing($parameters));
   }
 
+  /**
+   * Executes a `DELETE` request
+   *
+   * @param  [:var] $parameters
+   * @return webservices.rest.RestResponse
+   */
   public function delete($parameters= []) {
     return $this->endpoint->execute($this->request('DELETE')->passing($parameters));
   }
 
+  /**
+   * Executes a `POST` request with a given payload
+   *
+   * @param  var $paylod
+   * @param  string $type
+   * @return webservices.rest.RestResponse
+   */
   public function post($payload, $type= 'application/x-www-form-urlencoded') {
     return $this->endpoint->execute($this->request('POST')->with(['Content-Type' => $type])->transfer($payload));
   }
 
+  /**
+   * Executes a `PUT` request with a given payload
+   *
+   * @param  var $paylod
+   * @param  string $type
+   * @return webservices.rest.RestResponse
+   */
   public function put($payload, $type= 'application/x-www-form-urlencoded') {
     return $this->endpoint->execute($this->request('PUT')->with(['Content-Type' => $type])->transfer($payload));
   }
 
+  /**
+   * Executes a `PATCH` request with a given payload
+   *
+   * @param  var $paylod
+   * @param  string $type
+   * @return webservices.rest.RestResponse
+   */
   public function patch($payload, $type= 'application/x-www-form-urlencoded') {
     return $this->endpoint->execute($this->request('PATCH')->with(['Content-Type' => $type])->transfer($payload));
   }
