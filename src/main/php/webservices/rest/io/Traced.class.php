@@ -53,7 +53,7 @@ class Traced extends Transfer {
 
   public function writer($request, $format, $marshalling) {
     if ($payload= $request->payload()) {
-      $bytes= $format->serialize($marshalling->marshal($payload->value()), new MemoryOutputStream())->getBytes();
+      $bytes= $format->serialize($marshalling->marshal($payload->value()), new MemoryOutputStream())->bytes();
       $stream= $this->untraced->endpoint->open($request->with($this->untraced->headers(strlen($bytes))));
       $stream->start();
 

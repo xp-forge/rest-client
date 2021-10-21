@@ -78,7 +78,7 @@ class CookiesTest {
   #[Test]
   public function string_representation() {
     $cookies= new Cookies([
-      new Cookie('session', '0x6100', ['Secure' => true]),
+      new Cookie('session', '0x6100', ['Secure' => true, 'HttpOnly' => true]),
       new Cookie('lang', 'de'),
     ]);
 
@@ -87,6 +87,7 @@ class CookiesTest {
       "  webservices.rest.Cookie(lang=de)@[]\n".
       "  webservices.rest.Cookie(session=0x6100)@[\n".
       "    Secure => true\n".
+      "    HttpOnly => true\n".
       "  ]\n".
       "}",
       $cookies->toString()

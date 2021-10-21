@@ -15,7 +15,7 @@ class FormUrlencodedTest {
   #[Test]
   public function serialize() {
     $format= new FormUrlencoded();
-    Assert::equals('key=value', $format->serialize(['key' => 'value'], new MemoryOutputStream())->getBytes());
+    Assert::equals('key=value', $format->serialize(['key' => 'value'], new MemoryOutputStream())->bytes());
   }
 
   #[Test]

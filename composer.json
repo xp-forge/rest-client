@@ -6,13 +6,13 @@
   "description" : "REST Client",
   "keywords": ["module", "xp"],
   "require" : {
-    "xp-framework/core": "^10.0 | ^9.0 | ^8.0 | ^7.0",
+    "xp-framework/core": "^11.0 | ^10.0",
     "xp-framework/http": "^10.0 | ^9.1",
-    "xp-framework/logging": "^10.0 | ^9.0 | ^8.0 | ^7.0",
+    "xp-framework/logging": "^11.0 | ^10.0 | ^9.0 | ^8.0 | ^7.0",
     "xp-framework/tokenize": "^9.0 | ^8.0",
-    "xp-forge/json": "^4.0 | ^3.1",
+    "xp-forge/json": "^5.0 | ^4.0 | ^3.1",
     "xp-forge/uri": "^2.0 | ^1.3",
-    "xp-forge/marshalling": "^1.0 | ^0.3 | ^0.2",
+    "xp-forge/marshalling": "^1.0",
     "php": ">=7.0.0"
   },
   "require-dev" : {

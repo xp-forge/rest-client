@@ -15,17 +15,17 @@ class NdJsonTest {
 
   #[Test, Values([[['some', 'value'], "\"some\"\n\"value\"\n"], [[['key' => 'value']], "{\"key\":\"value\"}\n"], [[['key' => 'value'], ['other'=>'value']], "{\"key\":\"value\"}\n{\"other\":\"value\"}\n"],])]
   public function serialize($value, $expected) {
-    Assert::equals($expected, (new NdJson())->serialize(new \ArrayIterator($value), new MemoryOutputStream())->getBytes());
+    Assert::equals($expected, (new NdJson())->serialize(new \ArrayIterator($value), new MemoryOutputStream())->bytes());
   }
 
   #[Test, Values([[[], '{}'], [['key' => 'value'], '{"key":"value"}'],])]
   public function serialize_object($map, $expected) {
-    Assert::equals($expected, (new NdJson())->serialize((object)$map, new MemoryOutputStream())->getBytes());
+    Assert::equals($expected, (new NdJson())->serialize((object)$map, new MemoryOutputStream())->bytes());
   }
 
   #[Test, Values([[[], '[]'], [['key' => 'value'], '{"key":"value"}'],])]
   public function serialize_array($map, $expected) {
-    Assert::equals($expected, (new NdJson())->serialize($map, new MemoryOutputStream())->getBytes());
+    Assert::equals($expected, (new NdJson())->serialize($map, new MemoryOutputStream())->bytes());
   }
 
   #[Test, Values([["\"some\"\n\"value\"\n", ['some', 'value']], ['{"key":"value"}', [['key' => 'value']]], ["{\"key\":\"value\"}\n{\"other\":\"value\"}\n", [['key' => 'value'], ['other'=>'value']]],])]

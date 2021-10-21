@@ -14,12 +14,12 @@ class JsonTest {
 
   #[Test]
   public function serialize() {
-    Assert::equals('{"key":"value"}', (new Json())->serialize(['key' => 'value'], new MemoryOutputStream())->getBytes());
+    Assert::equals('{"key":"value"}', (new Json())->serialize(['key' => 'value'], new MemoryOutputStream())->bytes());
   }
 
   #[Test, Values([[[], '{}'], [['key' => 'value'], '{"key":"value"}'],])]
   public function serialize_object($map, $expected) {
-    Assert::equals($expected, (new Json())->serialize((object)$map, new MemoryOutputStream())->getBytes());
+    Assert::equals($expected, (new Json())->serialize((object)$map, new MemoryOutputStream())->bytes());
   }
 
   #[Test]
