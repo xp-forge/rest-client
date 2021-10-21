@@ -5,6 +5,9 @@ Rest client change log
 
 ## 3.0.0 / 2021-10-21
 
+* Added compatibility with XP 11, `xp-framework/logging` version 11.0.0
+  and `xp-forge/json` version 5.0.0
+  (@thekid)
 * Implemented xp-framework/rfc#341, dropping compatibility with XP 9
   (@thekid)
 
