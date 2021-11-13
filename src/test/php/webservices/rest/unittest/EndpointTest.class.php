@@ -63,4 +63,33 @@ class EndpointTest {
   public function execute_given_illegal_argument() {
     $this->newFixture()->execute(null);
   }
+
+  #[Test, Expect(IllegalArgumentException::class), Values(['/api/v1', 'mailto:thekid@example.com'])]
+  public function cannot_be_constructed_with($uri) {
+    $this->newFixture($uri);
+  }
+
+  #[Test]
+  public function supports_basic_auth() {
+    Assert::equals(
+      ['Authorization' => 'Basic dXNlcjpwYXNz'],
+      $this->newFixture('https://user:pass@example.org/')->headers()
+    );
+  }
+
+  #[Test]
+  public function supports_bearer_token() {
+    Assert::equals(
+      ['Authorization' => 'Bearer JWT'],
+      $this->newFixture('https://JWT@example.org/')->headers()
+    );
+  }
+
+  #[Test, Values(['user:pass', 'token'])]
+  public function credentials_not_included_in_base($credentials) {
+    Assert::equals(
+      new URI('https://example.org/'),
+      $this->newFixture("https://${credentials}@example.org/")->base()
+    );
+  }
 }
