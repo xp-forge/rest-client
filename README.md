@@ -177,10 +177,18 @@ use webservices\rest\Endpoint;
 $api= new Endpoint('https://user:pass@api.example.com/');
 ```
 
-Header-based authentication can be passed along as follows:
+Bearer tokens can also be embedded in the endpoint URL:
 
 ```php
 use webservices\rest\Endpoint;
 
-$api= (new Endpoint('https://api.example.com/'))->with(['Authorization' => 'Bearer '.$token]);
+$api= new Endpoint('https://token@api.example.com/');
+```
+
+Other header-based authentication values can be passed along as follows:
+
+```php
+use webservices\rest\Endpoint;
+
+$api= (new Endpoint('https://api.example.com/'))->with(['X-API-Key' => $key]);
 ```
