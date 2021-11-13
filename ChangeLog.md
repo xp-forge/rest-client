@@ -3,6 +3,12 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 3.1.0 / 2021-11-13
+
+* Merged PR #18: Add support for bearer tokens embedded directly in base
+  URI, e.g. `https://token@example.org/api/v1`
+  (@thekid)
+
 ## 3.0.0 / 2021-10-21
 
 * Added compatibility with XP 11, `xp-framework/logging` version 11.0.0
