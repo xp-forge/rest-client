@@ -12,8 +12,8 @@ use webservices\rest\{Endpoint, RestException, RestUpload};
 class ExecuteTest {
 
   /** Returns a new endpoint using the `TestConnection` class */
-  private function newFixture() {
-    return (new Endpoint('http://test'))->connecting([TestConnection::class, 'new']);
+  private function newFixture(string $base= 'http://test') {
+    return (new Endpoint($base))->connecting([TestConnection::class, 'new']);
   }
 
   /** Returns a log appender which stores formatted lines */
@@ -338,6 +338,24 @@ class ExecuteTest {
       "\r\n".
       "{\"test\":true}",
       $resource->post(['test' => true], 'application/json')->content()
+    );
+  }
+
+  #[Test]
+  public function passes_basic_auth() {
+    $resource= $this->newFixture('http://user:pass@test')->resource('/test');
+    Assert::equals(
+      "GET /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\nAuthorization: Basic dXNlcjpwYXNz\r\n\r\n",
+      $resource->get()->content()
+    );
+  }
+
+  #[Test]
+  public function passes_bearer_token() {
+    $resource= $this->newFixture('http://JWT@test')->resource('/test');
+    Assert::equals(
+      "GET /test HTTP/1.1\r\nConnection: close\r\nHost: test\r\nAuthorization: Bearer JWT\r\n\r\n",
+      $resource->get()->content()
     );
   }
 }

@@ -1,6 +1,6 @@
 <?php namespace webservices\rest;
 
-use lang\Throwable;
+use lang\{Throwable, IllegalArgumentException};
 use peer\URL;
 use peer\http\{HttpConnection, HttpRequest};
 use util\URI;
@@ -20,10 +20,17 @@ class Endpoint implements Traceable {
 
   /**
    * Creates a new REST endpoint with a given base URI. The base URI may contain
-   * basic auth credentials, and a path, which is treated as a directory.
+   * credentials and a path, which is treated as a directory.
+   *
+   * Examples:
+   * - Inside the root directory: `https://api.example.org/`
+   * - Including path: `https://example.org/api/v1`
+   * - With basic authentication: `https://user:pass@example.org/api/v1`
+   * - Passing a bearer token: `https://token@example.org/api/v1`
    * 
    * @param  string|util.URI|peer.URL $base
    * @param  ?webservices.rest.Formats $formats
+   * @throws lang.IllegalArgumentException if URI does not have an authority
    */
   public function __construct($base, Formats $formats= null) {
     if ($base instanceof URI) {
@@ -34,7 +41,18 @@ class Endpoint implements Traceable {
       $uri= new URI((string)$base);
     }
 
-    $this->base= $uri->using()->path(rtrim($uri->path() ?? '', '/').'/')->create();
+    if (null === ($authority= $uri->authority())) {
+      throw new IllegalArgumentException('Given URI does not have an authority');
+    }
+
+    // Extract credentials embedded in authority into authorization header
+    if (($user= $authority->user()) && ($password= $authority->password())) {
+      $this->headers['Authorization']= 'Basic '.base64_encode($user.':'.$password->reveal());
+    } else if ($user) {
+      $this->headers['Authorization']= 'Bearer '.$user;
+    }
+
+    $this->base= $uri->using()->authority($authority->host())->path(rtrim($uri->path() ?? '', '/').'/')->create();
     $this->formats= $formats ?: Formats::defaults();
     $this->transfer= new Streamed($this);
     $this->marshalling= new Marshalling();
