@@ -11,10 +11,14 @@ Rest client change log
 
 ## 3.0.0 / 2021-10-21
 
+This major release drops compatibility with XP 9-SERIES. XP 9.0.0 was
+released 2017-09-24, more than 4 years ago and has no support for PHP 8,
+released roughly a year ago at the time of writing.
+
+* **Heads up**: Minimum required XP version is 10, see xp-framework/rfc#341
+  (@thekid)
 * Added compatibility with XP 11, `xp-framework/logging` version 11.0.0
   and `xp-forge/json` version 5.0.0
-  (@thekid)
-* Implemented xp-framework/rfc#341, dropping compatibility with XP 9
   (@thekid)
 
 ## 2.3.0 / 2021-09-11
@@ -60,6 +64,10 @@ Rest client change log
 
 ## 2.0.0 / 2020-04-10
 
+This major release drops PHP 5 support. PHP 5 has been EOL since the end
+2018, see https://www.php.net/eol.php. Dropping support for it enables us
+to make use a variety of PHP 7 features.
+
 * Implemented xp-framework/rfc#334: Drop PHP 5.6:
   . **Heads up:** Minimum required PHP version now is PHP 7.0.0
   . Rewrote code base, grouping use statements
@@ -81,6 +89,8 @@ Rest client change log
 * Made compatible with XP 10 - @thekid
 
 ## 1.0.0 / 2019-01-26
+
+The first release to be used in production. The API has now stabilized.
 
 * Added `RestResponse::links()` method to access the *Link* header
   (@thekid)
