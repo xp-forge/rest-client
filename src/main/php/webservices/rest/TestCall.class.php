@@ -1,11 +1,12 @@
 <?php namespace webservices\rest;
 
-use webservices\rest\io\Reader;
+use webservices\rest\io\{Reader, Transmission};
 use io\streams\{InputStream, MemoryInputStream};
 use util\data\Marshalling;
 
-class TestCall {
-  private $request, $formats, $marshalling;
+class TestCall extends Transmission {
+  private $formats, $marshalling;
+  public $transfer= null;
 
   /** Creates a new call */
   public function __construct(RestRequest $request, Formats $formats, Marshalling $marshalling= null) {
@@ -16,6 +17,27 @@ class TestCall {
 
   /** Returns the request associated with this call */
   public function request(): RestRequest { return $this->request; }
+
+  /**
+   * Writes given bytes
+   *
+   * @param  string $bytes
+   * @return int
+   */
+  public function write($bytes) {
+    $this->transfer.= $bytes;
+    return strlen($bytes);
+  }
+
+  /** @return void */
+  public function flush() {
+    // NOOP
+  }
+
+  /** @return void */
+  public function close() {
+    // NOOP
+  }
 
   /**
    * Responds to this call with a given status call, message, headers and payload.

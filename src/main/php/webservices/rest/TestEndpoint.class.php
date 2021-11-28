@@ -1,5 +1,7 @@
 <?php namespace webservices\rest;
 
+use webservices\rest\io\Transmission;
+
 /**
  * Endpoint subclass used for testing REST clients.
  *
@@ -28,18 +30,50 @@ class TestEndpoint extends Endpoint {
   }
 
   /**
+   * Handle a call
+   *
+   * @param  webservices.rest.TestCall $call
+   * @return webservices.rest.RestResponse
+   */
+  private function handle($call) {
+    $request= $call->request();
+    $handler= $this->routes[$request->method().' '.$request->path()]
+      ?? $this->routes[$request->path()]
+      ?? function() { return new RestResponse(404, 'No route', []); }
+    ;
+
+    return $handler($call);
+  }
+
+  /**
+   * Opens a request and returns a transmission instance
+   * 
+   * @param  webservices.rest.RestRequest $request
+   * @return webservices.rest.io.Transmission
+   */
+  public function open(RestRequest $req) {
+    return new TestCall($req, $this->formats, $this->marshalling);
+  }
+
+  /**
+   * Finish a given transmission and returns the response
+   *
+   * @param  webservices.rest.io.Transmission $transmission
+   * @return webservices.rest.RestResponse
+   * @throws webservices.rest.RestException
+   */
+  public function finish(Transmission $transmission) {
+    return $this->handle($transmission);
+  }
+
+  /**
    * Sends a request and returns the response
    *
    * @param  webservices.rest.RestRequest $request
    * @return webservices.rest.RestResponse
    * @throws webservices.rest.RestException
    */
-  public function execute(RestRequest $req) {
-    $handler= $this->routes[$req->method().' '.$req->path()]
-      ?? $this->routes[$req->path()]
-      ?? function() { return new RestResponse(404, 'No route', []); }
-    ;
-
-    return $handler(new TestCall($req, $this->formats, $this->marshalling));
+  public function execute(RestRequest $request) {
+    return $this->handle(new TestCall($request, $this->formats, $this->marshalling));
   }
 }

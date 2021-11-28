@@ -1,5 +1,6 @@
 <?php namespace webservices\rest\unittest;
 
+use io\streams\MemoryInputStream;
 use unittest\{Assert, Test};
 use webservices\rest\{TestEndpoint, RestResponse};
 
@@ -37,6 +38,21 @@ class TestEndpointTest {
 
     Assert::equals(200, $r->status());
     Assert::equals(['id' => 6100, 'handle' => 'test'], $r->value());
+  }
+
+  #[Test]
+  public function routed_path_with_upload() {
+    $fixture= new TestEndpoint([
+      '/users/6100/picture' => function($call) {
+        return $call->respond(202, 'Accepted');
+      }
+    ]);
+    $r= $fixture->resource('/users/6100/picture')->upload()
+      ->transfer('picture', new MemoryInputStream('...'), 'image.jpg')
+      ->finish()
+    ;
+
+    Assert::equals(202, $r->status());
   }
 
   #[Test]
