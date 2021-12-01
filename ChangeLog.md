@@ -3,6 +3,12 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 3.2.0 / 2021-12-11
+
+* Merged PR #19: Testability, adding a `webservices.rest.TestEndpoint`
+  class which can be used for testing purposes
+  (@thekid)
+
 ## 3.1.0 / 2021-11-13
 
 * Merged PR #18: Add support for bearer tokens embedded directly in base
