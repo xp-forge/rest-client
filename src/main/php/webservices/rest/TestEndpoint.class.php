@@ -3,13 +3,20 @@
 use webservices\rest\io\Transmission;
 
 /**
- * Endpoint subclass used for testing REST clients.
+ * Endpoint subclass used for testing REST clients. Accepts a map of routes
+ * using absolute paths, optionally prefixed with an HTTP method, as such:
  *
  * ```php
- * $endpoint= new TestEndpoint([
- *  '/users/me' => function($call) {
- *    return $call->respond(307, 'Temporary Redirect', ['Location' => '/users/6100']);
- *   }
+ * new TestEndpoint([
+ *   '/users/6100' => function($call) {
+ *     return $call->respond(200, 'OK', ['Content-Type' => 'application/json'], '{
+ *       "id": 6100,
+ *       "username": "binford"
+ *     }');
+ *   },
+ *   'POST /users' => function($call) {
+ *     return $call->respond(201, 'Created', ['Location' => '/users/6100']);
+ *   },
  * ]);
  * ```
  *
