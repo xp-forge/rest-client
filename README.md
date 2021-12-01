@@ -192,3 +192,26 @@ use webservices\rest\Endpoint;
 
 $api= (new Endpoint('https://api.example.com/'))->with(['X-API-Key' => $key]);
 ```
+
+### Testability
+
+This library also includes facilities to ease writing unittests for code making REST API calls. By using the *TestEndpoint* class and supplying it with routes it should respond to, various scenarios can be easily tested without the need for HTTP protocol and I/O overhead.
+
+```php
+use webservices\rest\TestEndpoint;
+
+$endpoint= new TestEndpoint([
+  '/users/6100' => function($call) {
+    return $call->respond(200, 'OK', ['Content-Type' => 'application/json'], '{
+      "id": 6100,
+      "username": "binford"
+    }');
+  },
+  'POST /users' => function($call) {
+    return $call->respond(201, 'Created', ['Location' => '/users/6100']);
+  },
+]);
+
+$response= $endpoint->resource('/users/me')->get();
+// Responds with HTTP status 200 and the above JSON payload
+```
