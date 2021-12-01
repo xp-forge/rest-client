@@ -17,15 +17,16 @@ use webservices\rest\io\Transmission;
  * @test  webservices.rest.unittest.TestEndpointTest
  */
 class TestEndpoint extends Endpoint {
-  private $routes= [];
+  private $routes;
 
   /**
    * Creates a new testing endpoint
    *
-   * @param  [:function(webservices.rest.TestCall): webservices.rest.RestResponse]
+   * @param  [:function(webservices.rest.TestCall): webservices.rest.RestResponse] $routes
+   * @param  string $base
    */
-  public function __construct(array $routes) {
-    parent::__construct('http://test.local', Formats::defaults());
+  public function __construct(array $routes, $base= '/') {
+    parent::__construct('http://test.local/'.ltrim($base, '/'), Formats::defaults());
     $this->routes= $routes;
   }
 
@@ -37,8 +38,9 @@ class TestEndpoint extends Endpoint {
    */
   private function handle($call) {
     $request= $call->request();
-    $handler= $this->routes[$request->method().' '.$request->path()]
-      ?? $this->routes[$request->path()]
+    $resolved= $this->base->resolve($request->path())->path();
+    $handler= $this->routes[$request->method().' '.$resolved]
+      ?? $this->routes[$resolved]
       ?? function() { return new RestResponse(404, 'No route', []); }
     ;
 

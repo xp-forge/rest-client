@@ -1,7 +1,7 @@
 <?php namespace webservices\rest\unittest;
 
 use io\streams\MemoryInputStream;
-use unittest\{Assert, Test};
+use unittest\{Assert, Test, Values};
 use webservices\rest\{TestEndpoint, RestResponse};
 
 class TestEndpointTest {
@@ -11,17 +11,30 @@ class TestEndpointTest {
     new TestEndpoint([]);
   }
 
-  #[Test]
-  public function routed_path() {
+  #[Test, Values(['/users/self', 'users/self'])]
+  public function routed_path($resource) {
     $fixture= new TestEndpoint([
       '/users/self' => function($call) {
         return $call->respond(307, 'Temporary Redirect', ['Location' => '/users/6100']);
       }
     ]);
-    $r= $fixture->resource('/users/self')->get();
+    $r= $fixture->resource($resource)->get();
 
     Assert::equals(307, $r->status());
     Assert::equals('/users/6100', $r->header('Location'));
+  }
+
+  #[Test, Values(['/api/users/self', 'users/self'])]
+  public function routed_path_under_base($resource) {
+    $fixture= new TestEndpoint([
+      '/api/users/self' => function($call) {
+        return $call->respond(307, 'Temporary Redirect', ['Location' => '/api/users/6100']);
+      }
+    ], '/api');
+    $r= $fixture->resource($resource)->get();
+
+    Assert::equals(307, $r->status());
+    Assert::equals('/api/users/6100', $r->header('Location'));
   }
 
   #[Test]
