@@ -2,15 +2,28 @@
 
 use io\streams\MemoryInputStream;
 use lang\IllegalStateException;
-use unittest\{Assert, Test, Values};
+use unittest\{Assert, Expect, Test, Values};
 use util\URI;
 use util\data\Marshalling;
-use webservices\rest\format\Json;
+use webservices\rest\format\{Json, Unsupported};
 use webservices\rest\io\Reader;
-use webservices\rest\{Cookie, Cookies, Link, RestResponse};
+use webservices\rest\{Cookie, Cookies, Link, RestResponse, UnexpectedStatus};
 
 class RestResponseTest {
   const API = 'https://api.example.com/';
+
+  /**
+   * Creates headers and reader using JSON from a given source
+   * 
+   * @param  string $source
+   * @return var[]
+   */
+  private function json($source) {
+    return [
+      ['Content-Type' => 'application/json'],
+      new Reader(new MemoryInputStream($source), new Json(), new Marshalling())
+    ];
+  }
 
   #[Test]
   public function can_create() {
@@ -24,8 +37,7 @@ class RestResponseTest {
 
   #[Test]
   public function can_create_with_reader() {
-    $reader= new Reader(new MemoryInputStream('...'), new Json(), new Marshalling());
-    new RestResponse(200, 'OK', [], $reader);
+    new RestResponse(200, 'OK', ...$this->json('{}'));
   }
 
   #[Test, Values(eval: '["http://localhost/", new URI("http://localhost/")])]')]
@@ -73,15 +85,34 @@ class RestResponseTest {
 
   #[Test]
   public function without_links() {
-    Assert::equals([], iterator_to_array((new RestResponse(200, 'OK', []))->links()->all()));
+    Assert::equals([], (new RestResponse(200, 'OK', []))->links());
   }
 
   #[Test]
-  public function link() {
+  public function links() {
+    $links= '</search?page=1>;rel=prev, </search?page=3>;rel=next';
     Assert::equals(
-      [new Link('meta.rdf', ['rel' => 'meta'])],
-      iterator_to_array((new RestResponse(200, 'OK', ['Link' => '<meta.rdf>;rel=meta']))->links()->all())
+      ['prev' => new URI('/search?page=1'), 'next' => new URI('/search?page=3')],
+      (new RestResponse(200, 'OK', ['Link' => $links]))->links()
     );
+  }
+
+  #[Test]
+  public function select_link_by_rel() {
+    Assert::equals(
+      new URI('meta.rdf'),
+      (new RestResponse(200, 'OK', ['Link' => '<meta.rdf>;rel=meta']))->link('meta')
+    );
+  }
+
+  #[Test]
+  public function select_non_existant_link() {
+    Assert::null((new RestResponse(200, 'OK', ['Link' => '<meta.rdf>;rel=meta']))->link('next'));
+  }
+
+  #[Test]
+  public function select_link_when_no_link_header_is_present() {
+    Assert::null((new RestResponse(200, 'OK', []))->link('next'));
   }
 
   #[Test]
@@ -127,24 +158,101 @@ class RestResponseTest {
   }
 
   #[Test]
-  public function value() {
-    $stream= new MemoryInputStream('{"key":"value"}');
-    $reader= new Reader($stream, new Json(), new Marshalling());
-    Assert::equals(['key' => 'value'], (new RestResponse(200, 'OK', [], $reader))->value());
+  public function value_on_success() {
+    Assert::equals(['key' => 'value'], (new RestResponse(200, 'OK', ...$this->json('{"key":"value"}')))->value());
+  }
+
+  #[Test, Expect(class: UnexpectedStatus::class, withMessage: 'Unexpected 400 (Bad Request)')]
+  public function value_on_error() {
+    (new RestResponse(400, 'Bad Request', ...$this->json('{"message":"Error"}')))->value();
   }
 
   #[Test]
-  public function type_coercion() {
-    $stream= new MemoryInputStream('{"key":200}');
-    $reader= new Reader($stream, new Json(), new Marshalling());
-    Assert::equals(['key' => '200'], (new RestResponse(200, 'OK', [], $reader))->value('[:string]'));
+  public function value_with_type_coercion() {
+    Assert::equals(['key' => '200'], (new RestResponse(200, 'OK', ...$this->json('{"key":200}')))->value('[:string]'));
   }
 
+  #[Test]
+  public function optional_on_success() {
+    Assert::equals(['key' => 'value'], (new RestResponse(200, 'OK', ...$this->json('{"key":"value"}')))->value());
+  }
+
+  #[Test]
+  public function optional_on_error() {
+    Assert::null((new RestResponse(404, 'Not Found', ...$this->json('{"error":"Unknown user"}')))->optional());
+  }
+
+  #[Test]
+  public function optional_with_type_coercion() {
+    Assert::equals(['key' => '200'], (new RestResponse(200, 'OK', ...$this->json('{"key":200}')))->optional('[:string]'));
+  }
+
+  #[Test]
+  public function error_on_success() {
+    Assert::null((new RestResponse(200, 'OK', ...$this->json('{"key":"value"}')))->error());
+  }
+
+  #[Test]
+  public function error_on_error() {
+    Assert::equals(
+      ['error' => 'Unknown user'],
+      (new RestResponse(404, 'Not Found', ...$this->json('{"error":"Unknown user"}')))->error()
+    );
+  }
+
+  #[Test]
+  public function error_with_type_coercion() {
+    Assert::equals(
+      ['error' => '6100'],
+      (new RestResponse(404, 'Not Found', ...$this->json('{"error":6100}')))->error('[:string]')
+    );
+  }
+
+  #[Test]
+  public function error_and_value_on_success() {
+    $response= new RestResponse(200, 'OK', ...$this->json('{"key":"value"}'));
+    Assert::null($response->error());
+    Assert::equals(['key' => 'value'], $response->value());
+  }
+
+  #[Test]
+  public function error_with_unsupported_format() {
+    $reader= new Reader(new MemoryInputStream('Unknown user'), new Unsupported('text/plain'), new Marshalling());
+    Assert::equals('Unknown user', (new RestResponse(404, 'Not Found', [], $reader))->error());
+  }
+
+  #[Test]
+  public function match_on_success() {
+    Assert::equals(['key' => 'value'], (new RestResponse(200, 'OK', ...$this->json('{"key":"value"}')))->match([
+      200 => function($response) { return $response->value(); },
+      404 => null
+    ]));
+  }
+
+  #[Test]
+  public function match_on_error() {
+    Assert::null((new RestResponse(404, 'Not Found', ...$this->json('{"error":"Unknown user"}')))->match([
+      200 => function($response) { return $response->value(); },
+      404 => null
+    ]));
+  }
+
+  #[Test, Expect(class: UnexpectedStatus::class, withMessage: 'Unexpected 503 (Service Unavailable)')]
+  public function match_on_unhandled() {
+    (new RestResponse(503, 'Service Unavailable', ...$this->json('{"error":"Database down"}')))->match([
+      200 => function($response) { return $response->value(); },
+      404 => null
+    ]);
+  }
+
+  /** @deprecated */
   #[Test]
   public function result() {
-    $stream= new MemoryInputStream('{"key":"value"}');
-    $reader= new Reader($stream, new Json(), new Marshalling());
-    Assert::equals(['key' => 'value'], (new RestResponse(200, 'OK', [], $reader))->result()->value());
+    Assert::equals(
+      ['key' => 'value'],
+      (new RestResponse(200, 'OK', ...$this->json('{"key":"value"}')))->result()->value()
+    );
+    \xp::gc();
   }
 
   #[Test]

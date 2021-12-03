@@ -2,6 +2,7 @@
 
 use lang\Value;
 use util\URI;
+use webservices\rest\format\Unsupported;
 use webservices\rest\io\Reader;
 
 /**
@@ -87,7 +88,6 @@ class RestResponse implements Value {
    * Returns the value of the "Location" header, or NULL if it not present.
    * The URI is resolved against the request URI.
    *
-   * @deprecated Use `self::result()->location()` or `self::header('Location')`
    * @return ?util.URI
    */
   public function location() {
@@ -98,32 +98,115 @@ class RestResponse implements Value {
   }
 
   /**
-   * Returns links sent by server.
+   * Returns links sent by server. Returns an empty array if no `Link`
+   * header is present. Throws an exception if the HTTP statuscode not
+   * in the 200-299 range.
    *
-   * @deprecated Use `self::result()->links()` or `self::header('Link')`
-   * @return webservices.rest.Links
+   * @return [:util.URI]
+   * @throws webservices.rest.UnexpectedStatus
    */
   public function links() {
-    return Links::in($this->header('Link'));
+    if ($this->status < 200 || $this->status >= 300) throw new UnexpectedStatus($this);
+
+    $r= [];
+    foreach (Links::in($this->header('Link'))->all() as $link) {
+      $r[$link->param('rel')]= $this->resolve($link->uri());
+    }
+    return $r;
   }
 
   /**
-   * Returns a value from the response, using the given type for deserialization
+   * Returns link URI with a given `rel` attribute or NULL if the given
+   * link is not present (or no `Link` header is present at all). Throws
+   * an exception if the HTTP statuscode not in the 200-299 range.
    *
-   * @deprecated Use `self::result()->value()`
-   * @param  string $type
+   * @param  string $rel
+   * @return ?util.URI
+   * @throws webservices.rest.UnexpectedStatus
+   */
+  public function link($rel) {
+    if ($this->status < 200 || $this->status >= 300) throw new UnexpectedStatus($this);
+
+    if ($uri= Links::in($this->header('Link'))->uri(['rel' => $rel])) {
+      return $this->resolve($uri);
+    }
+    return null;
+  }
+
+  /**
+   * Returns a value from the response, using the given type for deserialization.
+   * Throws an exception if the HTTP statuscode not in the 200-299 range.
+   *
+   * @param  ?string $type
+   * @return var
+   * @throws webservices.rest.UnexpectedStatus
+   */
+  public function value($type= null) {
+    if ($this->status >= 200 && $this->status < 300) return $this->reader->read($type);
+
+    throw new UnexpectedStatus($this);
+  }
+
+  /**
+   * Returns a value from the response, using the given type for deserialization.
+   * Returns NULL for a given list of status codes indicating absence, defaulting
+   * to 404s. Throws an exception if the HTTP statuscode not in the 200-299 range.
+   *
+   * @param  ?string $type
+   * @param  int[] $absent Status code indicating absence
+   * @return var
+   * @throws webservices.rest.UnexpectedStatus
+   */
+  public function optional($type= null, $absent= [404]) {
+    if ($this->status >= 200 && $this->status < 300) return $this->reader->read($type);
+    if (in_array($this->status, $absent)) return null;
+
+    throw new UnexpectedStatus($this);
+  }
+
+  /**
+   * Returns the error from the response, using the given type for deserialization.
+   * Falls back to using the complete body as a string if the response format is
+   * unsupported.
+   *
+   * @param  ?string $type
    * @return var
    */
-  public function value($type= 'var') {
-    return $this->reader->read($type);
+  public function error($type= null) {
+    if ($this->status < 400) return null;
+
+    return $this->reader->format() instanceof Unsupported ? $this->reader->content() : $this->reader->read($type);
   }
 
   /**
-   * Returns a result instance representing the data in this response.
+   * Matches response status codes and returns values based on the given cases.
+   * A case is an integer status code mapped to either a given value or a
+   * function which receives this result instance and returns a value. Throws
+   * an exception if the HTTP statuscode is unhandled.
    *
-   * @return webservices.rest.Result
+   * @param  [:var] $cases
+   * @return var
+   * @throws webservices.rest.UnexpectedStatus
    */
-  public function result() { return new Result($this); }
+  public function match(array $cases) {
+    if (array_key_exists($this->status, $cases)) return $cases[$this->status] instanceof \Closure
+      ? $cases[$this->status]($this)
+      : $cases[$this->status]
+    ;
+
+    throw new UnexpectedStatus($this);
+  }
+
+  /**
+   * Returns an instance representing the data in this response.
+   *
+   * @deprecated Directly use this class!
+   * @return webservices.rest.RestResponse
+   */
+  public function result() {
+    trigger_error('Use response directly!', E_USER_DEPRECATED);
+    return $this;
+  }
 
   /** @return string */
   public function hashCode() { return spl_object_hash($this); }

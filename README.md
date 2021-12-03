@@ -21,7 +21,7 @@ The `Endpoint` class serves as the entry point to this API. Create a new instanc
 use webservices\rest\Endpoint;
 
 $api= new Endpoint('https://api.example.com/');
-$result= $api->resource('users')->post(['name' => 'Test'], 'application/json')->result();
+$result= $api->resource('users')->post(['name' => 'Test'], 'application/json');
 
 // Get location from created response, raising an UnexpectedStatus
 // exception for any statuscode outside of the range 200-299.
@@ -44,25 +44,25 @@ $api= new Endpoint('https://api.example.com/');
 
 // Test for existance with HEAD, raising UnexpectedStatus exceptions
 // for any status code other than 200 and 404.
-$exists= $api->resource('users/1549')->head()->result()->match([
+$exists= $api->resource('users/1549')->head()->match([
   200 => true,
   404 => false
 ]);
 
 // Return user object, raising an UnexpectedStatus exception for any
 // statuscode outside of the range 200-299.
-$user= $api->resource('users/self')->get()->result()->value();
+$user= $api->resource('users/self')->get()->value();
 
 // Same as above, but returns NULL for 404s instead of an exception
-$user= $api->resource('users/{0}', [$id])->get()->result()->optional();
+$user= $api->resource('users/{0}', [$id])->get()->optional();
 
 // Pass parameters
-$list= $api->resource('user')->get(['page' => 1, 'per_page' => 50])->result()->value();
+$list= $api->resource('user')->get(['page' => 1, 'per_page' => 50])->value();
 
 // Access pagination via `Link: <...>; rel="next"` header
 $resource= 'groups';
 do {
-  $result= $this->endpoint->resource($resource)->get(['per_page' => 200])->result();
+  $result= $this->endpoint->resource($resource)->get(['per_page' => 200]);
   foreach ($result->value() as $group) {
     yield $group['id'] => $group;
   }
@@ -81,10 +81,10 @@ $resource= $api->resource('users/self')
 ;
 
 // Default content type and accept types set on resource used
-$updated= $resource->put(['name' => 'Tested', 'login' => $mail])->result()->value();
+$updated= $resource->put(['name' => 'Tested', 'login' => $mail])->value();
 
 // Resources can be reused!
-$updated= $resource->patch(['name' => 'Changed'])->result()->value();
+$updated= $resource->patch(['name' => 'Changed'])->value();
 ```
 
 ### Deleting: delete
@@ -96,7 +96,7 @@ $api= new Endpoint('https://api.example.com/');
 
 // Pass segments, map 204 to true, 404 to null, raise UnexpectedStatus
 // exception otherwise
-$api->resource('users/{id}', $user)->delete()->result()->match([
+$api->resource('users/{id}', $user)->delete()->match([
   204 => true,
   404 => null
 ]);
@@ -120,7 +120,7 @@ $result= $endpoint->resource('files')->upload()
   ->transfer('letter', $stream, 'letter.txt', 'text/plain')
   ->transfer('cv', $file->in(), $file->filename)
   ->finish()
-  ->result()
+  
 ;
 ```
 
@@ -131,7 +131,7 @@ Automatic result deserialization is supported by passing a type to the `value()`
 ```php
 use com\example\api\types\User;
 
-$result= $api->resource('users/{0}', [$id])->get()->result();
+$result= $api->resource('users/{0}', [$id])->get();
 
 // If a type is passed, the result will be unmarshalled to an object
 $map= $result->value();
@@ -142,7 +142,7 @@ $map= $result->optional();
 $object= $result->optional(User::class);
 
 // Works with any type from the XP typesystem, e.g. arrays of objects
-$list= $api->resource('users')->get()->result()->value('org.example.User[]');
+$list= $api->resource('users')->get()->value('org.example.User[]');
 ```
 
 ### Error handling
@@ -155,15 +155,17 @@ use util\cmd\Console;
 
 // In unexpected cases
 try {
-  $user= $api->resource('users/self')->get()->result()->value();
+  $user= $api->resource('users/self')->get()->value();
 } catch (UnexpectedStatus $e) {
   Console::writeLine('Unexpected ', $e->status(), ': ', $e->reason());
 }
 
 // More graceful handling
-$result= $api->resource('users/self')->get()->result();
+$result= $api->resource('users/self')->get();
 if ($error= $result->error()) {
   Console::writeLine('Unexpected ', $result->status(), ': ', $error);
+} else {
+  $user= $result->value();
 }
 ```
 
