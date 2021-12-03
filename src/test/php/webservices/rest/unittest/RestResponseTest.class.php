@@ -245,16 +245,6 @@ class RestResponseTest {
     ]);
   }
 
-  /** @deprecated */
-  #[Test]
-  public function result() {
-    Assert::equals(
-      ['key' => 'value'],
-      (new RestResponse(200, 'OK', ...$this->json('{"key":"value"}')))->result()->value()
-    );
-    \xp::gc();
-  }
-
   #[Test]
   public function no_cookies() {
     Assert::equals(Cookies::$EMPTY, (new RestResponse(200, 'OK', []))->cookies());

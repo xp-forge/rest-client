@@ -197,17 +197,6 @@ class RestResponse implements Value {
     throw new UnexpectedStatus($this);
   }
 
-  /**
-   * Returns an instance representing the data in this response.
-   *
-   * @deprecated Directly use this class!
-   * @return webservices.rest.RestResponse
-   */
-  public function result() {
-    trigger_error('Use response directly!', E_USER_DEPRECATED);
-    return $this;
-  }
-
   /** @return string */
   public function hashCode() { return spl_object_hash($this); }
 
