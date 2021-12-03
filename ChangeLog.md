@@ -3,7 +3,18 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
-## 3.2.0 / 2021-12-11
+## 4.0.0 / 2021-12-03
+
+This major release makes the result API, which has proven to be far more
+useful than the previous low-level one, the default. This makes a clean
+cut but also breaks backward compatibility, and all your code will need
+to be thoroughly checked before migrating!
+
+* Merged PR #20: Fold result into response. The `value()` and `links()`
+  methods' behavior has changed, `result()` has been removed.
+  (@thekid)
+
+## 3.2.0 / 2021-12-01
 
 * Merged PR #19: Testability, adding a `webservices.rest.TestEndpoint`
   class which can be used for testing purposes
