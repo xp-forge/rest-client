@@ -45,25 +45,25 @@ class LinksTest {
     Assert::equals([], iterator_to_array(Links::in(null)->all()));
   }
 
-  #[Test]
-  public function uri_by_rel() {
+  #[Test, Values([[['rel' => 'prev'], ['rel' => 'next']], ['prev', 'next']])]
+  public function uri_by_rel($prev, $next) {
     $links= new Links('<http://example.com/?page=3>; rel="next", <http://example.com/?page=1>; rel="prev"');
     Assert::equals(
       ['http://example.com/?page=1', 'http://example.com/?page=3'],
-      [$links->uri(['rel' => 'prev']), $links->uri(['rel' => 'next'])]
+      [$links->uri($prev), $links->uri($next)]
     );
   }
 
-  #[Test]
-  public function uri_by_non_existant_rel_returns_null() {
+  #[Test, Values([[['rel' => 'prev']], ['prev']])]
+  public function uri_by_non_existant_rel_returns_null($search) {
     $links= new Links('<http://example.com/?page=2>; rel="next"');
-    Assert::equals(null, $links->uri(['rel' => 'prev']));
+    Assert::null($links->uri($search));
   }
 
-  #[Test]
-  public function uri_by_non_existant_rel_returns_default() {
+  #[Test, Values([[['rel' => 'prev']], ['prev']])]
+  public function uri_by_non_existant_rel_returns_default($search) {
     $links= new Links('<http://example.com/?page=2>; rel="next"');
-    Assert::equals('http://example.com', $links->uri(['rel' => 'prev'], 'http://example.com'));
+    Assert::equals('http://example.com', $links->uri($search, 'http://example.com'));
   }
 
   #[Test]

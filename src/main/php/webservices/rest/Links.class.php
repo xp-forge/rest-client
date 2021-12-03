@@ -92,10 +92,10 @@ class Links implements Value {
   /**
    * Returns a map of link URIs to parameters, optionally restricted to a given search
    *
-   * @param  [:string] $search If omitted, all links are returned
+   * @param  ?[:string] $search If omitted, all links are returned
    * @return iterable
    */
-  public function all($search= null) {
+  public function all(array $search= null) {
     if (null === $search) {
       foreach ($this->links as $link) {
         yield $link;
@@ -111,14 +111,14 @@ class Links implements Value {
   }
 
   /**
-   * Searches for the first link URI by a given search
+   * Searches for the first link URI by a given search.
    *
-   * @param  [:string] $search
+   * @param  string|[:string] $search
    * @param  string $default
    * @return string
    */
   public function uri($search, $default= null) {
-    foreach ($this->all($search) as $link) {
+    foreach ($this->all(is_string($search) ? ['rel' => $search] : $search) as $link) {
       return $link->uri();
     }
     return $default;
