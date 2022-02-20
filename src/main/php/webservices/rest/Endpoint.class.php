@@ -1,6 +1,7 @@
 <?php namespace webservices\rest;
 
 use io\streams\Compression;
+use io\streams\compress\Algorithm;
 use lang\{Throwable, IllegalArgumentException};
 use peer\URL;
 use peer\http\{HttpConnection, HttpRequest};
@@ -82,8 +83,14 @@ class Endpoint implements Traceable {
    */
   public function compressing($algorithms= null) {
     $supported= [];
-    foreach ($algorithms ?? Compression::algorithms()->supported() as $algorithm) {
-      $supported[]= $algorithm->token();
+    if (null === $algorithms) {
+      foreach (Compression::algorithms()->supported() as $algorithm) {
+        $supported[]= $algorithm->token();
+      }
+    } else {
+      foreach ($algorithms as $algorithm) {
+        $supported[]= $algorithm instanceof Algorithm ? $algorithm->token() : (string)$algorithm;
+      }
     }
 
     if (empty($supported)) {

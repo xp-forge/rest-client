@@ -49,6 +49,13 @@ class CompressionHandlingTest {
   }
 
   #[Test]
+  public function do_not_use_compression() {
+    $this->endpoint->compressing(['identity']);
+
+    Assert::equals('identity', $this->endpoint->headers()['Accept-Encoding']);
+  }
+
+  #[Test]
   public function removes_accept_encoding_header() {
     $this->endpoint->compressing([]);
 
