@@ -1,5 +1,6 @@
 <?php namespace webservices\rest;
 
+use io\streams\Compression;
 use lang\{Throwable, IllegalArgumentException};
 use peer\URL;
 use peer\http\{HttpConnection, HttpRequest};
@@ -69,6 +70,27 @@ class Endpoint implements Traceable {
    */
   public function buffered() {
     $this->transfer= new Buffered($this);
+    return $this;
+  }
+
+  /**
+   * Signal support compression algorithms in the "Accept-Encoding" header.
+   * Pass an empty iterable will remove the header alltogether.
+   *
+   * @param  ?iterable $algorithms If omitted, detects support algorithms
+   * @return self
+   */
+  public function compressing($algorithms= null) {
+    $supported= [];
+    foreach ($algorithms ?? Compression::algorithms()->supported() as $algorithm) {
+      $supported[]= $algorithm->token();
+    }
+
+    if (empty($supported)) {
+      unset($this->headers['Accept-Encoding']);
+    } else {
+      $this->headers['Accept-Encoding']= implode(', ', $supported);
+    }
     return $this;
   }
 

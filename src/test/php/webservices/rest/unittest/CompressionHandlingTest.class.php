@@ -1,6 +1,7 @@
 <?php namespace webservices\rest\unittest;
 
 use io\streams\MemoryInputStream;
+use io\streams\compress\{Gzip, Brotli};
 use peer\http\HttpResponse;
 use unittest\actions\ExtensionAvailable;
 use unittest\{Action, Assert, Before, Test, Values};
@@ -38,6 +39,20 @@ class CompressionHandlingTest {
   #[Before]
   public function endpoint() {
     $this->endpoint= new Endpoint('http://api.example.com');
+  }
+
+  #[Test]
+  public function sets_accept_encoding_header() {
+    $this->endpoint->compressing([new Gzip(), new Brotli()]);
+
+    Assert::equals('gzip, br', $this->endpoint->headers()['Accept-Encoding']);
+  }
+
+  #[Test]
+  public function removes_accept_encoding_header() {
+    $this->endpoint->compressing([]);
+
+    Assert::false(isset($this->endpoint->headers()['Accept-Encoding']));
   }
 
   #[Test, Values([1, 6, 9]), Action(eval: 'new ExtensionAvailable("zlib")')]
