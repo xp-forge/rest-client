@@ -76,9 +76,10 @@ class Endpoint implements Traceable {
 
   /**
    * Signal support compression algorithms in the "Accept-Encoding" header.
-   * Calling without arguments will use the 
+   * Calling without arguments will detect algorithms supported in this
+   * runtime setup.
    *
-   * @param  (string|io.streams.compress.Algorithm)... $algorithms
+   * @param  (?string|io.streams.compress.Algorithm)... $algorithms
    * @return self
    */
   public function compressing(...$algorithms) {
