@@ -43,21 +43,21 @@ class CompressionHandlingTest {
 
   #[Test]
   public function sets_accept_encoding_header() {
-    $this->endpoint->compressing([new Gzip(), new Brotli()]);
+    $this->endpoint->compressing(new Gzip(), new Brotli());
 
     Assert::equals('gzip, br', $this->endpoint->headers()['Accept-Encoding']);
   }
 
   #[Test]
   public function do_not_use_compression() {
-    $this->endpoint->compressing(['identity']);
+    $this->endpoint->compressing('identity');
 
     Assert::equals('identity', $this->endpoint->headers()['Accept-Encoding']);
   }
 
   #[Test]
   public function removes_accept_encoding_header() {
-    $this->endpoint->compressing([]);
+    $this->endpoint->compressing(null);
 
     Assert::false(isset($this->endpoint->headers()['Accept-Encoding']));
   }

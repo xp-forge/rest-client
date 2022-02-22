@@ -76,20 +76,27 @@ class Endpoint implements Traceable {
 
   /**
    * Signal support compression algorithms in the "Accept-Encoding" header.
-   * Pass an empty iterable will remove the header alltogether.
+   * Calling without arguments will use the 
    *
-   * @param  ?iterable $algorithms If omitted, detects support algorithms
+   * @param  (string|io.streams.compress.Algorithm)... $algorithms
    * @return self
    */
-  public function compressing($algorithms= null) {
+  public function compressing(...$algorithms) {
     $supported= [];
-    if (null === $algorithms) {
+
+    if (empty($algorithms)) {
       foreach (Compression::algorithms()->supported() as $algorithm) {
         $supported[]= $algorithm->token();
       }
     } else {
       foreach ($algorithms as $algorithm) {
-        $supported[]= $algorithm instanceof Algorithm ? $algorithm->token() : (string)$algorithm;
+        if (null === $algorithm) {
+          // Skip
+        } else if ($algorithm instanceof Algorithm) {
+          $supported[]= $algorithm->token();
+        } else {
+          $supported[]= (string)$algorithm;
+        }
       }
     }
 
