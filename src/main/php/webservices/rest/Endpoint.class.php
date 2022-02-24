@@ -1,5 +1,6 @@
 <?php namespace webservices\rest;
 
+use Traversable;
 use io\streams\Compression;
 use io\streams\compress\Algorithm;
 use lang\{Throwable, IllegalArgumentException};
@@ -32,9 +33,10 @@ class Endpoint implements Traceable {
    * 
    * @param  string|util.URI|peer.URL $base
    * @param  ?webservices.rest.Formats $formats
+   * @param  ?string|io.streams.compress.Algorithm|string[]|io.streams.compress.Algorithm[]|iterable $compressing
    * @throws lang.IllegalArgumentException if URI does not have an authority
    */
-  public function __construct($base, Formats $formats= null) {
+  public function __construct($base, Formats $formats= null, $compressing= null) {
     if ($base instanceof URI) {
       $uri= $base;
     } else if ($base instanceof URL) {
@@ -59,6 +61,7 @@ class Endpoint implements Traceable {
     $this->transfer= new Streamed($this);
     $this->marshalling= new Marshalling();
     $this->connections= function($uri) { return new HttpConnection($uri); };
+    $this->compressing($compressing ?? Compression::algorithms()->supported());
   }
 
   /**
@@ -67,6 +70,7 @@ class Endpoint implements Traceable {
    * likely to work with all webservers.
    *
    * @see    https://bz.apache.org/bugzilla/show_bug.cgi?id=53332
+   * @see    https://stackoverflow.com/q/66899385
    * @return self
    */
   public function buffered() {
@@ -76,28 +80,26 @@ class Endpoint implements Traceable {
 
   /**
    * Signal support compression algorithms in the "Accept-Encoding" header.
-   * Calling without arguments will detect algorithms supported in this
-   * runtime setup.
+   * Passing NULL will remove this header, indicating no specific preference.
    *
-   * @param  (?string|io.streams.compress.Algorithm)... $algorithms
+   * @param  ?string|io.streams.compress.Algorithm|string[]|io.streams.compress.Algorithm[]|iterable $arg
    * @return self
    */
-  public function compressing(...$algorithms) {
-    $supported= [];
-
-    if (empty($algorithms)) {
-      foreach (Compression::algorithms()->supported() as $algorithm) {
-        $supported[]= $algorithm->token();
-      }
+  public function compressing($arg) {
+    if (null === $arg) {
+      $it= [];
+    } else if ($arg instanceof Traversable || is_array($arg)) {
+      $it= $arg;
     } else {
-      foreach ($algorithms as $algorithm) {
-        if (null === $algorithm) {
-          // Skip
-        } else if ($algorithm instanceof Algorithm) {
-          $supported[]= $algorithm->token();
-        } else {
-          $supported[]= (string)$algorithm;
-        }
+      $it= [$arg];
+    }
+
+    $supported= [];
+    foreach ($it as $algorithm) {
+      if ($algorithm instanceof Algorithm) {
+        $supported[]= $algorithm->token();
+      } else {
+        $supported[]= (string)$algorithm;
       }
     }
 
