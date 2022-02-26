@@ -3,7 +3,7 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
-## 5.0.0 / ????-??-??
+## 5.0.0 / 2022-02-26
 
 This release brings compression handling to this library. Algorithms
 supported by the setup are transmitted with the *Accept-Encoding* header.
