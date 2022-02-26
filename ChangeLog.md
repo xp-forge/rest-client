@@ -11,6 +11,7 @@ Handling for compressed response data is determined by looking at the
 *Content-Encoding* header. **Heads up:** If you've been manually doing
 this before, read the "BC break and refactoring" section in #22.
 
+* Fixed "Creation of dynamic property" warnings in PHP 8.2 - @thekid
 * Merged PR #22: Compression, implementing feature request #21. Adds a
   dependency on the new `xp-forge/compression` library.
   (@thekid)
