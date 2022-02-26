@@ -3,6 +3,18 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 5.0.0 / ????-??-??
+
+This release brings compression handling to this library. Algorithms
+supported by the setup are transmitted with the *Accept-Encoding* header.
+Handling for compressed response data is determined by looking at the
+*Content-Encoding* header. **Heads up:** If you've been manually doing
+this before, read the "BC break and refactoring" section in #22.
+
+* Merged PR #22: Compression, implementing feature request #21. Adds a
+  dependency on the new `xp-forge/compression` library.
+  (@thekid)
+
 ## 4.0.0 / 2021-12-03
 
 This major release makes the result API, which has proven to be far more
