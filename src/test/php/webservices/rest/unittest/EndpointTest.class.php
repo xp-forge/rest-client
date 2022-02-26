@@ -16,7 +16,7 @@ class EndpointTest {
    * @return web.rest.Endpoint
    */
   private function newFixture($base= self::BASE_URL) {
-    return new Endpoint($base);
+    return new Endpoint($base, null, []);
   }
 
   #[Test, Values(eval: '[self::BASE_URL, new URI(self::BASE_URL), new URL(self::BASE_URL)]')]

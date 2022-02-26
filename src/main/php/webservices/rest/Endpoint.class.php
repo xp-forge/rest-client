@@ -1,5 +1,8 @@
 <?php namespace webservices\rest;
 
+use Traversable;
+use io\streams\Compression;
+use io\streams\compress\Algorithm;
 use lang\{Throwable, IllegalArgumentException};
 use peer\URL;
 use peer\http\{HttpConnection, HttpRequest};
@@ -30,9 +33,10 @@ class Endpoint implements Traceable {
    * 
    * @param  string|util.URI|peer.URL $base
    * @param  ?webservices.rest.Formats $formats
+   * @param  ?string|io.streams.compress.Algorithm|string[]|io.streams.compress.Algorithm[]|iterable $compressing
    * @throws lang.IllegalArgumentException if URI does not have an authority
    */
-  public function __construct($base, Formats $formats= null) {
+  public function __construct($base, Formats $formats= null, $compressing= null) {
     if ($base instanceof URI) {
       $uri= $base;
     } else if ($base instanceof URL) {
@@ -57,6 +61,7 @@ class Endpoint implements Traceable {
     $this->transfer= new Streamed($this);
     $this->marshalling= new Marshalling();
     $this->connections= function($uri) { return new HttpConnection($uri); };
+    $this->compressing($compressing ?? Compression::algorithms()->supported());
   }
 
   /**
@@ -65,10 +70,44 @@ class Endpoint implements Traceable {
    * likely to work with all webservers.
    *
    * @see    https://bz.apache.org/bugzilla/show_bug.cgi?id=53332
+   * @see    https://stackoverflow.com/q/66899385
    * @return self
    */
   public function buffered() {
     $this->transfer= new Buffered($this);
+    return $this;
+  }
+
+  /**
+   * Signal support compression algorithms in the "Accept-Encoding" header.
+   * Passing NULL will remove this header, indicating no specific preference.
+   *
+   * @param  ?string|io.streams.compress.Algorithm|string[]|io.streams.compress.Algorithm[]|iterable $arg
+   * @return self
+   */
+  public function compressing($arg) {
+    if (null === $arg) {
+      $it= [];
+    } else if ($arg instanceof Traversable || is_array($arg)) {
+      $it= $arg;
+    } else {
+      $it= [$arg];
+    }
+
+    $supported= [];
+    foreach ($it as $algorithm) {
+      if ($algorithm instanceof Algorithm) {
+        $supported[]= $algorithm->token();
+      } else {
+        $supported[]= (string)$algorithm;
+      }
+    }
+
+    if (empty($supported)) {
+      unset($this->headers['Accept-Encoding']);
+    } else {
+      $this->headers['Accept-Encoding']= implode(', ', $supported);
+    }
     return $this;
   }
 

@@ -1,10 +1,12 @@
 <?php namespace webservices\rest\io;
 
+use io\streams\Compression;
 use lang\MethodNotImplementedException;
 
 abstract class Transfer {
   protected $endpoint;
 
+  /** @param webservices.rest.Endpoint */
   public function __construct($endpoint) { $this->endpoint= $endpoint; }
 
   /** @return self */
@@ -33,6 +35,12 @@ abstract class Transfer {
   }
 
   public function reader($response, $format, $marshalling) {
-    return new Reader($response->in(), $format, $marshalling);
+    if ($encoding= $response->header('Content-Encoding')) {
+      $in= Compression::named($encoding[0])->open($response->in());
+    } else {
+      $in= $response->in();
+    }
+
+    return new Reader($in, $format, $marshalling);
   }
 }

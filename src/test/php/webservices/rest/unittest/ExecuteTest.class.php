@@ -13,7 +13,7 @@ class ExecuteTest {
 
   /** Returns a new endpoint using the `TestConnection` class */
   private function newFixture(string $base= 'http://test') {
-    return (new Endpoint($base))->connecting([TestConnection::class, 'new']);
+    return (new Endpoint($base, null, []))->connecting([TestConnection::class, 'new']);
   }
 
   /** Returns a log appender which stores formatted lines */
