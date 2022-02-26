@@ -195,6 +195,27 @@ use webservices\rest\Endpoint;
 $api= (new Endpoint('https://api.example.com/'))->with(['X-API-Key' => $key]);
 ```
 
+### Compression
+
+This library handlees compressed data transparently, sending an *Accept-Encoding* header containing compression algorithms supported in the PHP setup (*based on loaded extensions like e.g. [zlib](https://www.php.net/zlib)*) and using the *Content-Encoding* response header to determine which algorithm to select.
+
+```php
+use webservices\rest\Endpoint;
+use io\streams\Compression;
+
+// Detect supported compression algorithms and set "Accept-Encoding" accordingly
+$endpoint= new Endpoint($api);
+
+// Send "Accept-Encoding: identity", indicating the server should not compress
+$endpoint= (new Endpoint($api))->compressing(Compression::$NONE);
+
+// Send "Accept-Encoding: gzip, br"
+$endpoint= (new Endpoint($api))->compressing(['gzip', 'br']);
+
+// Do not send an "Accept-Encoding" header, i.e. no preference is expressed
+$endpoint= (new Endpoint($api))->compressing(null);
+```
+
 ### Testability
 
 This library also includes facilities to ease writing unittests for code making REST API calls. By using the *TestEndpoint* class and supplying it with routes it should respond to, various scenarios can be easily tested without the need for HTTP protocol and I/O overhead.
