@@ -34,6 +34,11 @@ class EndpointTest {
     Assert::equals(new URI(self::BASE_URL), $this->newFixture($base)->base());
   }
 
+  #[Test, Values([['http://localhost', null], ['http://localhost:8080', 8080]])]
+  public function port($base, $expected) {
+    Assert::equals($expected, $this->newFixture($base)->base()->port());
+  }
+
   #[Test]
   public function headers_empty_by_default() {
     Assert::equals([], $this->newFixture()->headers());

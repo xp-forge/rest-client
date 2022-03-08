@@ -6,7 +6,7 @@ use io\streams\compress\Algorithm;
 use lang\{Throwable, IllegalArgumentException};
 use peer\URL;
 use peer\http\{HttpConnection, HttpRequest};
-use util\URI;
+use util\{URI, Authority};
 use util\data\Marshalling;
 use util\log\Traceable;
 use webservices\rest\io\{Buffered, Reader, Streamed, Traced, Transmission};
@@ -56,7 +56,12 @@ class Endpoint implements Traceable {
       $this->headers['Authorization']= 'Bearer '.$user;
     }
 
-    $this->base= $uri->using()->authority($authority->host())->path(rtrim($uri->path() ?? '', '/').'/')->create();
+    $this->base= $uri->using()
+      ->authority(new Authority($authority->host(), $authority->port()))
+      ->path(rtrim($uri->path() ?? '', '/').'/')
+      ->create()
+    ;
+
     $this->formats= $formats ?: Formats::defaults();
     $this->transfer= new Streamed($this);
     $this->marshalling= new Marshalling();
@@ -179,6 +184,8 @@ class Endpoint implements Traceable {
   public function open(RestRequest $request) {
     $target= $this->base->resolve($request->path());
     $conn= $this->connections->__invoke($target);
+    $conn->setConnectTimeout(10);
+    $conn->setTimeout(10);
     $headers= array_merge($this->headers, $request->headers());
 
     // RFC 6265: When the user agent generates an HTTP request, the user agent
