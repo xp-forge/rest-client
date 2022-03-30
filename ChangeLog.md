@@ -3,6 +3,10 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 5.0.2 / 2022-03-30
+
+* Fixed exchanging log categories - @thekid
+
 ## 5.0.1 / 2022-03-09
 
 * Merged PR #23: Fix missing port - @thekid

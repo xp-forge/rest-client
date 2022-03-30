@@ -287,6 +287,36 @@ class ExecuteTest {
     Assert::equals($expected, $appender->lines);
   }
 
+  #[Test]
+  public function exchange_logging() {
+    $appender= $this->newAppender();
+    $fixture= $this->newFixture();
+
+    // Use first logger category
+    $fixture->setTrace(Logging::all()->using(new PatternLayout('%L %m'))->to($appender));
+    $fixture->resource('/users/0')->get();
+
+    // Exchange logging
+    $fixture->setTrace(Logging::all()->using(new PatternLayout('[%L] %m'))->to($appender));
+    $fixture->resource('/users/0')->get();
+
+    $request= implode("\r\n", [
+      'GET /users/0 HTTP/1.1',
+      'Connection: close',
+      'Host: test',
+      '',
+    ]);
+    $expected= [
+      "INFO >>> {$request}",
+      "INFO <<< HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 56\r\n",
+      "DEBUG {$request}\r\n",
+      "[INFO] >>> {$request}",
+      "[INFO] <<< HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 56\r\n",
+      "[DEBUG] {$request}\r\n",
+    ];
+    Assert::equals($expected, $appender->lines);
+  }
+
   #[Test, Expect(RestException::class)]
   public function exceptions_from_sending_requests_are_wrapped() {
     $fixture= (new Endpoint('http://test'))->connecting(function($uri) {

@@ -19,6 +19,17 @@ class Traced extends Transfer {
   /** @return parent */
   public function untraced() { return $this->untraced; }
 
+  /**
+   * Use another logging category
+   *
+   * @param  util.log.LogCategory $cat
+   * @return self
+   */
+  public function use($cat) {
+    $this->cat= $cat;
+    return $this;
+  }
+
   public function transmission($conn, $s, $target) {
     return new class($conn, $s, $target, $this->cat) extends Transmission {
       private $cat;

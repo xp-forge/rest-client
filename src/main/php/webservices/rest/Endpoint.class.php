@@ -170,6 +170,8 @@ class Endpoint implements Traceable {
   public function setTrace($cat) {
     if (null === $cat) {
       $this->transfer= $this->transfer->untraced();
+    } else if ($this->transfer instanceof Traced) {
+      $this->transfer->use($cat);
     } else {
       $this->transfer= new Traced($this->transfer, $cat);
     }
