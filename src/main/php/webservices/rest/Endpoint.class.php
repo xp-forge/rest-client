@@ -6,15 +6,16 @@ use io\streams\compress\Algorithm;
 use lang\{Throwable, IllegalArgumentException};
 use peer\URL;
 use peer\http\{HttpConnection, HttpRequest};
-use util\{URI, Authority};
 use util\data\Marshalling;
 use util\log\Traceable;
+use util\{URI, Authority};
 use webservices\rest\io\{Buffered, Reader, Streamed, Traced, Transmission};
 
 /**
  * Entry point class
  *
- * @test  xp://webservices.rest.unittest.EndpointTest
+ * @test  webservices.rest.unittest.EndpointTest
+ * @test  webservices.rest.unittest.ExecuteTest
  */
 class Endpoint implements Traceable {
   protected $base, $formats, $transfer, $marshalling, $connections;
@@ -186,12 +187,15 @@ class Endpoint implements Traceable {
   public function open(RestRequest $request) {
     $target= $this->base->resolve($request->path());
     $conn= $this->connections->__invoke($target);
-    $conn->setConnectTimeout(10);
-    $conn->setTimeout(10);
-    $headers= array_merge($this->headers, $request->headers());
+
+    // Use request timeouts if supplied, otherwise use those of the connection
+    $timeouts= $request->timeouts();
+    isset($timeouts[0]) && $conn->setTimeout($timeouts[0]);
+    isset($timeouts[1]) && $conn->setConnectTimeout($timeouts[1]);
 
     // RFC 6265: When the user agent generates an HTTP request, the user agent
     // MUST NOT attach more than one Cookie header field.
+    $headers= array_merge($this->headers, $request->headers());
     $cookies= (array)$request->header('Cookie');
     foreach ($request->cookies()->validFor($target) as $cookie) {
       $cookies[]= $cookie->name().'='.urlencode($cookie->value());

@@ -3,7 +3,8 @@
 /**
  * REST request
  *
- * @test  xp://webservices.rest.unittest.RestRequestTest
+ * @test  webservices.rest.unittest.RestRequestTest
+ * @test  webservices.rest.unittest.TimeoutTest
  */
 class RestRequest {
   use Headers;
@@ -11,6 +12,7 @@ class RestRequest {
   private $method, $path, $cookies;
   private $parameters= [];
   private $payload= null;
+  private $timeouts= [null, null];
 
   /**
    * Creates a new REST request
@@ -41,6 +43,9 @@ class RestRequest {
 
   /** @return webservices.rest.Payload */
   public function payload() { return $this->payload; }
+
+  /** @return (?float)[] */
+  public function timeouts() { return $this->timeouts; }
 
   /**
    * Uses a given HTTP method
@@ -83,6 +88,18 @@ class RestRequest {
    */
   public function passing($parameters) {
     $this->parameters= $parameters;
+    return $this;
+  }
+
+  /**
+   * Sets timeouts for reading and connecting
+   *
+   * @param  ?float $read
+   * @param  ?float $connect
+   * @return self
+   */
+  public function waiting($read= null, $connect= null) {
+    $this->timeouts= [$read, $connect];
     return $this;
   }
 
