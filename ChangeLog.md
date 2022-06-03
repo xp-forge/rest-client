@@ -3,6 +3,11 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 5.1.0 / 2022-06-03
+
+* Merged PR #24: Add possibility to modify read and connect timeouts
+  (@thekid)
+
 ## 5.0.2 / 2022-03-30
 
 * Fixed exchanging log categories - @thekid
