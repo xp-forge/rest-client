@@ -27,6 +27,11 @@ class FormatsTest {
   }
 
   #[Test]
+  public function supports_json_subtypes_by_default() {
+    Assert::instance(Json::class, Formats::defaults()->named('application/rdap+json'));
+  }
+
+  #[Test]
   public function supports_json_vendor_types_by_default() {
     Assert::instance(Json::class, Formats::defaults()->named('application/vnd.github.v3+json'));
   }

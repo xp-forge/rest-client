@@ -3,6 +3,10 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 5.1.1 / 2022-08-26
+
+* Fix issue #27: Cannot deserialize from application/rdap+json - @thekid
+
 ## 5.1.0 / 2022-06-03
 
 * Merged PR #24: Add possibility to modify read and connect timeouts

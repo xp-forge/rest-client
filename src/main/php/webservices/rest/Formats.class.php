@@ -18,7 +18,7 @@ class Formats {
   public static function defaults() {
     $self= new self();
     $self->matches[NdJson::MIMETYPE]= new NdJson();
-    $self->patterns['#^application/vnd\.(.+)\+json$#']= $self->matches['application/json']= new Json();
+    $self->patterns['#^application/(.+)\+json$#']= $self->matches['application/json']= new Json();
     $self->matches['application/x-www-form-urlencoded']= new FormUrlencoded();
     return $self;
   }
