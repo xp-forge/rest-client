@@ -3,6 +3,10 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 5.2.0 / 2022-09-04
+
+* Merge PR #28: Support segments in TestEndpoint routes - @thekid
+
 ## 5.1.1 / 2022-08-26
 
 * Fix issue #27: Cannot deserialize from application/rdap+json - @thekid
