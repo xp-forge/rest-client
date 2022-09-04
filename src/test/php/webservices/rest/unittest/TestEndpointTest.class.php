@@ -82,6 +82,22 @@ class TestEndpointTest {
   }
 
   #[Test]
+  public function routed_path_with_segment() {
+    $fixture= new TestEndpoint([
+      '/users/{id}' => function($call, $segments) {
+        return $call->respond(200, 'OK', ['Content-Type' => 'application/json'], '{
+          "id": '.$segments['id'].',
+          "handle": "test"
+        }');
+      }
+    ]);
+    $r= $fixture->resource('/users/6100')->get();
+
+    Assert::equals(200, $r->status());
+    Assert::equals(['id' => 6100, 'handle' => 'test'], $r->value());
+  }
+
+  #[Test]
   public function yields_404_for_unrouted_paths() {
     $fixture= new TestEndpoint([]);
     Assert::equals(404, $fixture->resource('/')->get()->status());
