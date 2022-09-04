@@ -86,7 +86,7 @@ class TestEndpointTest {
     $fixture= new TestEndpoint([
       '/users/{id}' => function($call, $segments) {
         return $call->respond(200, 'OK', ['Content-Type' => 'application/json'], '{
-          "id": '.$segments['id'].',
+          "id": '.(int)$segments['id'].',
           "handle": "test"
         }');
       }
