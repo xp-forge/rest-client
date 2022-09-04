@@ -24,7 +24,7 @@ use webservices\rest\io\Transmission;
  * @test  webservices.rest.unittest.TestEndpointTest
  */
 class TestEndpoint extends Endpoint {
-  private $routes;
+  private $routes= [];
 
   /**
    * Creates a new testing endpoint
@@ -34,7 +34,11 @@ class TestEndpoint extends Endpoint {
    */
   public function __construct(array $routes, $base= '/') {
     parent::__construct('http://test.local/'.ltrim($base, '/'), Formats::defaults());
-    $this->routes= $routes;
+    foreach ($routes as $match => $handler) {
+      $p= strpos($match, ' ');
+      $s= preg_replace(['/\{([^:}]+):([^}]+)\}/', '/\{([^}]+)\}/'], ['(?<$1>$2)', '(?<$1>[^/]+)'], $match);
+      $this->routes[false === $p ? '#.+ '.$s.'#' : '#'.$s.'#']= $handler;
+    }
   }
 
   /**
@@ -45,13 +49,13 @@ class TestEndpoint extends Endpoint {
    */
   private function handle($call) {
     $request= $call->request();
-    $resolved= $this->base->resolve($request->path())->path();
-    $handler= $this->routes[$request->method().' '.$resolved]
-      ?? $this->routes[$resolved]
-      ?? function() { return new RestResponse(404, 'No route', []); }
-    ;
 
-    return $handler($call);
+    $match= $request->method().' '.$this->base->resolve($request->path())->path();
+    foreach ($this->routes as $pattern => $handler) {
+      if (preg_match($pattern, $match, $capture)) return $handler($call, $capture);
+    }
+
+    return new RestResponse(404, 'No route '.$match, []);
   }
 
   /**
