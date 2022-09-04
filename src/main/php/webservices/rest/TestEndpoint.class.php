@@ -49,9 +49,8 @@ class TestEndpoint extends Endpoint {
    */
   private function handle($call) {
     $request= $call->request();
-    $resolved= $this->base->resolve($request->path())->path();
 
-    $match= $request->method().' '.$resolved;
+    $match= $request->method().' '.$this->base->resolve($request->path())->path();
     foreach ($this->routes as $pattern => $handler) {
       if (preg_match($pattern, $match, $capture)) return $handler($call, $capture);
     }
