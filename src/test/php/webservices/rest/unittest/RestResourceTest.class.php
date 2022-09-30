@@ -2,6 +2,7 @@
 
 use lang\ElementNotFoundException;
 use unittest\{Assert, Expect, Test, Values};
+use util\URI;
 use webservices\rest\{Cookie, Cookies, Endpoint, RestRequest, RestResource, RestResponse};
 
 class RestResourceTest {
@@ -43,6 +44,22 @@ class RestResourceTest {
   #[Test, Expect(['class' => ElementNotFoundException::class, 'withMessage' => 'No such segment "id"'])]
   public function missing_segment_raises_error() {
     new RestResource($this->endpoint(), '/users/{id}');
+  }
+
+  #[Test]
+  public function uri() {
+    Assert::equals(
+      new URI('https://api.example.com/users'),
+      (new RestResource($this->endpoint(), '/users'))->uri()
+    );
+  }
+
+  #[Test]
+  public function uri_with_segments() {
+    Assert::equals(
+      new URI('https://api.example.com/users/6100/avatar/self'),
+      (new RestResource($this->endpoint(), '/users/{0}/avatar/{1}', [6100, 'self']))->uri()
+    );
   }
 
   #[Test]

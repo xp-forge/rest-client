@@ -1,6 +1,7 @@
 <?php namespace webservices\rest;
 
 use lang\ElementNotFoundException;
+use util\URI;
 
 /**
  * A REST resource, consisting of path at a given endpoint; which can
@@ -55,6 +56,11 @@ class RestResource {
     } while ($offset < $l);
 
     return $target;
+  }
+
+  /** Returns target URI */
+  public function uri(): URI {
+    return $this->endpoint->base()->resolve($this->target);
   }
 
   /**
