@@ -3,6 +3,10 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 5.3.0 / 2022-09-30
+
+* Merge PR #30: Add RestResource::uri() - @thekid
+
 ## 5.2.0 / 2022-09-04
 
 * Merge PR #28: Support segments in TestEndpoint routes - @thekid
