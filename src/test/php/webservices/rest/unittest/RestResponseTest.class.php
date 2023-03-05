@@ -2,7 +2,7 @@
 
 use io\streams\MemoryInputStream;
 use lang\IllegalStateException;
-use unittest\{Assert, Expect, Test, Values};
+use test\{Assert, Expect, Test, Values};
 use util\URI;
 use util\data\Marshalling;
 use webservices\rest\format\{Json, Unsupported};
@@ -40,7 +40,7 @@ class RestResponseTest {
     new RestResponse(200, 'OK', ...$this->json('{}'));
   }
 
-  #[Test, Values(eval: '["http://localhost/", new URI("http://localhost/")])]')]
+  #[Test, Values(eval: '["http://localhost/", new URI("http://localhost/")]')]
   public function can_create_with_uri($uri) {
     new RestResponse(200, 'OK', [], null, $uri);
   }
@@ -162,7 +162,7 @@ class RestResponseTest {
     Assert::equals(['key' => 'value'], (new RestResponse(200, 'OK', ...$this->json('{"key":"value"}')))->value());
   }
 
-  #[Test, Expect(class: UnexpectedStatus::class, withMessage: 'Unexpected 400 (Bad Request)')]
+  #[Test, Expect(class: UnexpectedStatus::class, message: 'Unexpected 400 (Bad Request)')]
   public function value_on_error() {
     (new RestResponse(400, 'Bad Request', ...$this->json('{"message":"Error"}')))->value();
   }
@@ -237,7 +237,7 @@ class RestResponseTest {
     ]));
   }
 
-  #[Test, Expect(class: UnexpectedStatus::class, withMessage: 'Unexpected 503 (Service Unavailable)')]
+  #[Test, Expect(class: UnexpectedStatus::class, message: 'Unexpected 503 (Service Unavailable)')]
   public function match_on_unhandled() {
     (new RestResponse(503, 'Service Unavailable', ...$this->json('{"error":"Database down"}')))->match([
       200 => function($response) { return $response->value(); },

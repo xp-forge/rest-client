@@ -1,6 +1,6 @@
 <?php namespace webservices\rest\unittest;
 
-use unittest\{Assert, Test, Values};
+use test\{Assert, Test, Values};
 use webservices\rest\RestRequest;
 
 class RestRequestTest {

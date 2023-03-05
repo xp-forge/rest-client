@@ -1,7 +1,7 @@
 <?php namespace webservices\rest\unittest;
 
 use peer\http\HttpConnection;
-use unittest\{Assert, Before, Test};
+use test\{Assert, Before, Test};
 use webservices\rest\{Endpoint, RestRequest};
 
 class TimeoutTest {

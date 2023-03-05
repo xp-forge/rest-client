@@ -2,8 +2,8 @@
 
 use io\streams\{Compression, MemoryInputStream};
 use peer\http\HttpResponse;
-use unittest\actions\ExtensionAvailable;
-use unittest\{Action, Assert, Before, Test, Values};
+use test\verify\Runtime;
+use test\{Action, Assert, Before, Test, Values};
 use webservices\rest\Endpoint;
 use webservices\rest\io\Transmission;
 
@@ -40,12 +40,12 @@ class CompressionHandlingTest {
     $this->endpoint= new Endpoint('http://api.example.com');
   }
 
-  #[Test, Action(eval: 'new ExtensionAvailable("zlib")')]
+  #[Test, Runtime(extensions: ['zlib'])]
   public function accept_includes_gzip() {
     Assert::notEquals('', strstr($this->endpoint->headers()['Accept-Encoding'], 'gzip'));
   }
 
-  #[Test, Action(eval: 'new ExtensionAvailable("brotli")')]
+  #[Test, Runtime(extensions: ['brotli'])]
   public function accept_includes_brotli() {
     Assert::notEquals('', strstr($this->endpoint->headers()['Accept-Encoding'], 'br'));
   }
@@ -71,7 +71,7 @@ class CompressionHandlingTest {
     Assert::false(isset($this->endpoint->headers()['Accept-Encoding']));
   }
 
-  #[Test, Values([1, 6, 9]), Action(eval: 'new ExtensionAvailable("zlib")')]
+  #[Test, Values([1, 6, 9]), Runtime(extensions: ['zlib'])]
   public function gzip($level) {
     $response= $this->response(
       ['Content-Type' => 'application/json', 'Content-Encoding' => 'gzip'],
@@ -80,7 +80,7 @@ class CompressionHandlingTest {
     Assert::equals(['result' => true], $response->value());
   }
 
-  #[Test, Values([0, 6, 11]), Action(eval: 'new ExtensionAvailable("brotli")')]
+  #[Test, Values([0, 6, 11]), Runtime(extensions: ['brotli'])]
   public function brotli($level) {
     $response= $this->response(
       ['Content-Type' => 'application/json', 'Content-Encoding' => 'br'],

@@ -2,7 +2,7 @@
 
 use lang\{Error, FormatException, IllegalArgumentException};
 use peer\URL;
-use unittest\{Assert, Expect, Test, Values};
+use test\{Assert, Expect, Test, Values};
 use util\URI;
 use webservices\rest\{Endpoint, RestResource};
 
