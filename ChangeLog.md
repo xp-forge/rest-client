@@ -3,17 +3,19 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #31: Migrate to new testing library - @thekid
+
 ## 5.3.0 / 2022-09-30
 
-* Merge PR #30: Add RestResource::uri() - @thekid
+* Merged PR #30: Add RestResource::uri() - @thekid
 
 ## 5.2.0 / 2022-09-04
 
-* Merge PR #28: Support segments in TestEndpoint routes - @thekid
+* Merged PR #28: Support segments in TestEndpoint routes - @thekid
 
 ## 5.1.1 / 2022-08-26
 
-* Fix issue #27: Cannot deserialize from application/rdap+json - @thekid
+* Fixed issue #27: Cannot deserialize from application/rdap+json - @thekid
 
 ## 5.1.0 / 2022-06-03
 
