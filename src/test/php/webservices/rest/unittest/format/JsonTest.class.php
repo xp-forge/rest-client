@@ -1,8 +1,8 @@
 <?php namespace webservices\rest\unittest\format;
 
 use io\streams\{MemoryInputStream, MemoryOutputStream};
-use unittest\Assert;
-use unittest\{Test, TestCase, Values};
+use test\Assert;
+use test\{Test, TestCase, Values};
 use webservices\rest\format\Json;
 
 class JsonTest {

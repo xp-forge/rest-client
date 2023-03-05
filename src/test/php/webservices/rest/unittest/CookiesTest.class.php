@@ -1,7 +1,7 @@
 <?php namespace webservices\rest\unittest;
 
 use lang\ElementNotFoundException;
-use unittest\{Assert, Test};
+use test\{Assert, Test};
 use webservices\rest\{Cookie, Cookies};
 
 class CookiesTest {

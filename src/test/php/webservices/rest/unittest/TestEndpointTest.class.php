@@ -1,8 +1,8 @@
 <?php namespace webservices\rest\unittest;
 
 use io\streams\MemoryInputStream;
-use unittest\{Assert, Test, Values};
-use webservices\rest\{TestEndpoint, RestResponse};
+use test\{Assert, Test, Values};
+use webservices\rest\{RestResponse, TestEndpoint};
 
 class TestEndpointTest {
 

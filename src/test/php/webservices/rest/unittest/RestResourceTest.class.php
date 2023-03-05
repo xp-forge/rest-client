@@ -1,7 +1,7 @@
 <?php namespace webservices\rest\unittest;
 
 use lang\ElementNotFoundException;
-use unittest\{Assert, Expect, Test, Values};
+use test\{Assert, Expect, Test, Values};
 use util\URI;
 use webservices\rest\{Cookie, Cookies, Endpoint, RestRequest, RestResource, RestResponse};
 
@@ -41,7 +41,7 @@ class RestResourceTest {
     new RestResource($this->endpoint(), '/users/{0}', [6100]);
   }
 
-  #[Test, Expect(['class' => ElementNotFoundException::class, 'withMessage' => 'No such segment "id"'])]
+  #[Test, Expect(class: ElementNotFoundException::class, message: 'No such segment "id"')]
   public function missing_segment_raises_error() {
     new RestResource($this->endpoint(), '/users/{id}');
   }
@@ -119,7 +119,7 @@ class RestResourceTest {
     Assert::equals([(new RestRequest('GET', '/users'))->with($headers)], $endpoint->sent);
   }
 
-  #[Test, Values('cookies')]
+  #[Test, Values(from: 'cookies')]
   public function including_cookies($cookies) {
     $endpoint= $this->endpoint();
     $resource= new RestResource($endpoint, '/users');

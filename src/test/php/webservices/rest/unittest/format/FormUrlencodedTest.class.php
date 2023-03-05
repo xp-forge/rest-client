@@ -1,8 +1,8 @@
 <?php namespace webservices\rest\unittest\format;
 
 use io\streams\{MemoryInputStream, MemoryOutputStream};
-use unittest\Assert;
-use unittest\{Test, TestCase};
+use test\Assert;
+use test\{Test, TestCase};
 use webservices\rest\format\FormUrlencoded;
 
 class FormUrlencodedTest {

@@ -4,7 +4,7 @@ use io\streams\MemoryInputStream;
 use lang\ClassLoader;
 use peer\ConnectException;
 use peer\http\{Authorization, HttpConnection, HttpRequest, HttpResponse};
-use unittest\{Assert, Expect, Test};
+use test\{Assert, Expect, Test, Values};
 use util\log\layout\PatternLayout;
 use util\log\{Appender, Logging, LoggingEvent};
 use webservices\rest\{Endpoint, RestException, RestUpload};
