@@ -9,7 +9,7 @@ use peer\http\{HttpConnection, HttpRequest};
 use util\data\Marshalling;
 use util\log\Traceable;
 use util\{URI, Authority};
-use webservices\rest\io\{Buffered, Reader, Transfer, Streamed, Traced, Transmission};
+use webservices\rest\io\{Buffered, Reader, Transfer, Streamed, Transmission};
 
 /**
  * Entry point class
@@ -76,7 +76,7 @@ class Endpoint implements Traceable {
    * @param  webservices.rest.io.Transfer $transfer
    * @return self
    */
-  public function using($transfer) {
+  public function using(Transfer $transfer) {
     $this->transfer= $transfer;
     return $this;
   }
