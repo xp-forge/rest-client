@@ -11,9 +11,9 @@ class FormatsTest {
     new Formats();
   }
 
-  #[Test]
-  public function supports_json_by_default() {
-    Assert::instance(Json::class, Formats::defaults()->named('application/json'));
+  #[Test, Values(['application/json', 'text/json'])]
+  public function supports_json_by_default($mime) {
+    Assert::instance(Json::class, Formats::defaults()->named($mime));
   }
 
   #[Test]
