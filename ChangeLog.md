@@ -5,7 +5,9 @@ Rest client change log
 
 ## 5.4.0 / 2023-06-12
 
-* Merged PR #33: Support "text/json" in addition to the correct "application/json"
+* Merged PR #33: Support "text/json" mimetype in addition to the correct
+  "application/json", see https://stackoverflow.com/a/69518701
+  (@thekid)
 * Merged PR #31: Migrate to new testing library - @thekid
 
 ## 5.3.0 / 2022-09-30
