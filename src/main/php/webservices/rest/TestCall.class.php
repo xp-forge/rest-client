@@ -5,7 +5,7 @@ use util\data\Marshalling;
 use webservices\rest\io\{Reader, Transmission};
 
 class TestCall extends Transmission {
-  private $request, $formats, $marshalling;
+  private $formats, $marshalling;
   public $transfer= null;
 
   /** Creates a new call */
