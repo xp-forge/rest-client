@@ -12,7 +12,7 @@
     "xp-framework/tokenize": "^9.0 | ^8.0",
     "xp-forge/json": "^5.0 | ^4.0 | ^3.1",
     "xp-forge/uri": "^2.0 | ^1.3",
-    "xp-forge/marshalling": "^1.0",
+    "xp-forge/marshalling": "^2.0 | ^1.0",
     "xp-forge/compression": "^1.0",
     "php": ">=7.0.0"
   },
