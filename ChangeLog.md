@@ -3,6 +3,8 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 5.4.0 / 2023-09-24
+
 * Added compatibility with `xp-forge/marshalling` v2.0.0 - @thekid
 * Fixed *Creation of dynamic property [...] is deprecated* - @thekid
 * Merged PR #31: Migrate to new testing library - @thekid
