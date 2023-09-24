@@ -3,6 +3,7 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+* Fixed *Creation of dynamic property [...] is deprecated* - @thekid
 * Merged PR #31: Migrate to new testing library - @thekid
 
 ## 5.3.0 / 2022-09-30
