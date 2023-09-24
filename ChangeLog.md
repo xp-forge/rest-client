@@ -3,6 +3,8 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+* Fixed *Creation of dynamic property [...] is deprecated* - @thekid
+
 ## 5.4.0 / 2023-06-12
 
 * Merged PR #33: Support "text/json" mimetype in addition to the correct
