@@ -9,7 +9,7 @@ use peer\http\{HttpConnection, HttpRequest};
 use util\data\Marshalling;
 use util\log\Traceable;
 use util\{URI, Authority};
-use webservices\rest\io\{Buffered, Reader, Streamed, Traced, Transmission};
+use webservices\rest\io\{Buffered, Reader, Transfer, Streamed, Transmission};
 
 /**
  * Entry point class
@@ -64,10 +64,21 @@ class Endpoint implements Traceable {
     ;
 
     $this->formats= $formats ?: Formats::defaults();
-    $this->transfer= new Streamed($this);
+    $this->transfer= new Streamed();
     $this->marshalling= new Marshalling();
     $this->connections= function($uri) { return new HttpConnection($uri); };
     $this->compressing($compressing ?? Compression::algorithms()->supported());
+  }
+
+  /**
+   * Use given transfer method, which defaults to streaming.
+   *
+   * @param  webservices.rest.io.Transfer $transfer
+   * @return self
+   */
+  public function using(Transfer $transfer) {
+    $this->transfer= $transfer;
+    return $this;
   }
 
   /**
@@ -80,7 +91,7 @@ class Endpoint implements Traceable {
    * @return self
    */
   public function buffered() {
-    $this->transfer= new Buffered($this);
+    $this->transfer= new Buffered();
     return $this;
   }
 
@@ -169,13 +180,7 @@ class Endpoint implements Traceable {
    * @return void
    */
   public function setTrace($cat) {
-    if (null === $cat) {
-      $this->transfer= $this->transfer->untraced();
-    } else if ($this->transfer instanceof Traced) {
-      $this->transfer->use($cat);
-    } else {
-      $this->transfer= new Traced($this->transfer, $cat);
-    }
+    $this->cat= $cat;
   }
 
   /**
@@ -207,7 +212,8 @@ class Endpoint implements Traceable {
     $s->setTarget($target->path());
     $s->addHeaders($headers);
     $s->setParameters($request->parameters());
-    return $this->transfer->transmission($conn, $s, $target);
+
+    return new Transmission($conn, $s, $target, $this->transfer, $this->cat);
   }
 
   /**
@@ -220,9 +226,14 @@ class Endpoint implements Traceable {
   public function finish(Transmission $transmission) {
     try {
       $r= $transmission->finish();
-      $output= $this->formats->named($r->header('Content-Type')[0] ?? null);
-      $reader= $this->transfer->reader($r, $output, $this->marshalling);
-      return new RestResponse($r->statusCode(), $r->message(), $r->headers(), $reader, $transmission->target);
+      $in= $transmission->stream($r);
+      return new RestResponse(
+        $r->statusCode(),
+        $r->message(),
+        $r->headers(),
+        new Reader($in, $this->formats->named($r->header('Content-Type')[0] ?? null), $this->marshalling),
+        $transmission->target
+      );
     } catch (Throwable $e) {
       throw new RestException('Cannot send request', $e);
     }
@@ -236,7 +247,15 @@ class Endpoint implements Traceable {
    * @throws webservices.rest.RestException
    */
   public function execute(RestRequest $request) {
-    $input= $this->formats->named($request->header('Content-Type'));
-    return $this->transfer->writer($request, $input, $this->marshalling);
+    $transmission= $this->open($request);
+
+    if ($payload= $request->payload()) {
+      $transmission->transmit(
+        $this->marshalling->marshal($payload->value()),
+        $this->formats->named($request->header('Content-Type'))
+      );
+    }
+
+    return $this->finish($transmission);
   }
 }
