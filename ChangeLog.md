@@ -3,6 +3,8 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+* Added PHP 8.4 to the test matrix - @thekid
+
 ## 5.5.0 / 2023-09-24
 
 * Added compatibility with `xp-forge/marshalling` v2.0.0 - @thekid
