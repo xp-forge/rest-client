@@ -37,7 +37,7 @@ class Endpoint implements Traceable {
    * @param  ?string|io.streams.compress.Algorithm|string[]|io.streams.compress.Algorithm[]|iterable $compressing
    * @throws lang.IllegalArgumentException if URI does not have an authority
    */
-  public function __construct($base, Formats $formats= null, $compressing= null) {
+  public function __construct($base, $formats= null, $compressing= null) {
     if ($base instanceof URI) {
       $uri= $base;
     } else if ($base instanceof URL) {

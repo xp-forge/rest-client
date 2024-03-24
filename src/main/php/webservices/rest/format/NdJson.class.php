@@ -15,9 +15,9 @@ class NdJson extends Format {
   /**
    * Constructor
    *
-   * @param  text.json.Format $format Optional wire format, defaults to *dense*
+   * @param  ?text.json.Format $format Optional wire format, defaults to *dense*
    */
-  public function __construct(WireFormat $format= null) {
+  public function __construct($format= null) {
     $this->format= $format ?: WireFormat::dense();
   }
 

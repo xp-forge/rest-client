@@ -5,7 +5,7 @@ use text\json\{Format as WireFormat, StreamInput, StreamOutput};
 /**
  * Represents `application/json`
  *
- * @test  xp://webservices.rest.unittest.format.JsonTest
+ * @test  webservices.rest.unittest.format.JsonTest
  */
 class Json extends Format {
   private $format;
@@ -13,9 +13,9 @@ class Json extends Format {
   /**
    * Constructor
    *
-   * @param  text.json.Format $format Optional wire format, defaults to *dense*
+   * @param  ?text.json.Format $format Optional wire format, defaults to *dense*
    */
-  public function __construct(WireFormat $format= null) {
+  public function __construct($format= null) {
     $this->format= $format ?: WireFormat::dense();
   }
 
