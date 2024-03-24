@@ -21,10 +21,10 @@ class RestResponse implements Value {
    * @param  int $status
    * @param  string $message
    * @param  [:string|string[]] $headers
-   * @param  webservices.rest.io.Reader $reader
+   * @param  ?webservices.rest.io.Reader $reader
    * @param  string|?util.URI $uri The request URI, if available
    */
-  public function __construct($status, $message, $headers= [], Reader $reader= null, $uri= null) {
+  public function __construct($status, $message, $headers= [], $reader= null, $uri= null) {
     $this->status= $status;
     $this->message= $message;
     $this->reader= $reader;

@@ -95,7 +95,7 @@ class Links implements Value {
    * @param  ?[:string] $search If omitted, all links are returned
    * @return iterable
    */
-  public function all(array $search= null) {
+  public function all($search= null) {
     if (null === $search) {
       foreach ($this->links as $link) {
         yield $link;

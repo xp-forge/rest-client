@@ -9,7 +9,7 @@ class TestCall extends Transmission {
   public $transfer= null;
 
   /** Creates a new call */
-  public function __construct(RestRequest $request, Formats $formats, Marshalling $marshalling= null) {
+  public function __construct(RestRequest $request, Formats $formats, $marshalling= null) {
     $this->request= $request;
     $this->formats= $formats;
     $this->marshalling= $marshalling ?? new Marshalling();
