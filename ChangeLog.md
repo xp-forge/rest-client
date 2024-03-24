@@ -3,6 +3,10 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 5.6.0 / 2024-03-24
+
+* Made compatible with XP 12 - @thekid
+
 * Added PHP 8.4 to the test matrix - @thekid
 
 ## 5.5.0 / 2023-09-24
