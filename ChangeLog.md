@@ -3,6 +3,8 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 5.6.1 / 2024-10-05
+
 * Ensured URL segments are encoded correctly - @thekid
 
 ## 5.6.0 / 2024-03-24
