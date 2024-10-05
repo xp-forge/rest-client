@@ -3,6 +3,8 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+* Ensure URL segments are encoded correctly - @thekid
+
 ## 5.6.0 / 2024-03-24
 
 * Made compatible with XP 12 - @thekid
