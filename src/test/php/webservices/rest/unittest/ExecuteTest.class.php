@@ -103,6 +103,42 @@ class ExecuteTest {
     );
   }
 
+  #[Test]
+  public function segment_is_raw_urlencoded() {
+    $resource= $this->newFixture()->resource('/users/{0}', ['test it']);
+    Assert::equals(
+      "GET /users/test%20it HTTP/1.1\r\nConnection: close\r\nHost: test\r\n\r\n",
+      $resource->get()->content()
+    );
+  }
+
+  #[Test]
+  public function param_is_urlencoded() {
+    $resource= $this->newFixture()->resource('/users');
+    Assert::equals(
+      "GET /users?filter=test+it HTTP/1.1\r\nConnection: close\r\nHost: test\r\n\r\n",
+      $resource->get(['filter' => 'test it'])->content()
+    );
+  }
+
+  #[Test]
+  public function param_in_path_is_urlencoded() {
+    $resource= $this->newFixture()->resource('/users?filter={0}', ['test it']);
+    Assert::equals(
+      "GET /users?filter=test+it HTTP/1.1\r\nConnection: close\r\nHost: test\r\n\r\n",
+      $resource->get()->content()
+    );
+  }
+
+  #[Test]
+  public function raw_urlencoded_path_left_as_is() {
+    $resource= $this->newFixture()->resource('/users/test%20it');
+    Assert::equals(
+      "GET /users/test%20it HTTP/1.1\r\nConnection: close\r\nHost: test\r\n\r\n",
+      $resource->get()->content()
+    );
+  }
+
   #[Test, Values(['POST', 'PUT'])]
   public function upload($method) {
     $response= $this->newFixture()->resource('/test')->upload($method)

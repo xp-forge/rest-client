@@ -204,7 +204,7 @@ class Endpoint implements Traceable {
 
     $s= $conn->create(new HttpRequest());
     $s->setMethod($request->method());
-    $s->setTarget($target->path());
+    $s->setTarget($target->path(false));
     $s->addHeaders($headers);
     $s->setParameters($request->parameters());
     return $this->transfer->transmission($conn, $s, $target);
