@@ -1,6 +1,6 @@
 <?php namespace webservices\rest;
 
-use io\streams\{InputStream, MemoryInputStream};
+use io\streams\{InputStream, MemoryInputStream, MemoryOutputStream};
 use util\data\Marshalling;
 use webservices\rest\io\{Reader, Transmission};
 
@@ -17,6 +17,20 @@ class TestCall extends Transmission {
 
   /** Returns the request associated with this call */
   public function request(): RestRequest { return $this->request; }
+
+  /** @return var */
+  public function content() {
+    if (null !== $this->transfer) {
+      return $this->transfer;
+    } else if ($payload= $this->request->payload()) {
+      $stream= new MemoryOutputStream();
+      $output= $this->formats->named($this->request->header('Content-Type') ?? null);
+      $output->serialize($this->marshalling->marshal($payload->value()), $stream);
+      return $stream->bytes();
+    } else {
+      return null;
+    }
+  }
 
   /**
    * Writes given bytes
