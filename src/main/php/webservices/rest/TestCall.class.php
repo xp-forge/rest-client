@@ -18,6 +18,14 @@ class TestCall extends Transmission {
   /** Returns the request associated with this call */
   public function request(): RestRequest { return $this->request; }
 
+  /** @return var */
+  public function payload() {
+    if ($payload= $this->request->payload()) {
+      return $this->marshalling->marshal($payload->value());
+    }
+    return null;
+  }
+
   /**
    * Writes given bytes
    *

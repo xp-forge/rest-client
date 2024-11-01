@@ -4,6 +4,7 @@ use lang\{Error, FormatException, IllegalArgumentException};
 use peer\URL;
 use test\{Assert, Expect, Test, Values};
 use util\URI;
+use util\data\Marshalling;
 use webservices\rest\{Endpoint, RestResource};
 
 class EndpointTest {
@@ -37,6 +38,11 @@ class EndpointTest {
   #[Test, Values([['http://localhost', null], ['http://localhost:8080', 8080]])]
   public function port($base, $expected) {
     Assert::equals($expected, $this->newFixture($base)->base()->port());
+  }
+
+  #[Test]
+  public function marshalling() {
+    Assert::instance(Marshalling::class, $this->newFixture()->marshalling);
   }
 
   #[Test]

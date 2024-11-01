@@ -102,4 +102,18 @@ class TestEndpointTest {
     $fixture= new TestEndpoint([]);
     Assert::equals(404, $fixture->resource('/')->get()->status());
   }
+
+  #[Test]
+  public function payload() {
+    $fixture= new TestEndpoint([
+      'POST /users' => function($call) {
+        return $call->respond(201, 'Created', ['Location' => '/users/'.md5($call->payload()['name'])]);
+      }
+    ]);
+    $r= $fixture->resource('/users')->post(['name' => 'Test']);
+
+    Assert::equals(201, $r->status());
+    Assert::equals('/users/'.md5('Test'), $r->headers()['Location']);
+  }
+
 }

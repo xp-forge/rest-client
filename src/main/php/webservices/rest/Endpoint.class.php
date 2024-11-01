@@ -18,7 +18,8 @@ use webservices\rest\io\{Buffered, Reader, Streamed, Traced, Transmission};
  * @test  webservices.rest.unittest.ExecuteTest
  */
 class Endpoint implements Traceable {
-  protected $base, $formats, $transfer, $marshalling, $connections;
+  public $marshalling;
+  protected $base, $formats, $transfer, $connections;
   private $headers= [];
   private $cat= null;
 
