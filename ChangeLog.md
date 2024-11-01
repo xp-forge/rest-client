@@ -3,6 +3,14 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 5.7.0 / 2024-11-01
+
+* Made *marshalling* member of `webservices.rest.Endpoint` public in order
+  to be able to register user type mappings, see xp-forge/marshalling#7
+  (@thekid)
+* Merged PR #34: Add `TestCall::content()` which returns marshalled payload
+  (@thekid)
+
 ## 5.6.1 / 2024-10-05
 
 * Ensured URL segments are encoded correctly - @thekid
