@@ -3,6 +3,10 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 5.8.0 / 2025-01-18
+
+* Made this library compatible with `xp-forge/uri`, version 3.0+ (@thekid)
+
 ## 5.7.0 / 2024-11-01
 
 * Made *marshalling* member of `webservices.rest.Endpoint` public in order
