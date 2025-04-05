@@ -80,7 +80,7 @@ class Traced extends Transfer {
 
   public function reader($response, $format, $marshalling) {
     $this->cat->info('<<<', substr($response->getHeaderString(), 0, -2));
-    $bytes= Streams::readAll($response->in());
+    $bytes= Streams::readAll($this->in($response));
     $this->cat->debug($bytes);
 
     return new Reader(new MemoryInputStream($bytes), $format, $marshalling);

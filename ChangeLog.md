@@ -3,6 +3,10 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 5.8.1 / 2025-04-05
+
+* Fixed logging output with compressed HTTP responses (@thekid)
+
 ## 5.8.0 / 2025-01-18
 
 * Made this library compatible with `xp-forge/uri`, version 3.0+ (@thekid)

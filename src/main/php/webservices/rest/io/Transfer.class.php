@@ -6,6 +6,20 @@ use lang\MethodNotImplementedException;
 abstract class Transfer {
   protected $endpoint;
 
+  /**
+   * Returns stream, handling compression
+   *
+   * @param  webservices.rest.RestResponse
+   * @return io.streams.InputStream
+   */
+  protected function in($response) {
+    if ($encoding= $response->header('Content-Encoding')) {
+      return Compression::named($encoding[0])->open($response->in());
+    } else {
+      return $response->in();
+    }
+  }
+
   /** @param webservices.rest.Endpoint */
   public function __construct($endpoint) { $this->endpoint= $endpoint; }
 
@@ -35,12 +49,6 @@ abstract class Transfer {
   }
 
   public function reader($response, $format, $marshalling) {
-    if ($encoding= $response->header('Content-Encoding')) {
-      $in= Compression::named($encoding[0])->open($response->in());
-    } else {
-      $in= $response->in();
-    }
-
-    return new Reader($in, $format, $marshalling);
+    return new Reader($this->in($response), $format, $marshalling);
   }
 }
