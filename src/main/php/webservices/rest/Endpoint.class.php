@@ -67,7 +67,7 @@ class Endpoint implements Traceable {
     $this->formats= $formats ?: Formats::defaults();
     $this->transfer= new Streamed($this);
     $this->marshalling= new Marshalling();
-    $this->connections= function($uri) { return new HttpConnection($uri); };
+    $this->connections= fn($uri) => new HttpConnection($uri);
     $this->compressing($compressing ?? Compression::algorithms()->supported());
   }
 

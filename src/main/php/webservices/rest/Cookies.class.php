@@ -119,7 +119,7 @@ class Cookies implements Value, IteratorAggregate {
 
     // RFC 6265: The user agent SHOULD sort the cookie-list in the following order:
     // Cookies with longer paths are listed before cookies with shorter paths.
-    uksort($this->list, function($a, $b) { return strlen($b) - strlen($a); });
+    uksort($this->list, fn($a, $b) => strlen($b) - strlen($a));
     return $this;
   }
 
