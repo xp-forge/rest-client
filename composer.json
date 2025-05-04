@@ -8,11 +8,11 @@
   "require" : {
     "xp-framework/core": "^12.0 | ^11.0 | ^10.0",
     "xp-framework/http": "^10.0 | ^9.1",
-    "xp-framework/logging": "^11.0 | ^10.0 | ^9.0 | ^8.0 | ^7.0",
+    "xp-framework/logging": "^11.0 | ^10.0",
     "xp-framework/tokenize": "^9.0 | ^8.0",
-    "xp-forge/json": "^5.0 | ^4.0 | ^3.1",
-    "xp-forge/uri": "^3.0 | ^2.0 | ^1.3",
-    "xp-forge/marshalling": "^2.0 | ^1.0",
+    "xp-forge/json": "^6.0 | ^5.0",
+    "xp-forge/uri": "^3.0 | ^2.0",
+    "xp-forge/marshalling": "^2.0",
     "xp-forge/compression": "^1.0",
     "php": ">=7.4.0"
   },
