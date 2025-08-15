@@ -57,6 +57,11 @@ class CompressionHandlingTest {
     Assert::notEquals('', strstr($this->endpoint->headers()['Accept-Encoding'], 'br'));
   }
 
+  #[Test, Runtime(extensions: ['zstd'])]
+  public function accept_includes_zstd() {
+    Assert::notEquals('', strstr($this->endpoint->headers()['Accept-Encoding'], 'zstd'));
+  }
+
   #[Test]
   public function sets_accept_encoding_header() {
     $this->endpoint->compressing(['gzip', 'br']);
