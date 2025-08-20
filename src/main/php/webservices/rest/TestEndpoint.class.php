@@ -64,8 +64,8 @@ class TestEndpoint extends Endpoint {
    * @param  webservices.rest.RestRequest $request
    * @return webservices.rest.io.Transmission
    */
-  public function open(RestRequest $req) {
-    return new TestCall($req, $this->formats, $this->marshalling);
+  public function open(RestRequest $request) {
+    return new TestCall($request->with($this->headers()), $this->formats, $this->marshalling);
   }
 
   /**
@@ -87,6 +87,6 @@ class TestEndpoint extends Endpoint {
    * @throws webservices.rest.RestException
    */
   public function execute(RestRequest $request) {
-    return $this->handle(new TestCall($request, $this->formats, $this->marshalling));
+    return $this->handle(new TestCall($request->with($this->headers()), $this->formats, $this->marshalling));
   }
 }

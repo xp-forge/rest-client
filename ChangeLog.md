@@ -3,6 +3,11 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 6.1.1 / 2025-08-20
+
+* Fixed endpoint headers not correctly being passed to testing endpoints
+  (@thekid)
+
 ## 6.1.0 / 2025-08-15
 
 * Added compatibility with `xp-forge/compression` version 2.0+, enabling

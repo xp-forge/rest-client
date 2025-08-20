@@ -117,4 +117,29 @@ class TestEndpointTest {
     Assert::equals('/users/'.md5('Test'), $r->headers()['Location']);
   }
 
+  #[Test]
+  public function endoint_headers_passed() {
+    $fixture= new TestEndpoint([
+      'DELETE /users/{id}' => function($call) use(&$passed) {
+        $passed= $call->request()->headers();
+        return $call->respond(204, 'No Content');
+      }
+    ]);
+    $r= $fixture->with(['Mcp-Session-Id' => '6100'])->resource('/users/1')->delete();
+
+    Assert::equals('6100', $passed['Mcp-Session-Id']);
+  }
+
+  #[Test]
+  public function resource_headers_passed() {
+    $fixture= new TestEndpoint([
+      'DELETE /users/{id}' => function($call) use(&$passed) {
+        $passed= $call->request()->headers();
+        return $call->respond(204, 'No Content');
+      }
+    ]);
+    $r= $fixture->resource('/users/1')->with(['Mcp-Session-Id' => '6100'])->delete();
+
+    Assert::equals('6100', $passed['Mcp-Session-Id']);
+  }
 }
