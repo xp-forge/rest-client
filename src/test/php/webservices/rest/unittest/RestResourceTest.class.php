@@ -8,8 +8,8 @@ use webservices\rest\{Cookie, Cookies, Endpoint, RestRequest, RestResource, Rest
 class RestResourceTest {
 
   /** @return webservices.rest.Endpoint */
-  private function endpoint() {
-    return new class('https://api.example.com/') extends Endpoint {
+  private function endpoint($base= 'https://api.example.com/') {
+    return new class($base) extends Endpoint {
       public $sent= [];
       public function execute(RestRequest $request) {
         $this->sent[]= $request;
@@ -51,6 +51,14 @@ class RestResourceTest {
     Assert::equals(
       new URI('https://api.example.com/users'),
       (new RestResource($this->endpoint(), '/users'))->uri()
+    );
+  }
+
+  #[Test, Values(['https://api.example.com/', 'https://api.example.com/services/mcp', 'https://api.example.com/services/mcp/'])]
+  public function base_resource($base) {
+    Assert::equals(
+      new URI($base),
+      (new RestResource($this->endpoint($base)))->uri()
     );
   }
 
