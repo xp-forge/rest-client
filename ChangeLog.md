@@ -3,6 +3,12 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 6.2.0 / 2026-02-22
+
+* Merged PR #36: Add `RestResponse::ok()` which return a boolean stating
+  whether the response was successful (status in the range 200-299) or not.
+  (@thekid)
+
 ## 6.1.1 / 2025-08-20
 
 * Fixed endpoint headers not correctly being passed to testing endpoints
