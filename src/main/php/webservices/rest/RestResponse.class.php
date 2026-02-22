@@ -43,6 +43,9 @@ class RestResponse implements Value {
   /** @return int */
   public function status() { return $this->status; }
 
+  /** @return bool */
+  public function ok() { return $this->status >= 200 && $this->status <= 299; }
+
   /** @return string */
   public function message() { return $this->message; }
 

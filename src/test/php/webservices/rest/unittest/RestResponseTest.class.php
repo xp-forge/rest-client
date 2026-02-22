@@ -50,6 +50,11 @@ class RestResponseTest {
     Assert::equals(200, (new RestResponse(200, 'OK'))->status());
   }
 
+  #[Test, Values([[200, true], [202, true], [299, true], [100, false], [300, false], [400, false]])]
+  public function ok($status, $expected) {
+    Assert::equals($expected, (new RestResponse($status, 'Status #'.$status))->ok());
+  }
+
   #[Test]
   public function message() {
     Assert::equals('OK', (new RestResponse(200, 'OK'))->message());
