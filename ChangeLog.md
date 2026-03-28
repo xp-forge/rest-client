@@ -3,6 +3,9 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #37: Add `RestUpload::waiting()` to set connect and read timeouts
+  (@thekid)
+
 ## 6.2.0 / 2026-02-22
 
 * Merged PR #36: Add `RestResponse::ok()` which return a boolean stating
