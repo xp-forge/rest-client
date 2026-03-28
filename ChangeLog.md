@@ -3,6 +3,8 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 6.3.0 / 2026-03-28
+
 * Merged PR #38: Add `with($headers)` and `including($cookies)` to RestUpload
   (@thekid)
 * Merged PR #37: Add `RestUpload::waiting()` to set connect and read timeouts
