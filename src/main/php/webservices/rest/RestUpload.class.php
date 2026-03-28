@@ -35,6 +35,28 @@ class RestUpload {
     return $this;
   }
 
+  /**
+   * Adds given headers
+   *
+   * @param  [:string] $headers
+   * @return self
+   */
+  public function with($headers) {
+    $this->request->add($headers);
+    return $this;
+  }
+
+  /**
+   * Includes given cookies
+   *
+   * @param  [:?string]|webservices.rest.Cookie[]|webservices.rest.Cookies $cookies
+   * @return self
+   */
+  public function including($cookies) {
+    $this->request->including($cookies);
+    return $this;
+  }
+
   /** @return webservices.rest.io.Parts */
   public function open() {
     return new Parts(self::BOUNDARY, $this->endpoint->open($this->request->with([

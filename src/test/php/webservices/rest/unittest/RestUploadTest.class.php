@@ -51,6 +51,50 @@ class RestUploadTest {
   }
 
   #[Test]
+  public function with_headers() {
+    $upload= new RestUpload($this->newEndpoint(), new RestRequest('POST', '/'));
+    $upload->with(['X-Test' => 'true'])->pass('name', 'Test');
+
+    Assert::equals(
+      "POST / HTTP/1.1\r\n".
+      "Connection: close\r\n".
+      "Host: test\r\n".
+      "X-Test: true\r\n".
+      "Content-Type: multipart/form-data; boundary=---------------boundary1xp6132872336bc4\r\n".
+      "Transfer-Encoding: chunked\r\n".
+      "\r\n".
+      "-----------------boundary1xp6132872336bc4\r\n".
+      "Content-Disposition: form-data; name=\"name\"\r\n".
+      "\r\n".
+      "Test\r\n".
+      "-----------------boundary1xp6132872336bc4--\r\n",
+      $upload->finish()->content()
+    );
+  }
+
+  #[Test]
+  public function including_cookies() {
+    $upload= new RestUpload($this->newEndpoint(), new RestRequest('POST', '/'));
+    $upload->including(['session_id' => '1234'])->pass('name', 'Test');
+
+    Assert::equals(
+      "POST / HTTP/1.1\r\n".
+      "Connection: close\r\n".
+      "Host: test\r\n".
+      "Content-Type: multipart/form-data; boundary=---------------boundary1xp6132872336bc4\r\n".
+      "Transfer-Encoding: chunked\r\n".
+      "Cookie: session_id=1234\r\n".
+      "\r\n".
+      "-----------------boundary1xp6132872336bc4\r\n".
+      "Content-Disposition: form-data; name=\"name\"\r\n".
+      "\r\n".
+      "Test\r\n".
+      "-----------------boundary1xp6132872336bc4--\r\n",
+      $upload->finish()->content()
+    );
+  }
+
+  #[Test]
   public function transfer_file() {
     $upload= new RestUpload($this->newEndpoint(), new RestRequest('POST', '/'));
     $upload->transfer('file', new MemoryInputStream('Test'), 'test.txt');
