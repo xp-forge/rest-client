@@ -4,10 +4,12 @@ use io\streams\{InputStream, OutputStream};
 use util\MimeType;
 use webservices\rest\io\Parts;
 
+/** @test webservices.rest.unittest.RestUploadTest */
 class RestUpload {
-  const BOUNDARY = '---------------boundary1xp6132872336bc4';
+  const BOUNDARY= '---------------boundary1xp6132872336bc4';
 
-  private $endpoint, $parts;
+  private $endpoint, $request;
+  private $parts= null;
 
   /**
    * Creates a new upload instance
@@ -18,7 +20,24 @@ class RestUpload {
    */
   public function __construct($endpoint, $request) {
     $this->endpoint= $endpoint;
-    $this->parts= new Parts(self::BOUNDARY, $this->endpoint->open($request->with([
+    $this->request= $request;
+  }
+
+  /**
+   * Sets request timeouts for reading and connecting
+   *
+   * @param  ?float $read
+   * @param  ?float $connect
+   * @return self
+   */
+  public function waiting($read= null, $connect= null) {
+    $this->request->waiting($read, $connect);
+    return $this;
+  }
+
+  /** @return webservices.rest.io.Parts */
+  public function open() {
+    return new Parts(self::BOUNDARY, $this->endpoint->open($this->request->with([
       'Content-Type'      => ['multipart/form-data; boundary='.self::BOUNDARY],
       'Content-Length'    => [],
       'Transfer-Encoding' => ['chunked'],
@@ -33,6 +52,7 @@ class RestUpload {
    * @return self
    */
   public function pass($name, $value) {
+    $this->parts??= $this->open();
     $this->parts->begin(["Content-Disposition: form-data; name=\"{$name}\""]);
     $this->parts->write($value);
     return $this;
@@ -48,6 +68,7 @@ class RestUpload {
    * @return self
    */
   public function transfer($name, InputStream $in, $filename, $mime= null) {
+    $this->parts??= $this->open();
     $this->parts->begin([
       "Content-Disposition: form-data; name=\"{$name}\"; filename=\"{$filename}\"",
       'Content-Type: '.($mime ?? MimeType::getByFilename($filename))
@@ -67,6 +88,7 @@ class RestUpload {
    * @return io.streams.OutputStream
    */
   public function stream($name, $filename, $mime= null): OutputStream {
+    $this->parts??= $this->open();
     $this->parts->begin([
       "Content-Disposition: form-data; name=\"{$name}\"; filename=\"{$filename}\"",
       'Content-Type: '.($mime ?? MimeType::getByFilename($filename))
@@ -80,6 +102,7 @@ class RestUpload {
    * @return webservices.rest.RestResponse
    */
   public function finish() {
+    $this->parts??= $this->open();
     return $this->endpoint->finish($this->parts->finalize());
   }
 }
