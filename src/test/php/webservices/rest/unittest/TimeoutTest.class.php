@@ -5,7 +5,7 @@ use test\{Assert, Before, Test};
 use webservices\rest\{Endpoint, RestRequest};
 
 class TimeoutTest {
-  const API = 'https://api.example.com';
+  const API= 'https://api.example.com';
 
   private $endpoint, $conn;
 
