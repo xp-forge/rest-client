@@ -17,6 +17,19 @@ class RestUploadTest {
   }
 
   #[Test]
+  public function waiting() {
+    $conn= (new RestUpload($this->newEndpoint(), new RestRequest('POST', '/')))
+      ->waiting(600, 10)
+      ->open()
+      ->finalize()
+      ->connection()
+    ;
+
+    Assert::equals(600, $conn->getTimeout());
+    Assert::equals(10, $conn->getConnectTimeout());
+  }
+
+  #[Test]
   public function pass_parameter() {
     $upload= new RestUpload($this->newEndpoint(), new RestRequest('POST', '/'));
     $upload->pass('name', 'Test');
