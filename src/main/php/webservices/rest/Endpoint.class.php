@@ -57,12 +57,7 @@ class Endpoint implements Traceable {
     } else if ($user) {
       $this->headers['Authorization']= 'Bearer '.$user;
     }
-
-    $this->base= $uri->using()
-      ->authority(new Authority($authority->host(), $authority->port()))
-      ->path(rtrim($uri->path() ?? '', '/').'/')
-      ->create()
-    ;
+    $this->base= $uri->authenticated(null);
 
     $this->formats= $formats ?: Formats::defaults();
     $this->transfer= new Streamed($this);
@@ -159,7 +154,7 @@ class Endpoint implements Traceable {
    * @param  [:string] $segments
    * @return webservices.rest.RestResource
    */
-  public function resource($path, $segments= []) {
+  public function resource($path= '', $segments= []) {
     return new RestResource($this, $path, $segments);
   }
 
@@ -186,7 +181,8 @@ class Endpoint implements Traceable {
    * @return webservices.rest.io.Transmission
    */
   public function open(RestRequest $request) {
-    $target= $this->base->resolve($request->path());
+    $path= $request->path();
+    $target= '' === $path ? $this->base : $this->base->resolve($request->path());
     $conn= $this->connections->__invoke($target);
 
     // Use request timeouts if supplied, otherwise use those of the connection
