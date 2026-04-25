@@ -3,6 +3,10 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 6.4.0 / 2026-04-25
+
+* Made compatible with `xp-framework/http` version 11.0 - @thekid
+
 ## 6.3.0 / 2026-03-28
 
 * Merged PR #38: Add `with($headers)` and `including($cookies)` to RestUpload
