@@ -30,7 +30,7 @@ class TestEndpointTest {
       '/api/users/self' => function($call) {
         return $call->respond(307, 'Temporary Redirect', ['Location' => '/api/users/6100']);
       }
-    ], '/api');
+    ], '/api/');
     $r= $fixture->resource($resource)->get();
 
     Assert::equals(307, $r->status());

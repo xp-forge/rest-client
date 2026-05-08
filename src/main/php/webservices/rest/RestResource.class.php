@@ -21,7 +21,7 @@ class RestResource {
    * @param  string $path
    * @param  [:string] $segments
    */
-  public function __construct(Endpoint $endpoint, $path, $segments= []) {
+  public function __construct(Endpoint $endpoint, $path= '', $segments= []) {
     $this->endpoint= $endpoint;
     $this->target= $this->resolve($path, $segments, true);
   }
@@ -60,7 +60,7 @@ class RestResource {
 
   /** Returns target URI */
   public function uri(): URI {
-    return $this->endpoint->base()->resolve($this->target);
+    return '' === $this->target ? $this->endpoint->base() : $this->endpoint->base()->resolve($this->target);
   }
 
   /**
