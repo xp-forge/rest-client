@@ -32,7 +32,7 @@ class Transmission implements OutputStream {
    *
    * @param  string $bytes
    * @return int
-   * @throws io.IOException
+   * @throws io.OperationFailed
    */
   public function write($bytes) {
     $this->output ?? $this->start();
