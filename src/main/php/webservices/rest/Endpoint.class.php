@@ -225,7 +225,7 @@ class Endpoint implements Traceable {
       $reader= $this->transfer->reader($r, $output, $this->marshalling);
       return new RestResponse($r->statusCode(), $r->message(), $r->headers(), $reader, $transmission->target);
     } catch (Throwable $e) {
-      throw new RestException('Cannot send request', $e);
+      throw new RequestFailed($transmission->request(), $e);
     }
   }
 

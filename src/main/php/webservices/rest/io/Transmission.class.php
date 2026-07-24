@@ -22,6 +22,9 @@ class Transmission implements OutputStream {
   /** @return peer.http.HttpConnection */
   public function connection() { return $this->conn; }
 
+  /** @return peer.http.HttpRequest */
+  public function request() { return $this->request; }
+
   /** @return void */
   public function start() {
     $this->output= $this->conn->open($this->request);
