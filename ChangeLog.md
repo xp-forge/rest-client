@@ -3,6 +3,10 @@ Rest client change log
 
 ## ?.?.? / ????-??-??
 
+## 6.5.0 / 2026-10-17
+
+* Added compatibility with `xp-forge/json` version 7.0+ - @thekid
+
 ## 6.4.0 / 2026-04-25
 
 * Made compatible with `xp-framework/http` version 11.0 - @thekid

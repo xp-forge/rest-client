@@ -10,7 +10,7 @@
     "xp-framework/http": "^11.0 | ^10.0 | ^9.1",
     "xp-framework/logging": "^11.0 | ^10.0",
     "xp-framework/tokenize": "^9.0 | ^8.0",
-    "xp-forge/json": "^6.0 | ^5.0",
+    "xp-forge/json": "^7.0 | ^6.0 | ^5.0",
     "xp-forge/uri": "^3.0 | ^2.0",
     "xp-forge/marshalling": "^2.0",
     "xp-forge/compression": "^2.0 | ^1.0",
