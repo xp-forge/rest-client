@@ -94,12 +94,17 @@ class Cookies implements Value, IteratorAggregate {
   public function update($cookies) {
     foreach ($cookies as $name => $cookie) {
       if ($cookie instanceof Cookie) {
-        $domain= $cookie->domain() ?? '';
+        if (null === ($domain= $cookie->domain())) {
+          $match= '[^/]+';
+        } else if (0 === strncmp($domain, '.', 1)) {
+          $match= '.+'.preg_quote($domain);
+        } else {
+          $match= preg_quote($domain);
+        }
         $key= sprintf(
-          '#^%s://%s%s/%s#',
+          '#^%s://%s/%s#',
           $cookie->secure() ? 'https': 'https?',
-          0 === strncmp($domain, '.', 1) ? '.+' : '',
-          preg_quote($domain),
+          $match,
           ltrim($cookie->path() ?? '', '/')
         );
         if (null === ($value= $cookie->value())) {
