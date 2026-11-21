@@ -99,6 +99,16 @@ class RestResourceTest {
   }
 
   #[Test]
+  public function reset_cookies() {
+    Assert::equals(new Cookies([]), (new RestResource($this->endpoint(), '/'))
+      ->including(['lang' => 'de'])
+      ->including(null)
+      ->request('GET')
+      ->cookies()
+    );
+  }
+
+  #[Test]
   public function sending_type() {
     Assert::equals(
       ['Content-Type' => 'text/plain'],

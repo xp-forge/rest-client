@@ -121,11 +121,11 @@ class RestResource {
   /**
    * Includes given cookies. Encodes value using URL encoding.
    *
-   * @param  [:?string]|webservices.rest.Cookie[]|webservices.rest.Cookies $cookies
+   * @param  ?[:?string]|webservices.rest.Cookie[]|webservices.rest.Cookies $cookies
    * @return self
    */
   public function including($cookies) {
-    $this->cookies= $cookies;
+    $this->cookies= $cookies ?? [];
     return $this;
   }
 
