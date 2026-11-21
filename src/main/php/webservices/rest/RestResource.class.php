@@ -66,12 +66,16 @@ class RestResource {
   /**
    * Adds headers
    *
-   * @param  [:string] $headers
+   * @param  ?[:string] $headers
    * @return self
    */
   public function with($headers) {
-    foreach ($headers as $name => $value) {
-      $this->headers[$name]= $value;
+    if (null === $headers) {
+      $this->headers= [];
+    } else {
+      foreach ($headers as $name => $value) {
+        $this->headers[$name]= $value;
+      }
     }
     return $this;
   }
@@ -79,23 +83,38 @@ class RestResource {
   /**
    * Sets the media type to use as the "Content-Type" header
    *
-   * @param  string $type
+   * @param  ?string $type
    * @return self
    */
   public function sending($type) {
-    $this->headers['Content-Type']= $type;
+    if (null === $type) {
+      unset($this->headers['Content-Type']);
+    } else {
+      $this->headers['Content-Type']= $type;
+    }
     return $this;
   }
 
   /**
    * Adds a media type to the "Accept" header
    *
-   * @param  string $type
+   * @param  ?string|string[]|[:float] $arg
    * @param  ?float $q Optional q-value
    * @return self
    */
-  public function accepting($type, $q= null) {
-    $this->headers['Accept'][]= $type.(null === $q ? '' : ';q='.$q);
+  public function accepting($arg, $q= null) {
+    if (null === $arg) {
+      unset($this->headers['Accept']);
+    } else if (is_string($arg)) {
+      $this->headers['Accept']= [$arg.(null === $q ? '' : ';q='.$q)];
+    } else if (is_array($arg) && 0 === key($arg)) {
+      $this->headers['Accept']= $arg;
+    } else {
+      $this->headers['Accept']= [];
+      foreach ((array)$arg as $value => $q) {
+        $this->headers['Accept'][]= $value.(null === $q ? '' : ';q='.$q);
+      }
+    }
     return $this;
   }
 
